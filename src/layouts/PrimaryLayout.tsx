@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import type {ReactNode} from "react";
+import SideBar from "../components/SideBar.tsx";
+import {MobileNotificationProvider} from "../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   position: absolute;
@@ -13,13 +15,30 @@ const Wrapper = styled.div`
   justify-content: space-evenly;
   align-items: center;
   
-  background-color: white;
+  padding: 10dvh 0;
+  
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+`;
+
+const ContentWrapper = styled.div`
+  height: 100%;
+  width: 65dvw;
+  
+  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  border-radius: 18px;
+  
+  overflow: hidden;
 `;
 
 function PrimaryLayout({ children } : { children: ReactNode }) {
- return (
+  return (
    <Wrapper>
-     {children}
+     <MobileNotificationProvider>
+       <SideBar />
+       <ContentWrapper>
+         {children}
+       </ContentWrapper>
+     </MobileNotificationProvider>
    </Wrapper>
  );
 }

@@ -1,0 +1,634 @@
+import {
+  getStayApply,
+  getStayList,
+  type Outing,
+  type StayApply,
+  type StayListItem,
+  updateStayApply
+} from "../../api/stay.ts";
+import styled from "styled-components";
+import {useEffect, useRef, useState} from "react";
+import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
+import Loading from "../../components/Loading.tsx";
+import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
+import {ExportStayAppliesToDocx} from "../../utils/stay2docx.ts";
+import {sha256} from "../../utils/sha256.ts";
+import {genTable} from "../../utils/staySeatUtil.ts";
+import {Input} from "../../styles/components/input.ts";
+import CheckBoxOn from "../../assets/icons/checkbox/check_box_checked.svg?react"
+import {Button, LightButton} from "../../styles/components/button.ts";
+import {makeid} from "../../utils/makeid.ts";
+
+const Wrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  
+  display: flex;
+  flex-direction: row;
+  
+  gap: 2dvh;
+  
+  padding: 2dvh 2dvh;
+`;
+
+const StayApplyContainer = styled.div`
+  height: 100%;
+  width: 65%;
+  
+  display: flex;
+  flex-direction: column;
+  
+  gap: 1dvh;
+  padding: 1dvh 1dvh;
+  
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  border-radius: 8px;
+  
+  overflow-y: scroll;
+`;
+
+const ControllerContainer = styled.div`
+  flex: 1;
+  
+  display: flex;
+  flex-direction: column;
+
+  gap: 2dvh;
+  
+  color: ${({theme}) => theme.Colors.Content.Primary};
+`;
+
+const StretchContainer = styled.div`
+  flex: 1;
+  width: 100%;
+  
+  border-radius: 8px;
+
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  padding: 2dvh 2dvh;
+`;
+
+const FitContainer = styled.div`
+  height: fit-content;
+  width: 100%;
+  
+  border-radius: 8px;
+
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  padding: 2dvh 2dvh;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 2dvh;
+`;
+
+const NoApply = styled.div`
+  height: 100%;
+  width: 100%;
+  
+  text-align: center;
+  align-content: center;
+  
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Title.size};
+`;
+
+const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
+  height: auto;
+  width: 100%;
+
+  max-height: ${({
+                   opened,
+                   outingCount
+                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 3dvh + 3dvh + 6dvh)` : "8dvh"};
+    // max-height: ${({opened}) => opened ? "inherit" : "8dvh"};
+  flex: 0 0 auto;
+
+  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+
+  border-radius: 6px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 0 1dvw 2dvh;
+  transition: max-height 0.3s ease;
+  will-change: max-height;
+  overflow: hidden;
+
+  > button {
+    display: block;
+    flex: 0 0 auto;
+
+    height: 3dvh;
+    padding: 0;
+
+    margin-top: 2dvh;
+  }
+`;
+
+const StayApplyCardSummary = styled.div`
+  height: 8dvh;
+  width: 100%;
+
+  flex: 0 0 auto;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  
+  > .left {
+    align-content: center;
+
+    font-size: ${({theme}) => theme.Font.Title.size};
+  }
+
+  > .right {
+    flex: 1;
+
+    text-align: right;
+    align-content: center;
+    color: ${({theme}) => theme.Colors.Content.Secondary};
+  }
+`;
+
+const StayApplyDetail = styled.div`
+  flex: 0 0 auto;
+  
+  height: fit-content;
+  width: 100%;
+`;
+
+
+const SeatBox = styled.div`
+  flex: 0 0 auto;
+
+  height: 25dvh;
+  width: 100%;
+  
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  border-radius: 8px;
+  
+  overflow: scroll;
+`;
+
+const SeatRow = styled.div<{seat: string | null}>`
+  width: fit-content;
+  
+  white-space: nowrap;
+  
+  > span {
+    display: inline-block;
+    
+    width: 4.5dvw;
+    
+    padding: 12px 0;
+    margin: 8px;
+    
+    background-color: ${({theme}) => theme.Colors.Background.Primary};
+    border-radius: 8px;
+    
+    text-align: center;
+  }
+  
+  > span.inactive {
+    filter: blur(1.2px) brightness(90%);
+  }
+  
+  > span.taken {
+    color: white;
+    background-color: ${({theme}) => theme.Colors.Solid.Black};
+  }
+  
+  > span:active {
+    background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed};
+  }
+  
+  > span#${({seat}) => seat} {
+    color: white;
+    
+    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  }
+`;
+
+const OutingBox = styled.div`
+  flex: 0 0 auto;
+  
+  height: 15dvh;
+  width: 100%;
+  
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  border-radius: 8px;
+  margin-top: 2dvh;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  
+  font-size: ${({theme}) => theme.Font.Body.size};
+  
+  input {
+    height: 3dvh;
+    padding: 0;
+
+    //border: none;
+    font-size: ${({theme}) => theme.Font.Callout.size};
+    text-align: center;
+    background-color: inherit;
+  }
+
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(${window.matchMedia("(prefers-color-scheme: dark)").matches ? 1 : 0});
+  }
+`;
+
+const InputRow = styled.div<{width?: string}>`
+  width: ${({width}) => width || "100%"};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CheckBox = styled.div<{ canceled: boolean }>`
+  height: 3vh;
+  width: 32%;
+  
+  border-radius: 12px;
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
+  line-height: ${({theme}) => theme.Font.Paragraph_Large.lineHeight};
+  font-weight: ${({theme, canceled}) => canceled ? theme.Font.Paragraph_Large.weight.regular : theme.Font.Paragraph_Large.weight.weak};
+  transition: border-color 0.3s ease, font-weight 0.3s ease;
+  
+  display: flex;
+  gap: 6%;
+  align-items: center;
+  justify-content: center;
+  
+  path {
+    fill: ${({theme, canceled}) => canceled ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Quaternary};
+    transition: fill 0.3s ease;
+  }
+`;
+
+const StayCard = styled.div<{current: boolean}>`
+  height: 12%;
+  width: 100%;
+  
+  border-radius: 6px;
+  background-color: ${({theme, current}) => current ? theme.Colors.Background.Tertiary : theme.Colors.Background.Primary};
+  
+  font-size: ${({theme}) => theme.Font.Headline.size};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  
+  text-align: center;
+  align-content: center;
+  
+  transition: background-color 200ms ease;
+`;
+
+const ExportButton = styled.div`
+  height: 5dvh;
+  width: 100%;
+  
+  text-align: center;
+  align-content: center;
+  
+  background-color: ${({theme}) => theme.Colors.Components.Fill.Primary};
+  border-radius: 8px;
+`;
+
+const SelectionRow = styled.div`
+  margin-left: 2%;
+  
+  height: 3dvh;
+  width: 18%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border-radius: 12px;
+  
+  overflow: hidden;
+`;
+
+const SelectionItem = styled.div<{ boundState: boolean | null, middle?: boolean, selected: boolean }>`
+  flex: 1;
+  
+  height: 100%;
+  
+  text-align: center;
+  align-content: center;
+  
+  border-left: ${({theme, middle}) => middle ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
+  border-right: ${({theme, middle}) => middle ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
+  
+  background-color: ${({theme, selected, boundState}) => 
+    selected ? 
+        boundState === true ? theme.Colors.Core.Status.Positive :
+        boundState === false ? theme.Colors.Core.Status.Negative :
+          theme.Colors.Core.Status.Warning
+      : "none"
+  };
+`;
+
+const DeleteBtn = styled.div`
+  height: 3dvh;
+  width: 7%;
+  
+  text-align: center;
+  align-content: center;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
+  
+  border: 1px solid ${({theme}) => theme.Colors.Solid.Red};
+  border-radius: 12px;
+  
+  margin-left: 1%;
+`;
+
+function ApplyStayPage() {
+  const { showToast } = useNotification();
+
+  const seatRef = useRef<HTMLSpanElement | null>(null);
+  const seatBoxRef = useRef<HTMLDivElement | null>(null);
+
+  const [isClosing, setIsClosing] = useState<boolean>(false);
+  const [filterText, setFilterText] = useState<string>("");
+
+  const [stayList, setStayList] = useState<StayListItem[] | null>(null);
+  const [currentStay, setCurrentStay] = useState<string | null>(null);
+  const [stayApplies, setStayApplies] = useState<StayApply[] | null>(null);
+
+  const [selectedApply, setSelectedApply] = useState<StayApply | null>(null);
+  const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
+
+  const updateScreen = () => {
+    getStayList().then((res1) => {
+      setStayList(res1);
+      if (res1.length > 0) {
+        setCurrentStay(res1[0].id);
+        getStayApply(res1[0].id).then((res2) => {
+          console.log(res2)
+          setStayApplies(res2);
+        }).catch((e) => {
+          showToast(e.response.data.error.message || e.response.data.error, "danger");
+        });
+      }
+    }).catch((e) => {
+      console.log(e);
+      showToast(e.response.data.error.message || e.response.data.error, "danger");
+    });
+  }
+
+  const close = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      setSelectedApply(null);
+      setSelectedApplyChecksum(null);
+    }, 300)
+  }
+
+  const openEditor = (apply: StayApply) => {
+    if (selectedApply === null) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const merged = apply.stay_seat + apply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+      sha256(merged).then((data) => {
+        setSelectedApplyChecksum(data);
+        setSelectedApply(apply);
+      });
+      return;
+    }
+
+    if (selectedApply.id === apply.id) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+      sha256(merged).then((data) => {
+        if (data !== selectedApplyChecksum) {
+          if (confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
+            close();
+          }
+        }else {
+          close();
+        }
+      });
+    }else {
+      sha256(merged).then((data) => {
+        if (data !== selectedApplyChecksum) {
+          if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
+            close();
+          }
+        }else {
+          close();
+        }
+        openEditor(apply);
+      });
+    }
+  }
+
+  const edit = () => {
+    updateStayApply({...selectedApply, stay: currentStay, user: selectedApply?.user.id}).then(() => {
+      showToast("성공했습니다.", "info");
+      close();
+      updateScreen();
+    }).catch((e) => {
+      console.log(e);
+      showToast(e.response.data.error.message || e.response.data.error, "danger");
+    });
+  }
+
+  useEffect(() => {
+    updateScreen();
+  }, []);
+
+  useEffect(() => {
+    if (seatBoxRef.current && seatRef.current) {
+      const box = seatBoxRef.current;
+      const seat = seatRef.current;
+
+      box.scrollTo({
+        top: seat.offsetTop - box.clientHeight / 2 + seat.clientHeight / 2 - box.offsetTop,
+        left: seat.offsetLeft - box.clientWidth / 2 + seat.clientWidth / 2 - box.offsetLeft,
+        behavior: "smooth"
+      });
+    }
+  }, [selectedApply]);
+
+  return (
+    <Wrapper>
+      <StayApplyContainer>
+        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1).map((apply) => {
+          return (
+            <StayApplyCard
+              opened={!isClosing && !!selectedApply && apply.id === selectedApply.id}
+              outingCount={(selectedApply ? selectedApply.outing.length : null) || apply.outing.length}>
+              <StayApplyCardSummary>
+                <div className="left" onClick={(e) => {
+                  if (e.currentTarget === e.target) {
+                    openEditor(apply);
+                  }
+                }}>
+                  {apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}
+                </div>
+                <div className="right" onClick={(e) => {
+                  if (e.currentTarget === e.target) {
+                    openEditor(apply);
+                  }
+                }}>
+                  외출 {apply.outing.length}건
+                </div>
+              </StayApplyCardSummary>
+              {selectedApply && selectedApply.id === apply.id ? (
+                <>
+                  <StayApplyDetail>
+                    <SeatBox ref={seatBoxRef}>
+                      {genTable().map((row) => (
+                        <SeatRow seat={selectedApply.stay_seat}>
+                          {row.map((seat) => {
+                            const taken = stayApplies.find((sapply) => sapply.stay_seat === seat && sapply.stay_seat !== selectedApply.stay_seat);
+                            return (
+                              <span
+                                id={seat}
+                                ref={selectedApply.stay_seat === seat ? seatRef : null}
+                                className={["active", taken ? "taken" : "notTaken"].join(" ")}
+                                onClick={() => {setSelectedApply((p) => { return { ...p!, stay_seat: seat } })}}>
+                              {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
+                            </span>
+                            );
+                          })}
+                        </SeatRow>
+                      ))}
+                    </SeatBox>
+                  </StayApplyDetail>
+                  {selectedApply.outing.map((outing) => {
+                    const modify = (deleteTarget?: Outing) => {
+                      setSelectedApply((p) => {
+                        if (deleteTarget)
+                          return { ...p!, outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id) };
+                        else
+                          return { ...p!, outing: [...p!.outing.filter((p2) => p2.id !== outing.id), outing] };
+                      });
+                    }
+
+                    return (
+                      <OutingBox>
+                        <InputRow>
+                          <Input type={"text"}
+                                 style={{width: "62%"}}
+                                 onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
+                                 value={outing.reason}/>
+                          <SelectionRow>
+                            <SelectionItem selected={outing.approved === true}
+                                           boundState={true}
+                                            onClick={() => {outing.approved = true; modify();}}>
+                              허가
+                            </SelectionItem>
+                            <SelectionItem selected={outing.approved === null}
+                                           boundState={null}
+                                           middle={true}
+                                           onClick={() => {outing.approved = null; modify();}}>
+                              검토
+                            </SelectionItem>
+                            <SelectionItem selected={outing.approved === false}
+                                           boundState={false}
+                                           onClick={() => {outing.approved = false; modify();}}>
+                              불허
+                            </SelectionItem>
+                          </SelectionRow>
+                          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                          {/* @ts-ignore */}
+                          <DeleteBtn onClick={() => {modify(outing)}}>
+                            삭제
+                          </DeleteBtn>
+                        </InputRow>
+                        <InputRow>
+                          <Input type={"datetime-local"}
+                                 onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
+                                 onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                                 value={outing.from.split(/[+Z]/)[0]}/>
+                          <p>부터&nbsp;&nbsp;</p>
+                          <Input type={"datetime-local"}
+                                 onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
+                                 onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                                 value={outing.to.split(/[+Z]/)[0]}/>
+                          <p>까지</p>
+                        </InputRow>
+                        <InputRow>
+                          <CheckBox canceled={outing.breakfast_cancel}
+                                    onClick={() => {outing.breakfast_cancel = !outing.breakfast_cancel; modify()}}>
+                            <CheckBoxOn />
+                            <p>아침 취소</p>
+                          </CheckBox>
+                          &nbsp;&nbsp;
+                          <CheckBox canceled={outing.lunch_cancel}
+                                    onClick={() => {outing.lunch_cancel = !outing.lunch_cancel; modify()}}>
+                            <CheckBoxOn />
+                            <p>점심 취소</p>
+                          </CheckBox>
+                          &nbsp;&nbsp;
+                          <CheckBox canceled={outing.dinner_cancel}
+                                    onClick={() => {outing.dinner_cancel = !outing.dinner_cancel; modify()}}>
+                            <CheckBoxOn />
+                            <p>저녁 취소</p>
+                          </CheckBox>
+                        </InputRow>
+                      </OutingBox>
+                    )
+                  })}
+                </>
+              ) : null}
+              <LightButton type={"yellow"} onClick={() => {
+                setSelectedApply((p) => {
+                  return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
+                });
+              }}>외출추가</LightButton>
+              <Button onClick={() => edit()}>수정하기</Button>
+            </StayApplyCard>
+          );
+        }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
+      </StayApplyContainer>
+      <ControllerContainer>
+        <StretchContainer>
+          <p style={{marginBottom: "8px"}}>잔류 대상</p>
+          {stayList !== null ? stayList.map((apply) => {
+            return (
+              <StayCard current={apply.id === currentStay}>
+                {apply.name}
+              </StayCard>
+            );
+          }) : Loading()}
+        </StretchContainer>
+        <FitContainer>
+          <Input type={"text"}
+                 onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
+                 placeholder={"검색할 문자열을 입력하세요."}
+                 value={filterText}/>
+        </FitContainer>
+        <FitContainer>
+          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToExcel(stayApplies) : () => {}}>
+            일반 잔류자 명단 내보내기
+          </ExportButton>
+          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToDocx(stayApplies, { masking: true }) : () => {}}>
+            급식실용 잔류자 명단 내보내기
+          </ExportButton>
+          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToDocx(stayApplies) : () => {}}>
+            생활관용 잔류자 명단 내보내기
+          </ExportButton>
+        </FitContainer>
+      </ControllerContainer>
+    </Wrapper>
+  );
+}
+
+export default ApplyStayPage;

@@ -24,15 +24,11 @@ const GlobalStyle = createGlobalStyle`
   html, body {
     margin: 0;
     padding: 0;
-    color-scheme: light !important;
-    font-family: "Pretendard Variable", Pretendard, -apple-system,
-    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
-    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 
     font-size: clamp(0.5rem, 1.5vh, 1rem);
+    font-family: Pretendard, sans-serif;
   }
-
+  
   a {
     color: inherit;
     text-decoration: none;

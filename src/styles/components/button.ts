@@ -25,11 +25,11 @@ export const Button = styled.button<ButtonProps & {type?: "primary" | "normal" |
         cursor: not-allowed;
     }
 `;
-export const LightButton = styled.button<ButtonProps & {type?: "primary" | "danger"}>`
+export const LightButton = styled.button<ButtonProps & {type?: "primary" | "danger" | "yellow"}>`
     padding: 16px 20px;
     border-radius: 12px;
-    border: 1px solid ${({theme, type}) => type === "danger" ? theme.Colors.Solid.Red : theme.Colors.Solid.White};
-    background-color: ${({theme, type}) => type === "danger" ? theme.Colors.Solid.Translucent.Red : theme.Colors.Core.Brand.Secondary};
+    border: 1px solid ${({theme, type}) => type === "danger" ? theme.Colors.Solid.Red : type === "yellow" ? theme.Colors.Solid.Yellow : theme.Colors.Solid.White};
+    background-color: ${({theme, type}) => type === "danger" ? theme.Colors.Solid.Translucent.Red : type === "yellow" ? theme.Colors.Solid.Translucent.Yellow : theme.Colors.Core.Brand.Secondary};
     color: ${({theme, type}) => type === "danger" ? theme.Colors.Solid.Red : theme.Colors.Solid.White};
     width: ${({width}) => width || "100%"};
 

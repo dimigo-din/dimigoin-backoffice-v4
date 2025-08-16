@@ -1,4 +1,5 @@
 import {getInstance} from "./client.ts";
+import {getPersonalInformation, type PersonalInformation} from "./auth.ts";
 
 const client = getInstance();
 
@@ -90,7 +91,7 @@ export type StayApply = {
     dinner_cancel: boolean;
     from: string;
     to: string;
-    approved: boolean;
+    approved: boolean | null;
     audit_reason: string;
   }[];
   user: {
@@ -98,7 +99,7 @@ export type StayApply = {
     email: string;
     name: string;
     permission: string;
-  }
+  } & PersonalInformation;
 }
 
 export type StayApplyPayload = {
@@ -189,7 +190,10 @@ export async function deleteStay(id: string): Promise<Stay> {
 }
 
 export async function getStayApply(id: string): Promise<StayApply[]> {
-  return (await client.get("/manage/stay/apply?id="+id)).data;
+  const apply: StayApply[] = (await client.get("/manage/stay/apply?id="+id)).data;
+  const users: string[] = apply.map((a) => a.user.email);
+  const personalInformation = await getPersonalInformation(users);
+  return apply.map((a, i) => { return {...a,  user: {...a.user, ...personalInformation[i]}}; });
 }
 
 export async function createStayApply(payload: StayApplyPayload): Promise<StayApply> {

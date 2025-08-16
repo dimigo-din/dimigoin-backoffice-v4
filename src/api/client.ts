@@ -5,7 +5,7 @@ let instance: AxiosInstance;
 export function getInstance(): AxiosInstance {
   if (!instance) {
     instance = axios.create({
-      baseURL: location.host === "dimigoin.io" ? 'https://api.dimigoin.io' : "http://localhost:3000",
+      baseURL: location.host === "admin.dimigoin.io" ? 'https://api.dimigoin.io' : "http://localhost:3000",
       timeout: 5000,
       withCredentials: true,
     });
@@ -19,6 +19,7 @@ export function getInstance(): AxiosInstance {
           instance.post("/auth/refresh").then(() => {
             resolve(instance(err.config));
           }).catch(() => {
+            localStorage.clear();
             location.href = "/login"
             reject(err);
           });

@@ -32,11 +32,12 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
 }
 
 export async function logout(): Promise<void> {
+  localStorage.clear();
   await client.get("/logout");
 }
 
 export async function getPersonalInformation(email: string[]): Promise<PersonalInformation[]> {
-  const res: {gender: "male" | "female", mail: string, name: string, number: string}[] = (await axios.get("https://dimiauth.findflag.kr/personalInformation", { headers: { "Authorization": localStorage.getItem("personalInformationKey") }, data: JSON.stringify({mail: email}) })).data;
+  const res: {gender: "male" | "female", mail: string, name: string, number: string}[] = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   return res.map((personalInformation): PersonalInformation => {
     const parsedNumber = {
       grade: parseInt(personalInformation.number.substring(0, 1)),
