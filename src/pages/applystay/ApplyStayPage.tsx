@@ -424,6 +424,9 @@ function ApplyStayPage() {
         }
       });
     }else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
       sha256(merged).then((data) => {
         if (data !== selectedApplyChecksum) {
           if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
@@ -438,7 +441,9 @@ function ApplyStayPage() {
   }
 
   const edit = () => {
-    updateStayApply({...selectedApply, stay: currentStay, user: selectedApply?.user.id}).then(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    updateStayApply({...selectedApply, stay: currentStay!, user: selectedApply!.user.id}).then(() => {
       showToast("성공했습니다.", "info");
       close();
       updateScreen();
@@ -589,6 +594,8 @@ function ApplyStayPage() {
                 </>
               ) : null}
               <LightButton type={"yellow"} onClick={() => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 setSelectedApply((p) => {
                   return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
                 });

@@ -100,7 +100,7 @@ function SideBar() {
       </UserWrapper>
       <Divider />
       <Menu>
-        {Object.keys(menuList).map((item, i) => (
+        {Object.keys(menuList).map((item) => (
           <MenuItem onClick={() => navigate(`/${item}`)} selected={location.pathname.startsWith(`/${item}`)}>
             {menuList[item as keyof typeof menuList]}
           </MenuItem>
