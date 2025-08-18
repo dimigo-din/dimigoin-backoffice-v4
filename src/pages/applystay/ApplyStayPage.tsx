@@ -302,11 +302,11 @@ const ExportButton = styled.div`
   border-radius: 8px;
 `;
 
-const SelectionRow = styled.div`
-  margin-left: 2%;
+const SelectionRow = styled.div<{ height?: string, width?: string }>`
+  margin-left: ${({width}) => width ? "none" : "2%"};
   
-  height: 3dvh;
-  width: 18%;
+  height: ${({height}) => height || "3dvh"};
+  width: ${({width}) => width || "18%"};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -319,7 +319,7 @@ const SelectionRow = styled.div`
   overflow: hidden;
 `;
 
-const SelectionItem = styled.div<{ boundState: boolean | null, middle?: boolean, selected: boolean }>`
+const SelectionItem = styled.div<{ boundState?: boolean | null, border?: boolean, selected: boolean }>`
   flex: 1;
   
   height: 100%;
@@ -327,14 +327,14 @@ const SelectionItem = styled.div<{ boundState: boolean | null, middle?: boolean,
   text-align: center;
   align-content: center;
   
-  border-left: ${({theme, middle}) => middle ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
-  border-right: ${({theme, middle}) => middle ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
+  border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
   
   background-color: ${({theme, selected, boundState}) => 
     selected ? 
         boundState === true ? theme.Colors.Core.Status.Positive :
         boundState === false ? theme.Colors.Core.Status.Negative :
-          theme.Colors.Core.Status.Warning
+        boundState === null ? theme.Colors.Core.Status.Warning :
+          theme.Colors.Core.Brand.Primary
       : "none"
   };
 `;
@@ -363,6 +363,7 @@ function ApplyStayPage() {
 
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
+  const [filterState, setFilterState] = useState<boolean | null | undefined>(undefined);
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStay, setCurrentStay] = useState<string | null>(null);
@@ -473,7 +474,7 @@ function ApplyStayPage() {
   return (
     <Wrapper>
       <StayApplyContainer>
-        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1).map((apply) => {
+        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 && (filterState === undefined || a.outing.some((o) => o.approved === filterState))).map((apply) => {
           return (
             <StayApplyCard
               opened={!isClosing && !!selectedApply && apply.id === selectedApply.id}
@@ -541,12 +542,13 @@ function ApplyStayPage() {
                             </SelectionItem>
                             <SelectionItem selected={outing.approved === null}
                                            boundState={null}
-                                           middle={true}
+                                           border={true}
                                            onClick={() => {outing.approved = null; modify();}}>
                               검토
                             </SelectionItem>
                             <SelectionItem selected={outing.approved === false}
                                            boundState={false}
+                                           border={true}
                                            onClick={() => {outing.approved = false; modify();}}>
                               불허
                             </SelectionItem>
@@ -617,10 +619,32 @@ function ApplyStayPage() {
           }) : Loading()}
         </StretchContainer>
         <FitContainer>
-          <Input type={"text"}
+          <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 문자열을 입력하세요."}
                  value={filterText}/>
+          <SelectionRow height={"4dvh"} width={"100%"}>
+            <SelectionItem boundState={true}
+                           selected={filterState === true}
+                           onClick={() => setFilterState(true)}>
+              허가
+            </SelectionItem>
+            <SelectionItem boundState={null}
+                           selected={filterState === null}
+                           onClick={() => setFilterState(null)}>
+              검토
+            </SelectionItem>
+            <SelectionItem boundState={false}
+                           selected={filterState === false}
+                           onClick={() => setFilterState(false)}>
+              불허
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterState === undefined}
+                           onClick={() => setFilterState(undefined)}>
+              모두
+            </SelectionItem>
+          </SelectionRow>
         </FitContainer>
         <FitContainer>
           <ExportButton onClick={() => stayApplies ? ExportStayAppliesToExcel(stayApplies) : () => {}}>
