@@ -81,11 +81,16 @@ function SideBar() {
   } as const;
 
   useEffect(() => {
-    if (!location.pathname.startsWith("/login"))
-      ping();
+    if (!location.pathname.startsWith("/login")) {
+      ping()
+    }
   }, []);
 
-  if (!localStorage.getItem("name")) return null;
+  if (!location.pathname.startsWith("/login") && !localStorage.getItem("name")) {
+    location.href = "/login";
+  }else if (location.pathname.startsWith("/login")) {
+    return null;
+  }
 
   return (
     <Wrapper>
