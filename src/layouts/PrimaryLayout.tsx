@@ -22,7 +22,7 @@ const Wrapper = styled.div`
 
 const ContentWrapper = styled.div`
   height: 100%;
-  width: 65dvw;
+  width: 70dvw;
   
   background-color: ${({theme}) => theme.Colors.Background.Primary};
   border-radius: 18px;
