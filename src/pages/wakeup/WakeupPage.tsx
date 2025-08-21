@@ -161,6 +161,7 @@ function WakeupPage() {
     if (!confirm("확정하시겠습니까?")) return;
     selectWakeupSong(id).then(() => {
       showToast("성공했습니다.", "info");
+      window.open(`https://www.youtube.com/watch?v=${applies?.find((a) => a.id === id)!.video_id}`, "_blank")
       updateScreen();
     }).catch((e) => {
       console.log(e);

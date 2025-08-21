@@ -1,4 +1,5 @@
 import {
+  createStayApply, deleteStayApply,
   getStayApply,
   getStayList,
   type Outing,
@@ -6,6 +7,8 @@ import {
   type StayListItem,
   updateStayApply
 } from "../../api/stay.ts";
+import { searchUser, type User } from "../../api/user.ts";
+import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
 import styled from "styled-components";
 import {useEffect, useRef, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
@@ -100,7 +103,7 @@ const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
   max-height: ${({
                    opened,
                    outingCount
-                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 3dvh + 3dvh + 6dvh)` : "8dvh"};
+                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 3dvh + 3dvh + 5dvh + 6dvh)` : "8dvh"};
     // max-height: ${({opened}) => opened ? "inherit" : "8dvh"};
   flex: 0 0 auto;
 
@@ -241,7 +244,7 @@ const OutingBox = styled.div`
   }
 
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(${window.matchMedia("(prefers-color-scheme: dark)").matches ? 1 : 0});
+    filter: ${window.matchMedia("(prefers-color-scheme: dark)").matches ? "invert(1)" : "none"};
   }
 `;
 
@@ -355,6 +358,43 @@ const DeleteBtn = styled.div`
   margin-left: 1%;
 `;
 
+const InputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const SuggestBox = styled.div`
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 30dvh;
+  overflow-y: auto;
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  z-index: 20;
+  min-width: 36rem;
+  max-width: 80dvw;
+`;
+
+const SuggestItem = styled.div`
+  padding: 10px 12px;
+  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+
+  &:hover { background-color: ${({theme}) => theme.Colors.Components.Interaction.Hover}; }
+  &:active { background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed}; }
+
+  .meta { color: ${({theme}) => theme.Colors.Content.Tertiary}; font-size: ${({theme}) => theme.Font.Footnote.size}; }
+`;
+
 function ApplyStayPage() {
   const { showToast } = useNotification();
 
@@ -364,6 +404,10 @@ function ApplyStayPage() {
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
   const [filterState, setFilterState] = useState<boolean | null | undefined>(undefined);
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false);
+  const [nameSearch, setNameSearch] = useState<string>("");
+  const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
+  const [nameLoading, setNameLoading] = useState<boolean>(false);
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStay, setCurrentStay] = useState<string | null>(null);
@@ -442,6 +486,26 @@ function ApplyStayPage() {
   }
 
   const edit = () => {
+    if (selectedApply?.id === "new") {
+      createStayApply({
+        stay: currentStay!,
+        user: selectedApply.user.id,
+        outing: selectedApply.outing,
+        stay_seat: selectedApply.stay_seat,
+      }).then(() => {
+        showToast("성공했습니다.", "info");
+        setNameLoading(false);
+        setNameResults([]);
+        setSelectedApply(null);
+        setSelectedApplyChecksum(null);
+        updateScreen();
+      }).catch((e) => {
+        console.log(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     updateStayApply({...selectedApply, stay: currentStay!, user: selectedApply!.user.id}).then(() => {
@@ -454,9 +518,50 @@ function ApplyStayPage() {
     });
   }
 
+  const deleteApply = (id: string) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    deleteStayApply(id).then(() => {
+      showToast("성공했습니다.", "info");
+      updateScreen();
+    }).catch((e) => {
+      console.log(e);
+      showToast(e.response.data.error.message || e.response.data.error, "danger");
+    });
+  }
+
   useEffect(() => {
     updateScreen();
   }, []);
+
+  useEffect(() => {
+    setIsSuggestOpen(!!nameSearch);
+  }, [nameSearch]);
+
+  useEffect(() => {
+    if (!nameSearch) { setNameResults([]); return; }
+    let alive = true;
+    const t = setTimeout(async () => {
+      try {
+        setNameLoading(true);
+        const res = await searchUser(nameSearch);
+        if (!alive) return;
+        if (res) {
+          getPersonalInformation(res.map((r) => r.email)).then((u) => {
+            setNameResults(res.map((r, i) => { return u[i] ? { ...r, ...u[i] } : null; }) as (User & PersonalInformation)[]);
+          });
+        }else {
+          setNameResults([]);
+        }
+      } catch (e) {
+        console.log(e);
+        setNameResults([]);
+      } finally {
+        setNameLoading(false);
+      }
+    }, 180);
+    return () => { alive = false; clearTimeout(t); };
+  }, [nameSearch]);
 
   useEffect(() => {
     if (seatBoxRef.current && seatRef.current) {
@@ -470,6 +575,7 @@ function ApplyStayPage() {
       });
     }
   }, [selectedApply]);
+
 
   return (
     <Wrapper>
@@ -485,7 +591,70 @@ function ApplyStayPage() {
                     openEditor(apply);
                   }
                 }}>
-                  {apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}
+                  {apply.id === "new" ? (
+                    <InputWrapper>
+                      <Input
+                        type={"search"}
+                        onFocus={() => setIsSuggestOpen(!!nameSearch)}
+                        onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
+                        onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
+                        placeholder={"이름으로 검색하세요."}
+                        value={nameSearch}
+                      />
+                      {isSuggestOpen && (
+                        <SuggestBox>
+                          {nameLoading && (
+                            <SuggestItem key="loading" onMouseDown={(e) => e.preventDefault()}>
+                              <span>검색 중…</span>
+                              <span className="meta">잠시만요</span>
+                            </SuggestItem>
+                          )}
+                          {!nameLoading && nameResults.filter((u) => u).slice(0, 12).map((u) => {
+                            const already = stayApplies?.find((sa) => sa.user && sa.user.id === u.id);
+                            return (
+                              <SuggestItem
+                                key={u.id}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  if (already) {
+                                    setSelectedApply(already);
+                                    setIsSuggestOpen(false);
+                                    setNameSearch("");
+                                    openEditor(already);
+                                    return;
+                                  }
+                                  const newApply = {
+                                    id: "new",
+                                    stay_seat: null,
+                                    outing: [],
+                                    user: u,
+                                  } as unknown as StayApply;
+                                  console.log(newApply);
+                                  setStayApplies((p) => {
+                                    const filtered = p ? p.filter((x) => x.id !== "new") : [];
+                                    return [newApply, ...filtered];
+                                  });
+                                  setSelectedApply(newApply);
+                                  setIsSuggestOpen(false);
+                                  setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
+                                }}
+                              >
+                                <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
+                              </SuggestItem>
+                            );
+                          })}
+                          {!nameLoading && nameResults.length === 0 && nameSearch && (
+                            <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
+                              <span>검색 결과가 없습니다</span>
+                              <span className="meta">다른 키워드를 입력해 보세요</span>
+                            </SuggestItem>
+                          )}
+                        </SuggestBox>
+                      )}
+                    </InputWrapper>
+                  ) : (
+                    <>{apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}</>
+                  )}
                 </div>
                 <div className="right" onClick={(e) => {
                   if (e.currentTarget === e.target) {
@@ -523,7 +692,11 @@ function ApplyStayPage() {
                         if (deleteTarget)
                           return { ...p!, outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id) };
                         else
-                          return { ...p!, outing: [...p!.outing.filter((p2) => p2.id !== outing.id), outing] };
+                          return { ...p!, outing: p!.outing.map((o) => {
+                              return o.id === outing.id ? {
+                                ...outing
+                              } : o;
+                            }) };
                       });
                     }
 
@@ -602,6 +775,7 @@ function ApplyStayPage() {
                   return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
                 });
               }}>외출추가</LightButton>
+              <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
               <Button onClick={() => edit()}>수정하기</Button>
             </StayApplyCard>
           );
@@ -618,6 +792,15 @@ function ApplyStayPage() {
             );
           }) : Loading()}
         </StretchContainer>
+        <FitContainer>
+          <Button onClick={() => {
+            const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            setStayApplies((p) => [newApply, ...(p || [])]);
+            setSelectedApply(newApply);
+          }}>잔류자 추가하기</Button>
+        </FitContainer>
         <FitContainer>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}

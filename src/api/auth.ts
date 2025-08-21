@@ -36,9 +36,10 @@ export async function logout(): Promise<void> {
   await client.get("/logout");
 }
 
-export async function getPersonalInformation(email: string[]): Promise<PersonalInformation[]> {
+export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
   const res: {gender: "male" | "female", mail: string, name: string, number: string}[] = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
-  return res.map((personalInformation): PersonalInformation => {
+  return res.map((personalInformation): PersonalInformation | null => {
+    if (!personalInformation) return null;
     const parsedNumber = {
       grade: parseInt(personalInformation.number.substring(0, 1)),
       class: parseInt(personalInformation.number.substring(1, 2)),

@@ -1,5 +1,6 @@
 import {getInstance} from "./client.ts";
 import {getPersonalInformation, type PersonalInformation} from "./auth.ts";
+import type {User} from "./user.ts";
 
 const client = getInstance();
 
@@ -94,12 +95,7 @@ export type StayApply = {
     approved: boolean | null;
     audit_reason: string;
   }[];
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    permission: string;
-  } & PersonalInformation;
+  user: User & PersonalInformation;
 }
 
 export type StayApplyPayload = {
