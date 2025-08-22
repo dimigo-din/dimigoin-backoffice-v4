@@ -30,7 +30,7 @@ const base = {
     },
     Line: {
       Divider: "#797b8a29",
-      Outline: "#797b8a1f",
+      Outline: "#797b8a5b",
     },
     Components: {
       Fill: {
@@ -40,7 +40,7 @@ const base = {
           Tertiary: "#f4f4f5",
         },
         Inverted: {
-          Primary: "#131314",
+          Primary: "#1f1f21",
           Secondary: "#161617",
           Tertiary: "#1b1b1d",
         },

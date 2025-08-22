@@ -82,7 +82,7 @@ const FitContainer = styled.div`
   
   display: flex;
   flex-direction: column;
-  gap: 2dvh;
+  gap: 1dvh;
 `;
 
 const NoApply = styled.div`
@@ -103,7 +103,7 @@ const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
   max-height: ${({
                    opened,
                    outingCount
-                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 3dvh + 3dvh + 5dvh + 6dvh)` : "8dvh"};
+                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 4dvh + 4dvh + 5dvh + 6dvh)` : "8dvh"};
     // max-height: ${({opened}) => opened ? "inherit" : "8dvh"};
   flex: 0 0 auto;
 
@@ -125,7 +125,7 @@ const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
     display: block;
     flex: 0 0 auto;
 
-    height: 3dvh;
+    height: 3.5dvh;
     padding: 0;
 
     margin-top: 2dvh;
@@ -234,7 +234,7 @@ const OutingBox = styled.div`
   font-size: ${({theme}) => theme.Font.Body.size};
   
   input {
-    height: 3dvh;
+    height: 4dvh;
     padding: 0;
 
     //border: none;
@@ -279,7 +279,7 @@ const CheckBox = styled.div<{ canceled: boolean }>`
 `;
 
 const StayCard = styled.div<{current: boolean}>`
-  height: 12%;
+  height: 35%;
   width: 100%;
   
   border-radius: 6px;
@@ -308,7 +308,7 @@ const ExportButton = styled.div`
 const SelectionRow = styled.div<{ height?: string, width?: string }>`
   margin-left: ${({width}) => width ? "none" : "2%"};
   
-  height: ${({height}) => height || "3dvh"};
+  height: ${({height}) => height || "4dvh"};
   width: ${({width}) => width || "18%"};
   display: flex;
   flex-direction: row;
@@ -343,7 +343,7 @@ const SelectionItem = styled.div<{ boundState?: boolean | null, border?: boolean
 `;
 
 const DeleteBtn = styled.div`
-  height: 3dvh;
+  height: 4dvh;
   width: 7%;
   
   text-align: center;
@@ -802,6 +802,7 @@ function ApplyStayPage() {
           }}>잔류자 추가하기</Button>
         </FitContainer>
         <FitContainer>
+          <p>외출 검색</p>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 문자열을 입력하세요."}
