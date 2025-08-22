@@ -33,6 +33,7 @@ const TitleBar = styled.div`
 const ContentWrapper = styled.div`
   flex: 1;
   width: 100%;
+  height: 90%;
 
   display: flex;
   flex-direction: row;
@@ -53,7 +54,7 @@ const WakeupList = styled.div`
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
-  overflow: hidden;
+  overflow-y: scroll;
   
   padding: 1dvh;
 `;
