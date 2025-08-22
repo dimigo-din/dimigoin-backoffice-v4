@@ -68,15 +68,15 @@ const base = {
       Pink: "#ff325a",
       Brown: "#a78963",
       Translucent: {
-        Red: "#ff40351a",
-        Orange: "#ff9a051a",
-        Yellow: "#f5c9051a",
-        Green: "#32cc581a",
-        Blue: "#057fff1a",
-        Indigo: "#5b59de1a",
-        Purple: "#b756e81a",
-        Pink: "#ff325a1a",
-        Brown: "#a789631a",
+        Red: "#ff3f3531",
+        Orange: "#ff9b0542",
+        Yellow: "#f5c90534",
+        Green: "#32cc5838",
+        Blue: "#057eff2d",
+        Indigo: "#5b59de42",
+        Purple: "#b756e842",
+        Pink: "#ff325b34",
+        Brown: "#a78a633a",
       },
       Black: "#000000",
       White: "#ffffff",
@@ -84,7 +84,7 @@ const base = {
     Core: {
       Brand: {
         Primary: "#e83c77",
-        Tertiary: "#e83c771a",
+        Tertiary: "#e83c783e",
         Secondary: "#e83c7780",
       },
       Status: {

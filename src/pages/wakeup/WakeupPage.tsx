@@ -103,7 +103,7 @@ const WakeupItem = styled.div`
   }
   
   > .right {
-    width: 15%;
+    width: 20%;
     
     display: flex;
     flex-direction: row;
@@ -113,7 +113,6 @@ const WakeupItem = styled.div`
       width: 50%;
       text-align: center;
       align-content: center;
-      writing-mode: vertical-rl;
       text-orientation: upright;
     }
     
@@ -206,8 +205,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제하기</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정하기</div>
+                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
+                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
                 </div>
               </WakeupItem>
             );
@@ -228,8 +227,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제하기</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정하기</div>
+                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
+                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
                 </div>
               </WakeupItem>
             );
