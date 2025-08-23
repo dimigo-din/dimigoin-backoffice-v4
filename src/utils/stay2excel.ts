@@ -150,7 +150,7 @@ export type ExportOptions = {
 
 export function ExportStayAppliesToExcel(currentStay: Stay, applies: StayApply[], opts: ExportOptions = {}) {
   const filename = (opts.filename && (opts.filename.endsWith(".xlsx") ? opts.filename : `${opts.filename}.xlsx`))
-    || `잔류 및 외출 현황(${currentStay.stay_from}~${currentStay.stay_to}).xlsx`;
+    || `잔류 및 외출 현황(${currentStay.stay_from.slice(5, 10)}~${currentStay.stay_to.slice(5, 10)}).xlsx`;
 
   // Columns exactly like the sample: 학년, 반, 인원, 학번, 이름, 성별, 조식, 중식, 석식, 외출, 위치
   const headers = ["학년", "반", "인원", "학번", "이름", "성별", "조식", "중식", "석식", "외출", "위치"];
