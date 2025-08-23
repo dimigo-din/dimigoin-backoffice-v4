@@ -1,7 +1,7 @@
 // gpted
 
 import XLSX from "xlsx-js-style";
-import type { StayApply } from "../api/stay.ts";
+import type { StayApply, Stay } from "../api/stay.ts";
 
 function genderKo(g: string) {
   if (g === "male") return "남";
@@ -60,12 +60,33 @@ const titleStyle: CellStyle = {
   },
 };
 
-function todayBannerText(): string {
+const totalStyle: CellStyle = {
+  font: { ...FONT, bold: true },
+  alignment: { horizontal: "center", vertical: "center" },
+  fill: { fgColor: { rgb: PEACH } },
+};
+
+const gradeClassStyle: CellStyle = {
+  font: { ...FONT, bold: true },
+  alignment: { horizontal: "center", vertical: "center" },
+  border: {
+    top: { style: "thin", color: { rgb: ORANGE } },
+    bottom: { style: "thin", color: { rgb: ORANGE } },
+    left: { style: "thin", color: { rgb: ORANGE } },
+    right: { style: "thin", color: { rgb: ORANGE } },
+  },
+};
+
+function createSheetTitle(date: Date, grade?: number): string {
+  const md = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).format(date);
+  const dow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(date).replace("요일", "");
   const now = new Date();
-  const md = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).format(now);
-  const dow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(now).replace("요일", "");
-  const hm = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
-  return `잔류 및 외출 신청 현황 (${md} ${dow} ${hm} 기준)`;
+  const currentMd = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).format(now);
+  const currentDow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(now).replace("요일", "");
+  const currentHm = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
+  
+  const gradeText = grade ? `${grade}학년 ` : "";
+  return `${md}(${dow}) ${gradeText}잔류 및 외출 신청 현황 (${currentMd} ${currentDow} ${currentHm} 기준)`;
 }
 
 function hhmmKST(s?: string) {
@@ -79,35 +100,63 @@ function hhmmKST(s?: string) {
 function applyGridStyle(ws: XLSX.WorkSheet) {
   if (!ws["!ref"]) return;
   const range = XLSX.utils.decode_range(ws["!ref"]!);
+  
   for (let R = range.s.r; R <= range.e.r; R++) {
     for (let C = range.s.c; C <= range.e.c; C++) {
       const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
       const cell = ws[cellRef] as StylableCell | undefined;
       if (!cell) continue;
+      
       if (R === 1) {
+        // 헤더 행
         cell.s = headerStyle;
       } else if (R === 0) {
+        // 제목 행
         cell.s = titleStyle;
+      } else if (R === range.e.r) {
+        // 마지막 행 (총원)
+        cell.s = totalStyle;
       } else {
-        cell.s = cellStyle;
+        // 일반 데이터 행
+        if (C >= 0 && C <= 2) {
+          // 학년-반-인원 열들
+          cell.s = gradeClassStyle;
+        } else {
+          cell.s = cellStyle;
+        }
       }
     }
   }
+}
+
+// Stay 기간 내의 모든 날짜를 생성하는 함수
+function getStayDates(stay: Stay): Date[] {
+  const dates: Date[] = [];
+  const startDate = new Date(stay.stay_from);
+  const endDate = new Date(stay.stay_to);
+  
+  const currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return dates;
 }
 
 export type ExportOptions = {
   filename?: string;
 };
 
-export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptions = {}) {
+export function ExportStayAppliesToExcel(currentStay: Stay, applies: StayApply[], opts: ExportOptions = {}) {
   const filename = (opts.filename && (opts.filename.endsWith(".xlsx") ? opts.filename : `${opts.filename}.xlsx`))
-    || "잔류 및 외출 현황.xlsx";
+    || `잔류 및 외출 현황(${currentStay.stay_from.slice(5, 10)}~${currentStay.stay_to.slice(5, 10)}).xlsx`;
 
   // Columns exactly like the sample: 학년, 반, 인원, 학번, 이름, 성별, 조식, 중식, 석식, 외출, 위치
   const headers = ["학년", "반", "인원", "학번", "이름", "성별", "조식", "중식", "석식", "외출", "위치"];
 
   // ---- helper to build one worksheet from a subset of applies ----
-  const buildSheet = (subset: StayApply[]): XLSX.WorkSheet => {
+  const buildSheet = (subset: StayApply[], date: Date, grade?: number): XLSX.WorkSheet => {
     type Header = (typeof headers)[number];
     type Row = { [K in Header]: string | number };
 
@@ -122,14 +171,20 @@ export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptio
         const number = a.user.number ?? "";
         const hakbun = `${grade}${klass}${String(number).padStart(2, "0")}`;
 
-        // Only approved outings, join with comma
+        // Only approved outings for the specific date, join with comma
         const approved = (a.outing || []).filter(o => o.approved);
-        const outingText = approved.map(o => `${hhmmKST(o.from)}~${hhmmKST(o.to)} (${o.reason ?? ""})`).join(", ");
+        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const dateSpecificOutings = approved.filter(o => {
+          if (!o.from) return false;
+          const outingDate = new Date(o.from).toISOString().split('T')[0];
+          return outingDate === dateStr;
+        });
+        const outingText = dateSpecificOutings.map(o => `${hhmmKST(o.from)}~${hhmmKST(o.to)} (${o.reason ?? ""})`).join(", ");
 
-        // Meal flags: O unless any approved outing cancels that meal
-        const bCancel = approved.some(o => o.breakfast_cancel);
-        const lCancel = approved.some(o => o.lunch_cancel);
-        const dCancel = approved.some(o => o.dinner_cancel);
+        // Meal flags: O unless any approved outing on this date cancels that meal
+        const bCancel = dateSpecificOutings.some(o => o.breakfast_cancel);
+        const lCancel = dateSpecificOutings.some(o => o.lunch_cancel);
+        const dCancel = dateSpecificOutings.some(o => o.dinner_cancel);
 
         return {
           "학년": a.user.grade ?? "",
@@ -146,22 +201,40 @@ export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptio
         };
       });
 
-    const title = todayBannerText();
+    const title = createSheetTitle(date, grade);
+    
+    // 총원 행 추가
+    const totalCount = rows.length;
+    const totalRow = [
+      `총원 (${totalCount}명)`, // 학년-반-인원 통합
+      "", "", // 병합될 빈 셀들
+      "", "", "", "", "", "", "", "" // 나머지 빈 셀들
+    ];
     const aoa: (string | number)[][] = [
       [title, ...Array(headers.length - 1).fill("")],
       headers,
-      ...rows.map(r => headers.map(h => r[h]))
+      ...rows.map(r => headers.map(h => r[h])),
+      totalRow
     ];
+    
     const ws = XLSX.utils.aoa_to_sheet(aoa);
 
     (ws["!merges"] as XLSX.Range[] | undefined) ??= [];
+    
+    // 제목 행 병합
     (ws["!merges"] as XLSX.Range[]).push({ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } });
+    
+    // 총원 행 병합 - 학년-반-인원 (0-2열)
+    const lastRowIndex = 2 + rows.length;
+    (ws["!merges"] as XLSX.Range[]).push({ s: { r: lastRowIndex, c: 0 }, e: { r: lastRowIndex, c: 2 } });
+    
+    // 총원 행 병합 - 나머지 칸들 (3-10열)
+    (ws["!merges"] as XLSX.Range[]).push({ s: { r: lastRowIndex, c: 3 }, e: { r: lastRowIndex, c: headers.length - 1 } });
 
     // Remove helper for merged regions (avoid Excel repair by deleting non-top-left cells):
     const delIfExists = (row: number, col: number) => {
       const ref = XLSX.utils.encode_cell({ r: row, c: col });
       if (ws[ref]) {
-        // delete the cell completely so the merged area only keeps top-left
         delete ws[ref];
       }
     };
@@ -170,11 +243,19 @@ export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptio
     for (let c = 1; c < headers.length; c++) {
       delIfExists(0, c);
     }
+    
+    // Remove cells in merged total row
+    for (let c = 1; c <= 2; c++) {
+      delIfExists(lastRowIndex, c);
+    }
+    for (let c = 4; c < headers.length; c++) {
+      delIfExists(lastRowIndex, c);
+    }
 
     const get = (row: number, col: number) => ws[XLSX.utils.encode_cell({ r: row, c: col })]?.v as string | number | undefined;
 
     // Compute merges for 학년(column 0), 반(column 1), 인원(column 2)
-    const startRow = 2; // data begins at row index 2 in AOA
+    const startRow = 2; // data begins at row index 2 in AOA (0: title, 1: header)
     let r = startRow;
     while (r < startRow + rows.length) {
       const grade = get(r, 0);
@@ -205,14 +286,14 @@ export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptio
           (ws["!merges"] as XLSX.Range[]).push({ s: { r: k, c: 2 }, e: { r: k2 - 1, c: 2 } });
           const topRef = XLSX.utils.encode_cell({ r: k, c: 2 });
           const topCell = (ws[topRef] ??= { t: "s", v: "" }) as StylableCell;
-          topCell.t = "s"; // ensure string type (avoid Excel repair from number->string swap)
+          topCell.t = "s";
           topCell.v = `${count}명`;
           for (let q = k + 1; q < k2; q++) delIfExists(q, 2);
         } else {
           // 인원 1명 표시(병합 없음)
           const oneRef = XLSX.utils.encode_cell({ r: k, c: 2 });
           const oneCell = (ws[oneRef] ??= { t: "s", v: "" }) as StylableCell;
-          oneCell.t = "s"; // force string type
+          oneCell.t = "s";
           oneCell.v = "1명";
         }
 
@@ -231,23 +312,43 @@ export function ExportStayAppliesToExcel(applies: StayApply[], opts: ExportOptio
 
     applyGridStyle(ws);
 
-    (ws["!rows"] as XLSX.RowInfo[]) = [ { hpt: 45 }, { hpt: 30 } ];
+    (ws["!rows"] as XLSX.RowInfo[]) = [ 
+      { hpt: 45 }, // 제목 행
+      { hpt: 30 }, // 헤더 행
+      ...Array(rows.length).fill({ hpt: 20 }), // 데이터 행들
+      { hpt: 30 } // 총원 행
+    ];
+    
     return ws;
   };
-
-  // ---- Build workbook with 4 sheets: 전체 + 학년별(1,2,3) ----
+  
+  // ---- Build workbook with Stay period dates ----
   const wb = XLSX.utils.book_new();
+  
+  // Stay 기간 내의 모든 날짜 가져오기
+  const stayDates = getStayDates(currentStay);
+  
+  // 먼저 전체 시트들을 생성 (날짜순)
+  for (const date of stayDates) {
+    const dayOfWeek = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(date).replace("요일", "");
+    const dateApplies = applies; // Stay 기간 동안은 모든 신청서가 유효
 
-  // 0) 전체
-  const fullWs = buildSheet(applies);
-  XLSX.utils.book_append_sheet(wb, fullWs, "잔류 및 외출");
-
-  // 1~3학년: create three additional sheets regardless of data presence
+    // 전체 시트
+    const fullWs = buildSheet(dateApplies, date);
+    XLSX.utils.book_append_sheet(wb, fullWs, `전체(${dayOfWeek})`);
+  }
+  
+  // 그 다음 학년별 시트들을 생성 (날짜순 -> 학년순)
   const gradeNums = [1, 2, 3] as const;
   for (const g of gradeNums) {
-    const subset = applies.filter(a => String(a.user.grade ?? "") === String(g));
-    const ws = buildSheet(subset);
-    XLSX.utils.book_append_sheet(wb, ws, `${g}학년`);
+    for (const date of stayDates) {
+      const dayOfWeek = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(date).replace("요일", "");
+      const dateApplies = applies;
+      const gradeApplies = dateApplies.filter(a => String(a.user.grade ?? "") === String(g));
+      
+      const gradeWs = buildSheet(gradeApplies, date, g);
+      XLSX.utils.book_append_sheet(wb, gradeWs, `${g}학년(${dayOfWeek})`);
+    }
   }
 
   XLSX.writeFile(wb, filename);

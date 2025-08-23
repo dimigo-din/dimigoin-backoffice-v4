@@ -52,6 +52,10 @@ const AppStyle = createGlobalStyle`
     border: none;
     background: none;
   }
+
+  * {
+    scrollbar-color: #888 #00000000;
+  }
 `;
 
 export default AppStyle;

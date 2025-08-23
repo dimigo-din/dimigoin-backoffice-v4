@@ -33,6 +33,7 @@ const TitleBar = styled.div`
 const ContentWrapper = styled.div`
   flex: 1;
   width: 100%;
+  height: 90%;
 
   display: flex;
   flex-direction: row;
@@ -53,7 +54,7 @@ const WakeupList = styled.div`
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
-  overflow: hidden;
+  overflow-y: scroll;
   
   padding: 1dvh;
 `;
@@ -103,7 +104,7 @@ const WakeupItem = styled.div`
   }
   
   > .right {
-    width: 15%;
+    width: 20%;
     
     display: flex;
     flex-direction: row;
@@ -113,7 +114,6 @@ const WakeupItem = styled.div`
       width: 50%;
       text-align: center;
       align-content: center;
-      writing-mode: vertical-rl;
       text-orientation: upright;
     }
     
@@ -161,6 +161,7 @@ function WakeupPage() {
     if (!confirm("확정하시겠습니까?")) return;
     selectWakeupSong(id).then(() => {
       showToast("성공했습니다.", "info");
+      window.open(`https://www.youtube.com/watch?v=${applies?.find((a) => a.id === id)!.video_id}`, "_blank")
       updateScreen();
     }).catch((e) => {
       console.log(e);
@@ -205,8 +206,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제하기</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정하기</div>
+                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
+                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
                 </div>
               </WakeupItem>
             );
@@ -227,8 +228,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제하기</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정하기</div>
+                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
+                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
                 </div>
               </WakeupItem>
             );

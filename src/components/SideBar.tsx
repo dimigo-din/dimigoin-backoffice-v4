@@ -51,11 +51,11 @@ const UserWrapper = styled.div`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2dvh;
+  gap: 1.5dvh;
 `;
 
 const MenuItem = styled.div<{ selected: boolean }>`
-  height: 4dvh;
+  height: 5dvh;
   width: 100%;
   
   padding: 0 1dvw;
