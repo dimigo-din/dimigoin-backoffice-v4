@@ -534,6 +534,7 @@ function ApplyStayPage() {
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
     if (id === 'new') {
+      close();
       updateScreen();
       return;
     }
