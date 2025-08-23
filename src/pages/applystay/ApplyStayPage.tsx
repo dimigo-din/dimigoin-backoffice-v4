@@ -190,7 +190,7 @@ const SeatRow = styled.div<{seat: string | null}>`
     width: 4.5dvw;
     
     padding: 12px 0;
-    margin: 8px;
+    margin: 4px;
     
     background-color: ${({theme}) => theme.Colors.Background.Primary};
     border-radius: 8px;
@@ -594,6 +594,8 @@ function ApplyStayPage() {
     }
   }, [selectedApply]);
 
+  console.log(genTable());
+
 
   return (
     <Wrapper>
@@ -686,22 +688,44 @@ function ApplyStayPage() {
                 <>
                   <StayApplyDetail>
                     <SeatBox ref={seatBoxRef}>
-                      {genTable().map((row) => (
-                        <SeatRow seat={selectedApply.stay_seat}>
-                          {row.map((seat) => {
-                            const taken = stayApplies.find((sapply) => sapply.stay_seat === seat && sapply.stay_seat !== selectedApply.stay_seat);
-                            return (
+                        {(() => {
+                        const table = genTable();
+                        const groupedRows: string[][][] = [];
+                        for (let i = 0; i < table.length; i += 2) {
+                          groupedRows.push(table.slice(i, i + 2));
+                        }
+                        return groupedRows.map((group, idx) => (
+                          <div key={idx} style={{ marginBottom: "16px" }}>
+                          {group.map((row, rowIdx) => (
+                            <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
+                            {row.map((seat, seatIdx) => {
+                              const taken = stayApplies.find(
+                              (sapply) =>
+                                sapply.stay_seat === seat &&
+                                sapply.stay_seat !== selectedApply.stay_seat
+                              );
+                              return (
                               <span
                                 id={seat}
                                 ref={selectedApply.stay_seat === seat ? seatRef : null}
                                 className={["active", taken ? "taken" : "notTaken"].join(" ")}
-                                onClick={() => {setSelectedApply((p) => { return { ...p!, stay_seat: seat } })}}>
-                              {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
-                            </span>
-                            );
-                          })}
-                        </SeatRow>
-                      ))}
+                                onClick={() =>
+                                setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
+                                }
+                                key={seat}
+                                style={{
+                                marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
+                                }}
+                              >
+                                {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
+                              </span>
+                              );
+                            })}
+                            </SeatRow>
+                          ))}
+                          </div>
+                        ));
+                        })()}
                     </SeatBox>
                   </StayApplyDetail>
                   {selectedApply.outing.map((outing) => {
