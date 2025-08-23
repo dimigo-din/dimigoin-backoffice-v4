@@ -89,6 +89,13 @@ function LoginPage() {
       googleLogin(code).then(({accessToken}) => {
         const payload = parseJwt(accessToken);
         console.log(payload)
+
+        // 권한 체크
+        if(payload.permission != 2 && payload.permission != 7) {
+          showToast("권한이 없습니다.", "danger");
+          return;
+        }
+
         localStorage.setItem("id", payload.id);
         localStorage.setItem("name", payload.name);
         localStorage.setItem("picture", payload.picture);
