@@ -2,9 +2,11 @@ import {
   createStayApply, deleteStayApply,
   getStayApply,
   getStayList,
+  getStay,
   type Outing,
   type StayApply,
   type StayListItem,
+  type Stay,
   updateStayApply
 } from "../../api/stay.ts";
 import { searchUser, type User } from "../../api/user.ts";
@@ -410,7 +412,7 @@ function ApplyStayPage() {
   const [nameLoading, setNameLoading] = useState<boolean>(false);
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
-  const [currentStay, setCurrentStay] = useState<string | null>(null);
+  const [currentStay, setCurrentStay] = useState<Stay | null>(null);
   const [stayApplies, setStayApplies] = useState<StayApply[] | null>(null);
 
   const [selectedApply, setSelectedApply] = useState<StayApply | null>(null);
@@ -420,13 +422,18 @@ function ApplyStayPage() {
     getStayList().then((res1) => {
       setStayList(res1);
       if (res1.length > 0) {
-        setCurrentStay(res1[0].id);
+        getStay(res1[0].id).then((res3) => {
+          setCurrentStay(res3);
+        }).catch((e) => {
+          showToast(e.response.data.error.message || e.response.data.error, "danger");
+        });
+
         getStayApply(res1[0].id).then((res2) => {
-          console.log(res2)
           setStayApplies(res2);
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
+
       }
     }).catch((e) => {
       console.log(e);
@@ -487,8 +494,13 @@ function ApplyStayPage() {
 
   const edit = () => {
     if (selectedApply?.id === "new") {
+      if (!currentStay) {
+        showToast("현재 잔류 정보가 없습니다.", "danger");
+        return;
+      }
+      showToast(currentStay.id, 'info');
       createStayApply({
-        stay: currentStay!,
+        stay: currentStay.id,
         user: selectedApply.user.id,
         outing: selectedApply.outing,
         stay_seat: selectedApply.stay_seat,
@@ -508,7 +520,7 @@ function ApplyStayPage() {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    updateStayApply({...selectedApply, stay: currentStay!, user: selectedApply!.user.id}).then(() => {
+    updateStayApply({...selectedApply, stay: currentStay.id!, user: selectedApply!.user.id}).then(() => {
       showToast("성공했습니다.", "info");
       close();
       updateScreen();
@@ -520,6 +532,11 @@ function ApplyStayPage() {
 
   const deleteApply = (id: string) => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    if (id === 'new') {
+      updateScreen();
+      return;
+    }
 
     deleteStayApply(id).then(() => {
       showToast("성공했습니다.", "info");
@@ -786,7 +803,7 @@ function ApplyStayPage() {
           <p style={{marginBottom: "8px"}}>잔류 대상</p>
           {stayList !== null ? stayList.map((apply) => {
             return (
-              <StayCard current={apply.id === currentStay}>
+              <StayCard current={apply.id === currentStay?.id}>
                 {apply.name}
               </StayCard>
             );
@@ -831,7 +848,7 @@ function ApplyStayPage() {
           </SelectionRow>
         </FitContainer>
         <FitContainer>
-          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToExcel(stayApplies) : () => {}}>
+          <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
             일반 잔류자 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? ExportStayAppliesToDocx(stayApplies, { masking: true }) : () => {}}>
