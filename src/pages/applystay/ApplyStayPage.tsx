@@ -9,20 +9,25 @@ import {
   type Stay,
   updateStayApply
 } from "../../api/stay.ts";
-import { searchUser, type User } from "../../api/user.ts";
+import {renderHtml, searchUser, type User} from "../../api/user.ts";
 import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
 import styled from "styled-components";
 import {useEffect, useRef, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
 import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
-import {ExportStayAppliesToDocx} from "../../utils/stay2docx.ts";
 import {sha256} from "../../utils/sha256.ts";
 import {genTable} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
 import CheckBoxOn from "../../assets/icons/checkbox/check_box_checked.svg?react"
 import {Button, LightButton} from "../../styles/components/button.ts";
 import {makeid} from "../../utils/makeid.ts";
+import moment from "moment-timezone";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import 'moment/dist/locale/ko';
+import {stay2format} from "../../utils/stay2format.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -402,6 +407,8 @@ const SuggestItem = styled.div`
 `;
 
 function ApplyStayPage() {
+  moment.locale("ko");
+
   const { showToast } = useNotification();
 
   const seatRef = useRef<HTMLSpanElement | null>(null);
@@ -414,6 +421,8 @@ function ApplyStayPage() {
   const [nameSearch, setNameSearch] = useState<string>("");
   const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
   const [nameLoading, setNameLoading] = useState<boolean>(false);
+
+  const [stayDate, setStayDate] = useState<string>("");
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
@@ -429,6 +438,7 @@ function ApplyStayPage() {
       if (res1.length > 0) {
         getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
+          setStayDate(moment(res3.stay_from, "YYYY-MM-DD").tz("Asia/Seoul").format("YYYY년 MM월 DD일 dddd"));
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
@@ -438,7 +448,6 @@ function ApplyStayPage() {
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
-
       }
     }).catch((e) => {
       console.log(e);
@@ -472,6 +481,7 @@ function ApplyStayPage() {
       // @ts-ignore
       const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
       sha256(merged).then((data) => {
+        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
         if (data !== selectedApplyChecksum) {
           if (confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
             close();
@@ -485,6 +495,7 @@ function ApplyStayPage() {
       // @ts-ignore
       const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
       sha256(merged).then((data) => {
+        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
         if (data !== selectedApplyChecksum) {
           if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
             close();
@@ -598,8 +609,6 @@ function ApplyStayPage() {
       });
     }
   }, [selectedApply]);
-
-  console.log(genTable());
 
 
   return (
@@ -840,7 +849,7 @@ function ApplyStayPage() {
           }) : Loading()}
         </StretchContainer>
         <FitContainer>
-          <Button onClick={() => {
+          <Button disabled={stayApplies === null || selectedApply?.id === "new"} onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -849,7 +858,6 @@ function ApplyStayPage() {
           }}>잔류자 추가하기</Button>
         </FitContainer>
         <FitContainer>
-          <p>외출 검색</p>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 문자열을 입력하세요."}
@@ -881,10 +889,10 @@ function ApplyStayPage() {
           <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
             일반 잔류자 명단 내보내기
           </ExportButton>
-          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToDocx(stayApplies, { masking: true }) : () => {}}>
+          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
             급식실용 잔류자 명단 내보내기
           </ExportButton>
-          <ExportButton onClick={() => stayApplies ? ExportStayAppliesToDocx(stayApplies) : () => {}}>
+          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}}>
             생활관용 잔류자 명단 내보내기
           </ExportButton>
         </FitContainer>
