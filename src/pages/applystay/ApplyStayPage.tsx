@@ -66,7 +66,11 @@ const ControllerContainer = styled.div`
 const StretchContainer = styled.div`
   flex: 1;
   width: 100%;
-  
+
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+
   border-radius: 8px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
@@ -281,7 +285,7 @@ const CheckBox = styled.div<{ canceled: boolean }>`
 `;
 
 const StayCard = styled.div<{current: boolean}>`
-  height: 35%;
+  height: 20%;
   width: 100%;
   
   border-radius: 6px;
@@ -412,6 +416,7 @@ function ApplyStayPage() {
   const [nameLoading, setNameLoading] = useState<boolean>(false);
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
+  const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
   const [currentStay, setCurrentStay] = useState<Stay | null>(null);
   const [stayApplies, setStayApplies] = useState<StayApply[] | null>(null);
 
@@ -422,13 +427,13 @@ function ApplyStayPage() {
     getStayList().then((res1) => {
       setStayList(res1);
       if (res1.length > 0) {
-        getStay(res1[0].id).then((res3) => {
+        getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
 
-        getStayApply(res1[0].id).then((res2) => {
+        getStayApply(res1[currentStayIndex].id).then((res2) => {
           setStayApplies(res2);
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
@@ -550,7 +555,7 @@ function ApplyStayPage() {
 
   useEffect(() => {
     updateScreen();
-  }, []);
+  }, [currentStayIndex]);
 
   useEffect(() => {
     setIsSuggestOpen(!!nameSearch);
@@ -828,8 +833,8 @@ function ApplyStayPage() {
           <p style={{marginBottom: "8px"}}>잔류 대상</p>
           {stayList !== null ? stayList.map((apply) => {
             return (
-              <StayCard current={apply.id === currentStay?.id}>
-                {apply.name}
+              <StayCard current={apply.id === currentStay?.id} onClick={() => {close(); setCurrentStayIndex(stayList.indexOf(apply));}}>
+                <span>{`${apply.name}`}</span>
               </StayCard>
             );
           }) : Loading()}
