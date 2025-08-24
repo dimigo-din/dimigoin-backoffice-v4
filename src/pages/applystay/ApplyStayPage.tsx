@@ -465,7 +465,6 @@ function ApplyStayPage() {
         setSelectedApplyChecksum(null);
         setStayApplies((p) => p!.filter((a) => a.id !== "new"));
       });
-      console.log(stayApplies);
 
       if (callback) {
         // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
