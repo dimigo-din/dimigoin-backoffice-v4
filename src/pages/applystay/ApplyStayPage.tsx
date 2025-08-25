@@ -868,7 +868,7 @@ function ApplyStayPage() {
           {stayList !== null ? stayList.map((apply) => {
             return (
               <StayCard current={apply.id === currentStay?.id} onClick={() => {close(); setCurrentStayIndex(stayList.indexOf(apply));}}>
-                <span>{`${apply.name}`}</span>
+                <span>{`${apply.name}`}</span> <span style={{color: "#888"}}>{`(${apply.stay_from} ~ ${apply.stay_to})`}</span>
               </StayCard>
             );
           }) : Loading()}
