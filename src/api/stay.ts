@@ -42,6 +42,8 @@ export type StaySchedule = {
 export type StayListItem = {
   id: string;
   name: string;
+  stay_from: string;
+  stay_to: string;
 }
 
 export type Stay = {

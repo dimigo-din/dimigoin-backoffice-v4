@@ -28,6 +28,7 @@ import moment from "moment-timezone";
 // @ts-ignore
 import 'moment/dist/locale/ko';
 import {stay2format} from "../../utils/stay2format.ts";
+import { flushSync } from "react-dom";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -71,7 +72,11 @@ const ControllerContainer = styled.div`
 const StretchContainer = styled.div`
   flex: 1;
   width: 100%;
-  
+
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+
   border-radius: 8px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
@@ -286,7 +291,7 @@ const CheckBox = styled.div<{ canceled: boolean }>`
 `;
 
 const StayCard = styled.div<{current: boolean}>`
-  height: 35%;
+  height: 20%;
   width: 100%;
   
   border-radius: 6px;
@@ -421,6 +426,7 @@ function ApplyStayPage() {
   const [stayDate, setStayDate] = useState<string>("");
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
+  const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
   const [currentStay, setCurrentStay] = useState<Stay | null>(null);
   const [stayApplies, setStayApplies] = useState<StayApply[] | null>(null);
 
@@ -431,14 +437,14 @@ function ApplyStayPage() {
     getStayList().then((res1) => {
       setStayList(res1);
       if (res1.length > 0) {
-        getStay(res1[0].id).then((res3) => {
+        getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
           setStayDate(moment(res3.stay_from, "YYYY-MM-DD").tz("Asia/Seoul").format("YYYY년 MM월 DD일 dddd"));
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
 
-        getStayApply(res1[0].id).then((res2) => {
+        getStayApply(res1[currentStayIndex].id).then((res2) => {
           setStayApplies(res2);
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
@@ -450,58 +456,82 @@ function ApplyStayPage() {
     });
   }
 
-  const close = () => {
-    setIsClosing(true);
+  const close = (callback?: () => void) => {
+  setIsClosing(true);
     setTimeout(() => {
-      setIsClosing(false);
-      setSelectedApply(null);
-      setSelectedApplyChecksum(null);
-    }, 300)
-  }
+      flushSync(() => {
+        setIsClosing(false);
+        setSelectedApply(null);
+        setSelectedApplyChecksum(null);
+        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
+      });
+
+      if (callback) {
+        // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
+        setTimeout(() => callback(), 100);
+      }
+    }, 300);
+  };
 
   const openEditor = (apply: StayApply) => {
+    // 현재 선택된 에디터가 없으면 바로 열기
     if (selectedApply === null) {
+      // 깊은 복사로 완전히 독립적인 객체 생성
+      const applyCopy = JSON.parse(JSON.stringify(apply));
+      
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const merged = apply.stay_seat + apply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+      const merged = applyCopy.stay_seat + applyCopy.outing.map(a => 
+        Object.keys(a).map((k) => String(a[k])).join("")
+      ).join("");
+      
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
-        setSelectedApply(apply);
+        setSelectedApply(applyCopy);
       });
       return;
     }
 
+    // 같은 탭을 다시 클릭한 경우
     if (selectedApply.id === apply.id) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
       sha256(merged).then((data) => {
-        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
         if (data !== selectedApplyChecksum) {
           if (confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
             close();
           }
-        }else {
+        } else {
           close();
         }
       });
-    }else {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
-      sha256(merged).then((data) => {
-        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
-        if (data !== selectedApplyChecksum) {
-          if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
-            close();
-          }
-        }else {
-          close();
-        }
-        openEditor(apply);
-      });
+      return;
     }
-  }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+    sha256(merged).then((data) => {
+      if (data !== selectedApplyChecksum) {
+        if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
+          // 무한 반복 방지를 위해 새로운 함수로 에디터 열기
+          const openNewEditor = (targetApply: StayApply) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const newMerged = targetApply.stay_seat + targetApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+            sha256(newMerged).then((newData) => {
+              setSelectedApplyChecksum(newData);
+              setSelectedApply(targetApply);
+            });
+          };
+          close(() => openNewEditor(apply));
+        }
+      } else {
+        close(() => openEditor(apply));
+      }
+    });
+  };
 
   const edit = () => {
     if (selectedApply?.id === "new") {
@@ -561,7 +591,7 @@ function ApplyStayPage() {
 
   useEffect(() => {
     updateScreen();
-  }, []);
+  }, [currentStayIndex]);
 
   useEffect(() => {
     setIsSuggestOpen(!!nameSearch);
@@ -837,8 +867,8 @@ function ApplyStayPage() {
           <p style={{marginBottom: "8px"}}>잔류 대상</p>
           {stayList !== null ? stayList.map((apply) => {
             return (
-              <StayCard current={apply.id === currentStay?.id}>
-                {apply.name}
+              <StayCard current={apply.id === currentStay?.id} onClick={() => {close(); setCurrentStayIndex(stayList.indexOf(apply));}}>
+                <span>{`${apply.name}`}</span> <span style={{color: "#888"}}>{`(${apply.stay_from} ~ ${apply.stay_to})`}</span>
               </StayCard>
             );
           }) : Loading()}
