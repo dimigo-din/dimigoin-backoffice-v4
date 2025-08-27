@@ -903,22 +903,22 @@ function ApplyStayPage() {
             <SelectionItem boundState={true}
                            selected={filterState === true}
                            onClick={() => setFilterState(true)}>
-              허가
+              {`허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === true).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={null}
                            selected={filterState === null}
                            onClick={() => setFilterState(null)}>
-              검토
+              {`검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === null).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={false}
                            selected={filterState === false}
                            onClick={() => setFilterState(false)}>
-              불허
+              {`불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === false).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={undefined}
                            selected={filterState === undefined}
                            onClick={() => setFilterState(undefined)}>
-              모두
+              {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
             </SelectionItem>
           </SelectionRow>
         </FitContainer>
