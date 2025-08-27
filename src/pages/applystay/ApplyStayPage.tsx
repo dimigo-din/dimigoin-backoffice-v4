@@ -912,7 +912,7 @@ function ApplyStayPage() {
         </FitContainer>
         <FitContainer>
           <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
-            일반 잔류자 명단 내보내기
+            학생 공지용 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
             급식실용 잔류자 명단 내보내기
