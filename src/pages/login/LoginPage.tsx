@@ -105,7 +105,7 @@ function LoginPage() {
           while (!token) {
             token = prompt("선생님 전용 토큰을 입력해주세요.");
           }
-          localStorage.setItem("personalInformationKey", btoa(token));
+          localStorage.setItem("personalInformationKey", token);
         }
 
         showToast("로그인에 성공하였습니다.", "info");
