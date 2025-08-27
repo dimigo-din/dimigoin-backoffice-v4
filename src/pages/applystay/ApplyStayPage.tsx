@@ -266,6 +266,10 @@ const InputRow = styled.div<{width?: string}>`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
+  > Input {
+      padding: 0 8px;
+  }
 `;
 
 const CheckBox = styled.div<{ canceled: boolean }>`
@@ -817,12 +821,16 @@ function ApplyStayPage() {
                           <Input type={"datetime-local"}
                                  onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
                                  onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.from.split(/[+Z]/)[0]}/>
+                                 value={outing.from.split(/[+Z]/)[0]}
+                                 step={600}
+                                 min="2025-01-01T00:00"/>
                           <p>부터&nbsp;&nbsp;</p>
                           <Input type={"datetime-local"}
                                  onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
                                  onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.to.split(/[+Z]/)[0]}/>
+                                 value={outing.to.split(/[+Z]/)[0]}
+                                 step={600}
+                                 min="2025-01-01T00:00"/>
                           <p>까지</p>
                         </InputRow>
                         <InputRow>
