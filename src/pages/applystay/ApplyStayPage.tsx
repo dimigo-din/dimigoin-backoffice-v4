@@ -588,6 +588,7 @@ function ApplyStayPage() {
 
     deleteStayApply(id).then(() => {
       showToast("성공했습니다.", "info");
+      close();
       updateScreen();
     }).catch((e) => {
       console.log(e);
