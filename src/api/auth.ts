@@ -1,4 +1,5 @@
 import {getInstance} from "./client.ts";
+import axios from "axios";
 
 const client = getInstance();
 
