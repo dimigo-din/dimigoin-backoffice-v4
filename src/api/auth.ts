@@ -33,7 +33,7 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
 
 export async function logout(): Promise<void> {
   localStorage.clear();
-  await client.get("/logout");
+  await client.get("/auth/logout");
 }
 
 export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
