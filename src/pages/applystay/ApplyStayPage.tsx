@@ -866,7 +866,7 @@ function ApplyStayPage() {
                 });
               }}>외출추가</LightButton>
               <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
-              <Button onClick={() => edit()}>수정하기</Button>
+              <Button onClick={() => edit()}>{selectedApply?.id == "new" ? "생성하기" : "수정하기"}</Button>
             </StayApplyCard>
           );
         }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
