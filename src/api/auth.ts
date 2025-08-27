@@ -1,4 +1,3 @@
-import axios from "axios";
 import {getInstance} from "./client.ts";
 
 const client = getInstance();
@@ -37,7 +36,25 @@ export async function logout(): Promise<void> {
 }
 
 export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
-  const res: {gender: "male" | "female", mail: string, name: string, number: string}[] = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
+  let res: ({gender: "male" | "female", mail: string, name: string, number: string} | null)[];
+  try {
+    // res  = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
+    res = email.map((e) => {
+      return e === "yeonfish6040@dimigo.hs.kr" ? {
+        gender: "male",
+        mail: "yeonfish6040@dimigo.hs.kr",
+        name: "이연준",
+        number: "2419",
+      } : null;
+    });
+  }catch (e) {
+    console.log(e);
+    localStorage.clear();
+    await logout();
+    location.href = "/login";
+
+    throw new Error();
+  }
   return res.map((personalInformation): PersonalInformation | null => {
     if (!personalInformation) return null;
     const parsedNumber = {
@@ -49,5 +66,5 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
       ...personalInformation,
       ...parsedNumber,
     };
-  })
+  });
 }
