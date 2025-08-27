@@ -319,6 +319,8 @@ const ExportButton = styled.div`
   
   background-color: ${({theme}) => theme.Colors.Components.Fill.Primary};
   border-radius: 8px;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
 `;
 
 const SelectionRow = styled.div<{ height?: string, width?: string }>`

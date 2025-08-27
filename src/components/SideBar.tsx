@@ -67,6 +67,8 @@ const MenuItem = styled.div<{ selected: boolean }>`
   align-content: center;
   
   transition: background-color 200ms ease;
+
+  font-size: ${({theme}) => theme.Font.Headline.size};
 `;
 
 function SideBar() {
