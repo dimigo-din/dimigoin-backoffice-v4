@@ -791,7 +791,8 @@ function ApplyStayPage() {
                           <Input type={"text"}
                                  style={{width: "62%"}}
                                  onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
-                                 value={outing.reason}/>
+                                 value={outing.reason}
+                                 placeholder={"외출 사유를 입력하세요.."}/>
                           <SelectionRow>
                             <SelectionItem selected={outing.approved === true}
                                            boundState={true}
