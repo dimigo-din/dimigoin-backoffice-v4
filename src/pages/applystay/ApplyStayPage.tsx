@@ -266,6 +266,10 @@ const InputRow = styled.div<{width?: string}>`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
+  > Input {
+      padding: 0 8px;
+  }
 `;
 
 const CheckBox = styled.div<{ canceled: boolean }>`
@@ -315,6 +319,8 @@ const ExportButton = styled.div`
   
   background-color: ${({theme}) => theme.Colors.Components.Fill.Primary};
   border-radius: 8px;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
 `;
 
 const SelectionRow = styled.div<{ height?: string, width?: string }>`
@@ -582,6 +588,7 @@ function ApplyStayPage() {
 
     deleteStayApply(id).then(() => {
       showToast("성공했습니다.", "info");
+      close();
       updateScreen();
     }).catch((e) => {
       console.log(e);
@@ -787,7 +794,8 @@ function ApplyStayPage() {
                           <Input type={"text"}
                                  style={{width: "62%"}}
                                  onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
-                                 value={outing.reason}/>
+                                 value={outing.reason}
+                                 placeholder={"외출 사유를 입력하세요.."}/>
                           <SelectionRow>
                             <SelectionItem selected={outing.approved === true}
                                            boundState={true}
@@ -817,12 +825,16 @@ function ApplyStayPage() {
                           <Input type={"datetime-local"}
                                  onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
                                  onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.from.split(/[+Z]/)[0]}/>
+                                 value={outing.from.split(/[+Z]/)[0]}
+                                 step={600}
+                                 min="2025-01-01T00:00"/>
                           <p>부터&nbsp;&nbsp;</p>
                           <Input type={"datetime-local"}
                                  onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
                                  onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.to.split(/[+Z]/)[0]}/>
+                                 value={outing.to.split(/[+Z]/)[0]}
+                                 step={600}
+                                 min="2025-01-01T00:00"/>
                           <p>까지</p>
                         </InputRow>
                         <InputRow>
@@ -857,7 +869,7 @@ function ApplyStayPage() {
                 });
               }}>외출추가</LightButton>
               <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
-              <Button onClick={() => edit()}>수정하기</Button>
+              <Button onClick={() => edit()}>{selectedApply?.id == "new" ? "생성하기" : "수정하기"}</Button>
             </StayApplyCard>
           );
         }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
@@ -891,30 +903,30 @@ function ApplyStayPage() {
             <SelectionItem boundState={true}
                            selected={filterState === true}
                            onClick={() => setFilterState(true)}>
-              허가
+              {`허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === true).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={null}
                            selected={filterState === null}
                            onClick={() => setFilterState(null)}>
-              검토
+              {`검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === null).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={false}
                            selected={filterState === false}
                            onClick={() => setFilterState(false)}>
-              불허
+              {`불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === false).length, 0) || 0}건)`}
             </SelectionItem>
             <SelectionItem boundState={undefined}
                            selected={filterState === undefined}
                            onClick={() => setFilterState(undefined)}>
-              모두
+              {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
             </SelectionItem>
           </SelectionRow>
         </FitContainer>
         <FitContainer>
           <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
-            일반 잔류자 명단 내보내기
+            학생 공지용 명단 내보내기
           </ExportButton>
-          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
+          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: true }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
             급식실용 잔류자 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}}>

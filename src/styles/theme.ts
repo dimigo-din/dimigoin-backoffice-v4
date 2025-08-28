@@ -113,7 +113,7 @@ const base = {
     Title: {size: "1.5rem", lineHeight: "34px", weight: {weak: 400, regular: 500, strong: 600}},
     Headline: {size: "1.25rem", lineHeight: "28px", weight: {weak: 400, regular: 500, strong: 600}},
     Body: {size: "1rem", lineHeight: "24px", weight: {weak: 400, regular: 500, strong: 600}},
-    Callout: {size: "0.875rem", lineHeight: "20px", weight: {weak: 400, regular: 500, strong: 600}},
+    Callout: {size: "1.1rem", lineHeight: "20px", weight: {weak: 400, regular: 500, strong: 600}},
     Footnote: {size: "0.75rem", lineHeight: "18px", weight: {weak: 400, regular: 500, strong: 600}},
     Caption: {size: "0.625rem", lineHeight: "14px", weight: {weak: 400, regular: 500, strong: 600}},
     Paragraph_Large: {size: "1rem", lineHeight: "28.8px", weight: {weak: 400, regular: 500, strong: 600}},
