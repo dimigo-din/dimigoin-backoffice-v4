@@ -40,14 +40,6 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
   let res: ({gender: "male" | "female", mail: string, name: string, number: string} | null)[];
   try {
     res  = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
-    // res = email.map((e) => {
-    //   return e === "yeonfish6040@dimigo.hs.kr" ? {
-    //     gender: "male",
-    //     mail: "yeonfish6040@dimigo.hs.kr",
-    //     name: "이연준",
-    //     number: "2419",
-    //   } : null;
-    // });
   }catch (e) {
     console.log(e);
     localStorage.clear();
