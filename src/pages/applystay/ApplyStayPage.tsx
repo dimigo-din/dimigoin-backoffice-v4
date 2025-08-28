@@ -17,7 +17,7 @@ import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
 import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
 import {sha256} from "../../utils/sha256.ts";
-import {genTable} from "../../utils/staySeatUtil.ts";
+import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
 import CheckBoxOn from "../../assets/icons/checkbox/check_box_checked.svg?react"
 import {Button, LightButton} from "../../styles/components/button.ts";
@@ -209,7 +209,7 @@ const SeatRow = styled.div<{seat: string | null}>`
   }
   
   > span.inactive {
-    filter: blur(1.2px) brightness(90%);
+    filter: brightness(0.9);
   }
   
   > span.taken {
@@ -218,7 +218,7 @@ const SeatRow = styled.div<{seat: string | null}>`
   }
   
   > span:active {
-    background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed};
+    background-color: ${({theme}) => theme.Colors.Solid.Blue};
   }
   
   > span#${({seat}) => seat} {
@@ -540,7 +540,12 @@ function ApplyStayPage() {
   };
 
   const edit = () => {
-    if (selectedApply?.id === "new") {
+    if (!selectedApply) {
+      showToast("선택된 신청이 없습니다.", "danger");
+      return;
+    }
+
+    if (selectedApply.id === "new") {
       if (!currentStay) {
         showToast("현재 잔류 정보가 없습니다.", "danger");
         return;
@@ -563,6 +568,23 @@ function ApplyStayPage() {
         showToast(e.response.data.error.message || e.response.data.error, "danger");
       });
       return;
+    }
+
+    if (!selectedApply.stay_seat) {
+      showToast("좌석을 선택해주세요.", "danger");
+      return;
+    }
+
+    // 좌석 검사: 해당 학년에 맞는지
+    const isValidSeat = currentStay?.stay_seat_preset.stay_seat.some((target) => 
+      isInRange(target.range.split(":"), selectedApply.stay_seat) && 
+      target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`
+    );
+
+    if (!isValidSeat) {
+      if(!confirm("해당 학년의 좌석이 아닙니다. 정말로 저장하시겠습니까?")) {
+        return;
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -745,6 +767,8 @@ function ApplyStayPage() {
                           {group.map((row, rowIdx) => (
                             <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
                             {row.map((seat, seatIdx) => {
+                              console.log(currentStay?.stay_seat_preset.stay_seat);
+                              const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${apply.user.grade}_${apply.user.gender}`);
                               const taken = stayApplies.find(
                               (sapply) =>
                                 sapply.stay_seat === seat &&
@@ -754,9 +778,9 @@ function ApplyStayPage() {
                               <span
                                 id={seat}
                                 ref={selectedApply.stay_seat === seat ? seatRef : null}
-                                className={["active", taken ? "taken" : "notTaken"].join(" ")}
+                                className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
                                 onClick={() =>
-                                setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
+                                  setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
                                 }
                                 key={seat}
                                 style={{
@@ -923,7 +947,7 @@ function ApplyStayPage() {
           </SelectionRow>
         </FitContainer>
         <FitContainer>
-          <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
+          <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
             학생 공지용 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: true }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>

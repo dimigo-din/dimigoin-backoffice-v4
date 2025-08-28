@@ -70,7 +70,7 @@ const base = {
       Translucent: {
         Red: "#ff3f3531",
         Orange: "#ff9b0542",
-        Yellow: "#f5c90534",
+        Yellow: "#f5c90545",
         Green: "#32cc5838",
         Blue: "#057eff2d",
         Indigo: "#5b59de42",
@@ -94,7 +94,7 @@ const base = {
         Translucent: {
           Positive: "#32cc581a",
           Warning:
-            "#f5c9051a",
+            "#f5c90537",
           Negative:
             "#ff40351a",
         }
