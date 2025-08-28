@@ -923,7 +923,7 @@ function ApplyStayPage() {
           </SelectionRow>
         </FitContainer>
         <FitContainer>
-          <ExportButton onClick={() => (stayApplies && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies) : undefined}>
+          <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
             학생 공지용 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: true }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
