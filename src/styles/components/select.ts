@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
-export const Input = styled.input`
-  padding: 12px 16px;
+export const Select = styled.select`
+  padding: 0 16px;
   border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Primary};
   border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
