@@ -9,7 +9,7 @@ import {
   type Stay,
   updateStayApply
 } from "../../api/stay.ts";
-import {renderHtml, searchUser, type User} from "../../api/user.ts";
+import {searchUser, type User} from "../../api/user.ts";
 import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
 import styled from "styled-components";
 import {useEffect, useRef, useState} from "react";
@@ -19,6 +19,7 @@ import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
 import {sha256} from "../../utils/sha256.ts";
 import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
+import {Select} from "../../styles/components/select.ts";
 import CheckBoxOn from "../../assets/icons/checkbox/check_box_checked.svg?react"
 import {Button, LightButton} from "../../styles/components/button.ts";
 import {makeid} from "../../utils/makeid.ts";
@@ -27,7 +28,7 @@ import moment from "moment-timezone";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import 'moment/dist/locale/ko';
-import {stay2format} from "../../utils/stay2format.ts";
+import {stay2excel} from "../../utils/stay2format.ts";
 import { flushSync } from "react-dom";
 
 const Wrapper = styled.div`
@@ -313,14 +314,10 @@ const StayCard = styled.div<{current: boolean}>`
 const ExportButton = styled.div`
   height: 5dvh;
   width: 100%;
-  
-  text-align: center;
-  align-content: center;
-  
-  background-color: ${({theme}) => theme.Colors.Components.Fill.Primary};
-  border-radius: 8px;
 
-  font-size: ${({theme}) => theme.Font.Callout.size};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const SelectionRow = styled.div<{ height?: string, width?: string }>`
@@ -429,8 +426,6 @@ function ApplyStayPage() {
   const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
   const [nameLoading, setNameLoading] = useState<boolean>(false);
 
-  const [stayDate, setStayDate] = useState<string>("");
-
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
   const [currentStay, setCurrentStay] = useState<Stay | null>(null);
@@ -439,13 +434,14 @@ function ApplyStayPage() {
   const [selectedApply, setSelectedApply] = useState<StayApply | null>(null);
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
 
+  const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
+
   const updateScreen = () => {
     getStayList().then((res1) => {
       setStayList(res1);
       if (res1.length > 0) {
         getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
-          setStayDate(moment(res3.stay_from, "YYYY-MM-DD").tz("Asia/Seoul").format("YYYY년 MM월 DD일 dddd"));
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
@@ -919,9 +915,10 @@ function ApplyStayPage() {
           }}>잔류자 추가하기</Button>
         </FitContainer>
         <FitContainer>
+          <p style={{marginBottom: "8px"}}>잔류자 검색</p>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
-                 placeholder={"검색할 문자열을 입력하세요."}
+                 placeholder={"검색할 학생명을 입력하세요."}
                  value={filterText}/>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={true}
@@ -947,14 +944,40 @@ function ApplyStayPage() {
           </SelectionRow>
         </FitContainer>
         <FitContainer>
-          <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
+          <p style={{marginBottom: "8px"}}>파일 내보내기</p>
+          {/* {/* <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
             학생 공지용 명단 내보내기
           </ExportButton>
           <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: true }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
             급식실용 잔류자 명단 내보내기
-          </ExportButton>
-          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}}>
-            생활관용 잔류자 명단 내보내기
+          </ExportButton> */}
+          <ExportButton> {/*  onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}} */}
+            <Select style={{width: "70%", height: "100%"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
+              <option value="">선택하세요..</option>
+              <option value="in">내부용</option>
+              <option value="out">외부용</option>
+              <option value="dorm">생활관용</option>
+            </Select>
+            <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
+              if(currentSelectedFileOutput === "") {
+                showToast("내보내기 형식을 선택하세요.", "danger");
+              }else if(currentSelectedFileOutput === "in"){
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                  ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new'));
+                else
+                  showToast("내보낼 데이터가 없습니다.", "warning");
+              }else if(currentSelectedFileOutput === "out"){
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                  stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: true});
+                else
+                  showToast("내보낼 데이터가 없습니다.", "warning");
+              }else if(currentSelectedFileOutput === "dorm"){
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                  stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: false});
+                else
+                  showToast("내보낼 데이터가 없습니다.", "warning");
+              }
+            }}>내보내기</Button>
           </ExportButton>
         </FitContainer>
       </ControllerContainer>
