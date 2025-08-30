@@ -9,7 +9,7 @@ import {
   type Stay,
   updateStayApply
 } from "../../api/stay.ts";
-import {renderHtml, searchUser, type User} from "../../api/user.ts";
+import {searchUser, type User} from "../../api/user.ts";
 import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
 import styled from "styled-components";
 import {useEffect, useRef, useState} from "react";
@@ -426,8 +426,6 @@ function ApplyStayPage() {
   const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
   const [nameLoading, setNameLoading] = useState<boolean>(false);
 
-  const [stayDate, setStayDate] = useState<string>("");
-
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
   const [currentStay, setCurrentStay] = useState<Stay | null>(null);
@@ -444,7 +442,6 @@ function ApplyStayPage() {
       if (res1.length > 0) {
         getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
-          setStayDate(moment(res3.stay_from, "YYYY-MM-DD").tz("Asia/Seoul").format("YYYY년 MM월 DD일 dddd"));
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });

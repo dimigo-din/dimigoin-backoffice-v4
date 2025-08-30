@@ -21,17 +21,6 @@ function displayDateKorean(input?: string): string {
     weekday: "long",
   }).format(d); // 예: "2025년 8월 30일 토요일"
 }
-function weekdayKorean(input?: string): string {
-  const d = parseDate(input);
-  return new Intl.DateTimeFormat("ko-KR", { weekday: "long" }).format(d);
-}
-function fileDate(input?: string): string {
-  const d = parseDate(input);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
 
 // ===== 스타일 =====
 const border = {
