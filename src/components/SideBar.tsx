@@ -88,9 +88,9 @@ function SideBar() {
     }
   }, []);
 
-  if (!location.pathname.startsWith("/login") && !localStorage.getItem("name")) {
+  if (!location.pathname.startsWith("/login") && !location.pathname.startsWith("/openwakeup") && !localStorage.getItem("name")) {
     location.href = "/login";
-  }else if (location.pathname.startsWith("/login")) {
+  }else if (location.pathname.startsWith("/login") || location.pathname.startsWith("/openwakeup")) {
     return null;
   }
 
