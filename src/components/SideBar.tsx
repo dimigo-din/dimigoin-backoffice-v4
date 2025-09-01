@@ -51,7 +51,41 @@ const UserWrapper = styled.div`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5dvh;
+  gap: 1dvh;
+  
+  .title{
+    --line-color:#e5e7eb; /* 선 색 */
+    --line-weight:1px; /* 선 두께 */
+    --gap: .75rem; /* 글자-선 사이 간격 */
+
+
+    display:flex;
+    align-items:center;
+    gap:var(--gap);
+    color:#374151; /* 텍스트 색 (선과 별도) */
+    font-family: sans-serif;
+  }
+
+  .title::before{
+    content:"";
+    border-top:var(--line-weight) solid var(--line-color);
+    flex:0 0 auto; /* 왼쪽 선은 짧게 */
+    width:20px;
+  }
+  .title::after{
+    content:"";
+    flex:1 1 0; /* 오른쪽 선은 길게 */
+    border-top:var(--line-weight) solid var(--line-color);
+  }
+  .title > span{
+    white-space:nowrap;
+    font-weight:600;
+  }
+`;
+const MenuWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3dvh;
 `;
 
 const MenuItem = styled.div<{ selected: boolean }>`
@@ -74,13 +108,35 @@ const MenuItem = styled.div<{ selected: boolean }>`
 function SideBar() {
   let navigate = useNavigate();
 
-  const menuList = {
-    "stay": "잔류 관리",
-    "frigo": "금요귀가 관리",
-    "applystay": "잔류 신청 관리",
-    "applyfrigo": "금요귀가 신청 관리",
-    "wakeup": "기상송 열람 및 관리",
-  } as const;
+  const menuList = [
+    {
+      title: "잔류",
+      items: [
+        { key: "stay", label: "잔류 관리" },
+        { key: "applystay", label: "잔류 신청 관리" }
+      ]
+    },
+    {
+      title: "금요귀가",
+      items: [
+        { key: "frigo", label: "금요귀가 관리" },
+        { key: "applyfrigo", label: "금요귀가 신청 관리" }
+      ]
+    },
+    {
+      title: "세탁",
+      items: [
+        { key: "laundry", label: "세탁 관리" },
+        { key: "applylaundry", label: "세탁 신청 관리" }
+      ]
+    },
+    {
+      title: "기상송",
+      items: [
+        { key: "wakeup", label: "기상송 열람 및 관리" }
+      ]
+    }
+  ] as const;
 
   useEffect(() => {
     if (!location.pathname.startsWith("/login")) {
@@ -106,15 +162,30 @@ function SideBar() {
         </div>
       </UserWrapper>
       <Divider />
-      <Menu>
-        {Object.keys(menuList).map((item) => (
+      <MenuWrapper>
+        
+        {/* {Object.keys(menuList).map((item) => (
           <MenuItem onClick={() => navigate(`/${item}`)} selected={location.pathname.startsWith(`/${item}`)}>
             {menuList[item as keyof typeof menuList]}
           </MenuItem>
+        ))} */}
+
+        {menuList.map((menu) => (
+          <div key={menu.title}>
+            <Menu>
+              <div className="title">
+                <span>{menu.title}</span>
+              </div>
+              {menu.items.map((item) => (
+                <MenuItem onClick={() => navigate(`/${item.key}`)} selected={location.pathname.startsWith(`/${item.key}`)}>
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Menu>
+          </div>
         ))}
-      </Menu>
+      </MenuWrapper>
     </Wrapper>
   );
 }
-
 export default SideBar;

@@ -25,6 +25,11 @@ function OpenWakeup() {
 
   return (
     <>
+      <link rel="manifest" href="/manifest_wakeup.json" />
+      <link rel="apple-touch-icon" href="/dimigoin.png"/>
+      <meta name="apple-mobile-web-app-capable" content="yes"/>
+      <meta name="apple-mobile-web-app-title" content="디미고인 기상곡"/>
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     </>
   );
 }

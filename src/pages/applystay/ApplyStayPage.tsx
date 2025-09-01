@@ -684,6 +684,7 @@ function ApplyStayPage() {
                         onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
                         placeholder={"이름으로 검색하세요."}
                         value={nameSearch}
+                        style={{height: "5dvh"}}
                       />
                       {isSuggestOpen && (
                         <SuggestBox>
@@ -906,7 +907,7 @@ function ApplyStayPage() {
           }) : Loading()}
         </StretchContainer>
         <FitContainer>
-          <Button disabled={stayApplies === null || selectedApply?.id === "new"} onClick={() => {
+          <Button disabled={stayApplies === null || selectedApply?.id === "new"} style={{height: "5dvh", padding: 0}} onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -919,7 +920,8 @@ function ApplyStayPage() {
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 학생명을 입력하세요."}
-                 value={filterText}/>
+                 value={filterText}
+                style={{height: "5dvh"}}/>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={true}
                            selected={filterState === true}
@@ -952,7 +954,7 @@ function ApplyStayPage() {
             급식실용 잔류자 명단 내보내기
           </ExportButton> */}
           <ExportButton> {/*  onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}} */}
-            <Select style={{width: "70%", height: "100%"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
+            <Select style={{width: "70%", height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
               <option value="">선택하세요..</option>
               <option value="in">내부용</option>
               <option value="out">외부용</option>
