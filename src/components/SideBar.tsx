@@ -62,7 +62,7 @@ const Menu = styled.div`
     display:flex;
     align-items:center;
     gap:var(--gap);
-    color:#374151; /* 텍스트 색 (선과 별도) */
+    color: ${({theme}) => theme.Colors.Content.Primary};
     font-family: sans-serif;
   }
 
@@ -71,11 +71,15 @@ const Menu = styled.div`
     border-top:var(--line-weight) solid var(--line-color);
     flex:0 0 auto; /* 왼쪽 선은 짧게 */
     width:20px;
+
+    background-color: ${({theme}) => theme.Colors.Background.Secondary};
   }
   .title::after{
     content:"";
     flex:1 1 0; /* 오른쪽 선은 길게 */
     border-top:var(--line-weight) solid var(--line-color);
+
+    background-color: ${({theme}) => theme.Colors.Background.Secondary};
   }
   .title > span{
     white-space:nowrap;
