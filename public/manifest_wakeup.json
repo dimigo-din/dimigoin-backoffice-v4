@@ -1,8 +1,8 @@
 {
-  "name": "디미고인 관리자",
-  "short_name": "디미고인 관리자",
-  "description": "선생님을 위한 디미고인 관리자 페이지입니다.",
-  "start_url": "/",
+  "name": "디미고인 기상곡",
+  "short_name": "기상곡",
+  "description": "오늘의 기상곡을 엽니다.",
+  "start_url": "/openwakeup",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#e83c77",
