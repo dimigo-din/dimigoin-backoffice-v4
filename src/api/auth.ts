@@ -44,7 +44,7 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
     else if (location.host === "admin.dimigo.site")
       res = (await axios.post("https://dimiauth.dimigo.site/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
     else
-      res = (await axios.post("http://localhost:9008/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
+      res = (await axios.post("http://localhost:5000/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   }catch (e) {
     console.log(e);
     localStorage.clear();
