@@ -295,22 +295,6 @@ const CheckBox = styled.div<{ canceled: boolean }>`
   }
 `;
 
-const StayCard = styled.div<{current: boolean}>`
-  height: 20%;
-  width: 100%;
-  
-  border-radius: 6px;
-  background-color: ${({theme, current}) => current ? theme.Colors.Background.Tertiary : theme.Colors.Background.Primary};
-  
-  font-size: ${({theme}) => theme.Font.Headline.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  
-  text-align: center;
-  align-content: center;
-  
-  transition: background-color 200ms ease;
-`;
-
 const ExportButton = styled.div`
   height: 5dvh;
   width: 100%;
@@ -421,6 +405,8 @@ function ApplyStayPage() {
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
   const [filterState, setFilterState] = useState<boolean | null | undefined>(undefined);
+  const [filterGrade, setFilterGrade] = useState<boolean | null | undefined>(undefined);
+  const [filterGender, setFilterGender] = useState<boolean | null | undefined>(undefined);
   const [isSuggestOpen, setIsSuggestOpen] = useState(false);
   const [nameSearch, setNameSearch] = useState<string>("");
   const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
@@ -664,7 +650,19 @@ function ApplyStayPage() {
   return (
     <Wrapper>
       <StayApplyContainer>
-        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 && (filterState === undefined || a.outing.some((o) => o.approved === filterState))).map((apply) => {
+        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => 
+          `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 && 
+          (filterState === undefined || a.outing.some((o) => o.approved === filterState)) &&
+          (filterGrade === undefined || 
+            (filterGrade === true && a.user.grade === 1) ||
+            (filterGrade === null && a.user.grade === 2) ||
+            (filterGrade === false && a.user.grade === 3)
+          ) &&
+          (filterGender === undefined ||
+            (filterGender === true && a.user.gender === "male") ||
+            (filterGender === false && a.user.gender === "female")
+          )
+        ).map((apply) => {
           return (
             <StayApplyCard
               opened={!isClosing && !!selectedApply && apply.id === selectedApply.id}
@@ -896,16 +894,18 @@ function ApplyStayPage() {
         }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
       </StayApplyContainer>
       <ControllerContainer>
-        <StretchContainer>
-          <p style={{marginBottom: "8px"}}>잔류 대상</p>
-          {stayList !== null ? stayList.map((apply) => {
-            return (
-              <StayCard current={apply.id === currentStay?.id} onClick={() => {close(); setCurrentStayIndex(stayList.indexOf(apply));}}>
-                <span>{`${apply.name}`}</span> <span style={{color: "#888"}}>{`(${apply.stay_from} ~ ${apply.stay_to})`}</span>
-              </StayCard>
-            );
-          }) : Loading()}
-        </StretchContainer>
+        <FitContainer>
+          <p style={{marginBottom: "8px"}}>잔류 일정</p>
+          <Select style={{height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
+            {stayList !== null ? stayList.map((apply) => {
+              return (
+                <option key={apply.id} value={stayList.indexOf(apply)}>
+                  <span>{`${apply.name}`}</span> <span style={{color: "#888"}}>{`(${apply.stay_from} ~ ${apply.stay_to})`}</span>
+                </option>
+              );
+            }) : Loading()}
+          </Select>
+        </FitContainer>
         <FitContainer>
           <Button disabled={stayApplies === null || selectedApply?.id === "new"} style={{height: "5dvh", padding: 0}} onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
@@ -915,8 +915,47 @@ function ApplyStayPage() {
             setSelectedApply(newApply);
           }}>잔류자 추가하기</Button>
         </FitContainer>
-        <FitContainer>
+        <StretchContainer>
           <p style={{marginBottom: "8px"}}>잔류자 검색</p>
+          <SelectionRow height={"4dvh"} width={"100%"}>
+            <SelectionItem boundState={undefined}
+                           selected={filterGrade === true}
+                           onClick={() => setFilterGrade(true)}>
+              {`1학년 (${stayApplies?.filter(apply => apply.user.grade === 1).length || 0}건)`}
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterGrade === null}
+                           onClick={() => setFilterGrade(null)}>
+              {`2학년 (${stayApplies?.filter(apply => apply.user.grade === 2).length || 0}건)`}
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterGrade === false}
+                           onClick={() => setFilterGrade(false)}>
+              {`3학년 (${stayApplies?.filter(apply => apply.user.grade === 3).length || 0}건)`}
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterGrade === undefined}
+                           onClick={() => setFilterGrade(undefined)}>
+              {`모두 (${stayApplies?.length || 0}건)`}
+            </SelectionItem>
+          </SelectionRow>
+          <SelectionRow height={"4dvh"} width={"100%"}>
+            <SelectionItem boundState={undefined}
+                           selected={filterGender === true}
+                           onClick={() => setFilterGender(true)}>
+              {`남자 (${stayApplies?.filter(apply => apply.user.gender === "male").length || 0}건)`}
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterGender === false}
+                           onClick={() => setFilterGender(false)}>
+              {`여자 (${stayApplies?.filter(apply => apply.user.gender === "female").length || 0}건)`}
+            </SelectionItem>
+            <SelectionItem boundState={undefined}
+                           selected={filterGender === undefined}
+                           onClick={() => setFilterGender(undefined)}>
+              {`모두 (${stayApplies?.length || 0}건)`}
+            </SelectionItem>
+          </SelectionRow>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 학생명을 입력하세요."}
@@ -944,7 +983,7 @@ function ApplyStayPage() {
               {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
             </SelectionItem>
           </SelectionRow>
-        </FitContainer>
+        </StretchContainer>
         <FitContainer>
           <p style={{marginBottom: "8px"}}>파일 내보내기</p>
           {/* {/* <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>

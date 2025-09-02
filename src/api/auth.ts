@@ -39,7 +39,10 @@ export async function logout(): Promise<void> {
 export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
   let res: ({gender: "male" | "female", mail: string, name: string, number: string} | null)[];
   try {
-    res  = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
+    if (location.host === "admin.dimigo.site")
+      res  = (await axios.post("https://dimiauth.dimigo.site/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
+    else
+      res  = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   }catch (e) {
     console.log(e);
     localStorage.clear();
