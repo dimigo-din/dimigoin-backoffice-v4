@@ -295,22 +295,6 @@ const CheckBox = styled.div<{ canceled: boolean }>`
   }
 `;
 
-const StayCard = styled.div<{current: boolean}>`
-  height: 20%;
-  width: 100%;
-  
-  border-radius: 6px;
-  background-color: ${({theme, current}) => current ? theme.Colors.Background.Tertiary : theme.Colors.Background.Primary};
-  
-  font-size: ${({theme}) => theme.Font.Headline.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  
-  text-align: center;
-  align-content: center;
-  
-  transition: background-color 200ms ease;
-`;
-
 const ExportButton = styled.div`
   height: 5dvh;
   width: 100%;
@@ -931,7 +915,7 @@ function ApplyStayPage() {
             setSelectedApply(newApply);
           }}>잔류자 추가하기</Button>
         </FitContainer>
-        <FitContainer>
+        <StretchContainer>
           <p style={{marginBottom: "8px"}}>잔류자 검색</p>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={undefined}
@@ -999,7 +983,7 @@ function ApplyStayPage() {
               {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
             </SelectionItem>
           </SelectionRow>
-        </FitContainer>
+        </StretchContainer>
         <FitContainer>
           <p style={{marginBottom: "8px"}}>파일 내보내기</p>
           {/* {/* <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
