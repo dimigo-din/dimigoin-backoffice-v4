@@ -446,6 +446,11 @@ const NoOuting = styled.div`
   align-items: center;
 `;
 
+const Text = styled.p`
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  margin-bottom: 2px;
+`;
+
 function ApplyStayPage() {
   moment.locale("ko");
 
@@ -473,6 +478,8 @@ function ApplyStayPage() {
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
+  
+  const [newUser, setNewUser] = useState<User | null>(null);
 
   const updateScreen = () => {
     getStayList().then((res1) => {
@@ -497,20 +504,33 @@ function ApplyStayPage() {
   }
 
   const close = (callback?: () => void) => {
-    setIsClosing(true);
-    setTimeout(() => {
-      flushSync(() => {
-        setIsClosing(false);
-        setSelectedApply(null);
-        setSelectedApplyChecksum(null);
-        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
-      });
+    const closeAction = () => {
+      setIsClosing(true);
+      setTimeout(() => {
+        flushSync(() => {
+          setIsClosing(false);
+          setSelectedApply(null);
+          setSelectedApplyChecksum(null);
+          setStayApplies((p) => p!.filter((a) => a.id !== "new"));
+        });
 
-      if (callback) {
-        // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
-        setTimeout(() => callback(), 100);
+        if (callback) {
+          // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
+          setTimeout(() => callback(), 100);
+        }
+      }, 300);
+    }
+
+    if(!selectedApply) return;
+    
+    const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k as keyof typeof a])).join("")).join("");
+    sha256(merged).then((data) => {
+      if (data !== selectedApplyChecksum && !confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?"))
+        return;
+      else{
+        closeAction();
       }
-    }, 300);
+    });
   };
 
   const openEditor = (apply: StayApply) => {
@@ -534,18 +554,7 @@ function ApplyStayPage() {
 
     // 같은 탭을 다시 클릭한 경우
     if (selectedApply.id === apply.id) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
-      sha256(merged).then((data) => {
-        if (data !== selectedApplyChecksum) {
-          if (confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
-            close();
-          }
-        } else {
-          close();
-        }
-      });
+      close();
       return;
     }
 
@@ -585,6 +594,12 @@ function ApplyStayPage() {
         return;
       }
       showToast(currentStay.id, 'info');
+
+      if(selectedApply.stay_seat === "null") {
+        showToast("좌석을 선택해주세요.", "danger");
+        return;
+      }
+
       createStayApply({
         stay: currentStay.id,
         user: selectedApply.user.id,
@@ -809,7 +824,7 @@ function ApplyStayPage() {
       </StayApplyContainer>
       <ControllerContainer>
         <FitContainer>
-          <p style={{marginBottom: "8px"}}>잔류 일정</p>
+          <Text>잔류 일정</Text>
           <Select style={{height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
             {stayList !== null ? stayList.map((apply) => {
               return (
@@ -821,16 +836,56 @@ function ApplyStayPage() {
           </Select>
         </FitContainer>
         <FitContainer>
+          <Text>잔류 신청 추가</Text>
+          <InputWrapper>
+            <Input
+              type={"search"}
+              placeholder={"학생 이름을 입력해주세요."}
+              onFocus={() => setIsSuggestOpen(!!nameSearch)}
+              onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
+              onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
+              value={nameSearch}
+              style={{height: "5dvh", width: "100%"}}
+            />
+            {isSuggestOpen && (
+              <SuggestBox>
+                {nameLoading && (
+                  <SuggestItem key="loading" onMouseDown={(e) => e.preventDefault()}>
+                    <span>검색 중…</span>
+                    <span className="meta">잠시만요</span>
+                  </SuggestItem>
+                )}
+                {!nameLoading && nameResults.slice(0, 12).map((u) => (
+                  <SuggestItem
+                    key={u.id}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setNewUser(u);
+                      setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
+                      setIsSuggestOpen(false);
+                    }}
+                  >
+                    <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
+                  </SuggestItem>
+                ))}
+                {!nameLoading && nameResults.length === 0 && nameSearch && (
+                  <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
+                    <span>검색 결과가 없습니다</span>
+                    <span className="meta">다른 키워드를 입력해 보세요</span>
+                  </SuggestItem>
+                )}
+              </SuggestBox>
+            )}
+          </InputWrapper>
           <Button disabled={stayApplies === null || selectedApply?.id === "new"} style={{height: "5dvh", padding: 0}} onClick={() => {
-            const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
+            const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            setStayApplies((p) => [newApply, ...(p || [])]);
             setSelectedApply(newApply);
-          }}>잔류자 추가하기</Button>
+          }}>잔류 신청 추가하기</Button>
         </FitContainer>
         <StretchContainer>
-          <p style={{marginBottom: "8px"}}>잔류자 검색</p>
+          <Text>잔류자 검색</Text>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
                  placeholder={"검색할 학생명을 입력하세요."}
@@ -899,7 +954,7 @@ function ApplyStayPage() {
           </SelectionRow>
         </StretchContainer>
         <FitContainer>
-          <p style={{marginBottom: "8px"}}>파일 내보내기</p>
+          <Text>파일 내보내기</Text>
           <ExportButton>
             <Select style={{width: "70%", height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
               <option value="">선택하세요..</option>

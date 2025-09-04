@@ -408,7 +408,7 @@ function FrigoPage() {
           <Button disabled={!canApply} onClick={() => apply()}>신청하기</Button>
         </FitController>
         <FitController>
-          <Text>필터링</Text>
+          <Text>분류</Text>
           <Input value={filterName} onInput={(e) => setFilterName((e.target as HTMLInputElement).value)} placeholder={"이름을 입력해주세요."}/>
           <SelectionRow width={"100%"}>
             <SelectionItem selected={filterGrade === 1}
