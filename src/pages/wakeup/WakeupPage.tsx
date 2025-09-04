@@ -152,7 +152,7 @@ function WakeupPage() {
         (a.wakeupSongVote.filter((v) => v.upvote).length - a.wakeupSongVote.filter((v) => !v.upvote).length)
       ));
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
@@ -164,7 +164,7 @@ function WakeupPage() {
       window.open(`https://www.youtube.com/watch?v=${applies?.find((a) => a.id === id)!.video_id}`, "_blank")
       updateScreen();
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
@@ -175,7 +175,7 @@ function WakeupPage() {
       showToast("성공했습니다.", "info");
       updateScreen();
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }

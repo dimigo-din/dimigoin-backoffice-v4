@@ -30,43 +30,44 @@ import moment from "moment-timezone";
 import 'moment/dist/locale/ko';
 import {stay2excel} from "../../utils/stay2format.ts";
 import { flushSync } from "react-dom";
+import SelectionDialog from "../../components/SelectionDialog.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
   width: 100%;
-  
+
   display: flex;
   flex-direction: row;
-  
+
   gap: 2dvh;
-  
+
   padding: 2dvh 2dvh;
 `;
 
 const StayApplyContainer = styled.div`
   height: 100%;
   width: 65%;
-  
+
   display: flex;
   flex-direction: column;
-  
+
   gap: 1dvh;
   padding: 1dvh 1dvh;
-  
+
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 8px;
-  
+
   overflow-y: scroll;
 `;
 
 const ControllerContainer = styled.div`
   flex: 1;
-  
+
   display: flex;
   flex-direction: column;
 
   gap: 2dvh;
-  
+
   color: ${({theme}) => theme.Colors.Content.Primary};
 `;
 
@@ -87,12 +88,12 @@ const StretchContainer = styled.div`
 const FitContainer = styled.div`
   height: fit-content;
   width: 100%;
-  
+
   border-radius: 8px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   padding: 2dvh 2dvh;
-  
+
   display: flex;
   flex-direction: column;
   gap: 1dvh;
@@ -101,23 +102,19 @@ const FitContainer = styled.div`
 const NoApply = styled.div`
   height: 100%;
   width: 100%;
-  
+
   text-align: center;
   align-content: center;
-  
+
   color: ${({theme}) => theme.Colors.Content.Primary};
   font-size: ${({theme}) => theme.Font.Title.size};
 `;
 
-const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
+const StayApplyCard = styled.div<{outingCount: number}>`
   height: auto;
   width: 100%;
 
-  max-height: ${({
-                   opened,
-                   outingCount
-                 }) => opened ? `calc(8dvh + 25dvh + ${outingCount * 17}dvh + 4dvh + 4dvh + 5dvh + 6dvh)` : "8dvh"};
-    // max-height: ${({opened}) => opened ? "inherit" : "8dvh"};
+  max-height: 8dvh;
   flex: 0 0 auto;
 
   background-color: ${({theme}) => theme.Colors.Background.Tertiary};
@@ -133,16 +130,6 @@ const StayApplyCard = styled.div<{opened?: boolean, outingCount: number}>`
   transition: max-height 0.3s ease;
   will-change: max-height;
   overflow: hidden;
-
-  > button {
-    display: block;
-    flex: 0 0 auto;
-
-    height: 3.5dvh;
-    padding: 0;
-
-    margin-top: 2dvh;
-  }
 `;
 
 const StayApplyCardSummary = styled.div`
@@ -150,11 +137,11 @@ const StayApplyCardSummary = styled.div`
   width: 100%;
 
   flex: 0 0 auto;
-  
+
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  
+
   > .left {
     align-content: center;
 
@@ -172,94 +159,148 @@ const StayApplyCardSummary = styled.div`
 
 const StayApplyDetail = styled.div`
   flex: 0 0 auto;
-  
+
   height: fit-content;
   width: 100%;
+
+  > p {
+    font-size: ${({theme}) => theme.Font.Title.size};
+    font-weight: ${({theme}) => theme.Font.Title.weight};
+    margin-bottom: 2dvh;
+  }
+
+  > button {
+    display: block;
+    flex: 0 0 auto;
+
+    height: 3.5dvh;
+    padding: 0;
+
+    margin-top: 2dvh;
+  }
+
+  color: ${({theme}) => theme.Colors.Content.Primary};
 `;
 
 
 const SeatBox = styled.div`
   flex: 0 0 auto;
 
-  height: 25dvh;
+  height: 35dvh;
   width: 100%;
-  
+
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 8px;
-  
+
   overflow: scroll;
 `;
 
 const SeatRow = styled.div<{seat: string | null}>`
   width: fit-content;
-  
+
   white-space: nowrap;
-  
+
   > span {
     display: inline-block;
-    
+
     width: 4.5dvw;
-    
+
     padding: 12px 0;
     margin: 4px;
-    
+
     background-color: ${({theme}) => theme.Colors.Background.Primary};
     border-radius: 8px;
-    
+
     text-align: center;
   }
-  
+
   > span.inactive {
     filter: brightness(0.9);
   }
-  
+
   > span.taken {
     color: white;
     background-color: ${({theme}) => theme.Colors.Solid.Black};
   }
-  
+
   > span:active {
     background-color: ${({theme}) => theme.Colors.Solid.Blue};
   }
-  
+
   > span#${({seat}) => seat} {
     color: white;
-    
+
     background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
   }
 `;
 
 const OutingBox = styled.div`
-  flex: 0 0 auto;
-  
-  height: 15dvh;
-  width: 100%;
-  
+  display: flex;
+  flex-direction: column;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 8px;
   margin-top: 2dvh;
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  
-  font-size: ${({theme}) => theme.Font.Body.size};
-  
-  input {
-    height: 4dvh;
-    padding: 0;
 
-    //border: none;
-    font-size: ${({theme}) => theme.Font.Callout.size};
-    text-align: center;
-    background-color: inherit;
+  height: 45dvh;
+
+  overflow-y: scroll;
+
+  > div {
+    flex: 0 0 auto;
+
+    height: 15dvh;
+    width: 100%;
+
+    margin-top: 2dvh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    font-size: ${({theme}) => theme.Font.Body.size};
+
+    input {
+      height: 4dvh;
+      padding: 0;
+
+      //border: none;
+      font-size: ${({theme}) => theme.Font.Callout.size};
+      text-align: center;
+      background-color: inherit;
+    }
+
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: ${window.matchMedia("(prefers-color-scheme: dark)").matches ? "invert(1)" : "none"};
+    }
+
+    &:not(:last-child)::after {
+      content: "";
+      display: block;
+      width: 80%;
+      height: 1px;
+      background-color: ${({ theme }) => theme.Colors.Line.Outline};
+      margin: 2dvh auto 0; /* 위쪽 간격, 가운데 정렬 */
+    }
   }
 
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: ${window.matchMedia("(prefers-color-scheme: dark)").matches ? "invert(1)" : "none"};
-  }
 `;
+
+const ButtonBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  border-radius: 8px;
+  margin-top: 2dvh;
+
+  height: 5dvh;
+
+  gap: 2dvh;
+
+  > Button {
+    padding: 0;
+  }
+
+`
 
 const InputRow = styled.div<{width?: string}>`
   width: ${({width}) => width || "100%"};
@@ -269,26 +310,26 @@ const InputRow = styled.div<{width?: string}>`
   justify-content: center;
 
   > Input {
-      padding: 0 8px;
+    padding: 0 8px;
   }
 `;
 
 const CheckBox = styled.div<{ canceled: boolean }>`
   height: 3vh;
   width: 32%;
-  
+
   border-radius: 12px;
   color: ${({theme}) => theme.Colors.Content.Primary};
   font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
   line-height: ${({theme}) => theme.Font.Paragraph_Large.lineHeight};
   font-weight: ${({theme, canceled}) => canceled ? theme.Font.Paragraph_Large.weight.regular : theme.Font.Paragraph_Large.weight.weak};
   transition: border-color 0.3s ease, font-weight 0.3s ease;
-  
+
   display: flex;
   gap: 6%;
   align-items: center;
   justify-content: center;
-  
+
   path {
     fill: ${({theme, canceled}) => canceled ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Quaternary};
     transition: fill 0.3s ease;
@@ -306,7 +347,7 @@ const ExportButton = styled.div`
 
 const SelectionRow = styled.div<{ height?: string, width?: string }>`
   margin-left: ${({width}) => width ? "none" : "2%"};
-  
+
   height: ${({height}) => height || "4dvh"};
   width: ${({width}) => width || "18%"};
   display: flex;
@@ -314,46 +355,48 @@ const SelectionRow = styled.div<{ height?: string, width?: string }>`
   align-items: center;
   justify-content: space-evenly;
   font-size: ${({theme}) => theme.Font.Callout.size};
-  
+
   border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
   border-radius: 12px;
-  
+
   overflow: hidden;
 `;
 
 const SelectionItem = styled.div<{ boundState?: boolean | null, border?: boolean, selected: boolean }>`
   flex: 1;
-  
+
   height: 100%;
-  
+
   text-align: center;
   align-content: center;
-  
+
   border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
-  
-  background-color: ${({theme, selected, boundState}) => 
-    selected ? 
-        boundState === true ? theme.Colors.Core.Status.Positive :
+
+  background-color: ${({theme, selected, boundState}) =>
+    selected ?
+      boundState === true ? theme.Colors.Core.Status.Positive :
         boundState === false ? theme.Colors.Core.Status.Negative :
-        boundState === null ? theme.Colors.Core.Status.Warning :
-          theme.Colors.Core.Brand.Primary
+          boundState === null ? theme.Colors.Core.Status.Warning :
+            theme.Colors.Core.Brand.Primary
       : "none"
   };
+
+  color: ${({theme, selected}) => selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary};
 `;
 
 const DeleteBtn = styled.div`
   height: 4dvh;
   width: 7%;
-  
+
   text-align: center;
   align-content: center;
 
   font-size: ${({theme}) => theme.Font.Callout.size};
   background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
-  
+
   border: 1px solid ${({theme}) => theme.Colors.Solid.Red};
   border-radius: 12px;
-  
+
   margin-left: 1%;
 `;
 
@@ -394,6 +437,20 @@ const SuggestItem = styled.div`
   .meta { color: ${({theme}) => theme.Colors.Content.Tertiary}; font-size: ${({theme}) => theme.Font.Footnote.size}; }
 `;
 
+const NoOuting = styled.div`
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+const Text = styled.p`
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  margin-bottom: 2px;
+`;
+
 function ApplyStayPage() {
   moment.locale("ko");
 
@@ -421,6 +478,8 @@ function ApplyStayPage() {
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
+  
+  const [newUser, setNewUser] = useState<User | null>(null);
 
   const updateScreen = () => {
     getStayList().then((res1) => {
@@ -439,26 +498,39 @@ function ApplyStayPage() {
         });
       }
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
 
   const close = (callback?: () => void) => {
-  setIsClosing(true);
-    setTimeout(() => {
-      flushSync(() => {
-        setIsClosing(false);
-        setSelectedApply(null);
-        setSelectedApplyChecksum(null);
-        setStayApplies((p) => p!.filter((a) => a.id !== "new"));
-      });
+    const closeAction = () => {
+      setIsClosing(true);
+      setTimeout(() => {
+        flushSync(() => {
+          setIsClosing(false);
+          setSelectedApply(null);
+          setSelectedApplyChecksum(null);
+          setStayApplies((p) => p!.filter((a) => a.id !== "new"));
+        });
 
-      if (callback) {
-        // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
-        setTimeout(() => callback(), 100);
+        if (callback) {
+          // 상태 변경이 완전히 반영될 때까지 충분히 기다린 후 콜백 실행
+          setTimeout(() => callback(), 100);
+        }
+      }, 300);
+    }
+
+    if(!selectedApply) return;
+    
+    const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k as keyof typeof a])).join("")).join("");
+    sha256(merged).then((data) => {
+      if (data !== selectedApplyChecksum && !confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?"))
+        return;
+      else{
+        closeAction();
       }
-    }, 300);
+    });
   };
 
   const openEditor = (apply: StayApply) => {
@@ -466,13 +538,13 @@ function ApplyStayPage() {
     if (selectedApply === null) {
       // 깊은 복사로 완전히 독립적인 객체 생성
       const applyCopy = JSON.parse(JSON.stringify(apply));
-      
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const merged = applyCopy.stay_seat + applyCopy.outing.map(a => 
+      const merged = applyCopy.stay_seat + applyCopy.outing.map(a =>
         Object.keys(a).map((k) => String(a[k])).join("")
       ).join("");
-      
+
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
@@ -482,18 +554,7 @@ function ApplyStayPage() {
 
     // 같은 탭을 다시 클릭한 경우
     if (selectedApply.id === apply.id) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
-      sha256(merged).then((data) => {
-        if (data !== selectedApplyChecksum) {
-          if (confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
-            close();
-          }
-        } else {
-          close();
-        }
-      });
+      close();
       return;
     }
 
@@ -533,6 +594,12 @@ function ApplyStayPage() {
         return;
       }
       showToast(currentStay.id, 'info');
+
+      if(selectedApply.stay_seat === "null") {
+        showToast("좌석을 선택해주세요.", "danger");
+        return;
+      }
+
       createStayApply({
         stay: currentStay.id,
         user: selectedApply.user.id,
@@ -546,7 +613,7 @@ function ApplyStayPage() {
         setSelectedApplyChecksum(null);
         updateScreen();
       }).catch((e) => {
-        console.log(e);
+        console.error(e);
         showToast(e.response.data.error.message || e.response.data.error, "danger");
       });
       return;
@@ -558,8 +625,8 @@ function ApplyStayPage() {
     }
 
     // 좌석 검사: 해당 학년에 맞는지
-    const isValidSeat = currentStay?.stay_seat_preset.stay_seat.some((target) => 
-      isInRange(target.range.split(":"), selectedApply.stay_seat) && 
+    const isValidSeat = currentStay?.stay_seat_preset.stay_seat.some((target) =>
+      isInRange(target.range.split(":"), selectedApply.stay_seat) &&
       target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`
     );
 
@@ -576,7 +643,7 @@ function ApplyStayPage() {
       close();
       updateScreen();
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
@@ -595,7 +662,7 @@ function ApplyStayPage() {
       close();
       updateScreen();
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
@@ -624,7 +691,7 @@ function ApplyStayPage() {
           setNameResults([]);
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
         setNameResults([]);
       } finally {
         setNameLoading(false);
@@ -634,26 +701,30 @@ function ApplyStayPage() {
   }, [nameSearch]);
 
   useEffect(() => {
-    if (seatBoxRef.current && seatRef.current) {
-      const box = seatBoxRef.current;
-      const seat = seatRef.current;
+    const timeout = setTimeout(() => {
+      if (seatBoxRef.current && seatRef.current) {
+        const box = seatBoxRef.current;
+        const seat = seatRef.current;
 
-      box.scrollTo({
-        top: seat.offsetTop - box.clientHeight / 2 + seat.clientHeight / 2 - box.offsetTop,
-        left: seat.offsetLeft - box.clientWidth / 2 + seat.clientWidth / 2 - box.offsetLeft,
-        behavior: "smooth"
-      });
-    }
+        box.scrollTo({
+          top: seat.offsetTop - box.clientHeight / 2 + seat.clientHeight / 2 - box.offsetTop,
+          left: seat.offsetLeft - box.clientWidth / 2 + seat.clientWidth / 2 - box.offsetLeft,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, [selectedApply]);
 
 
   return (
     <Wrapper>
       <StayApplyContainer>
-        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) => 
-          `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 && 
+        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) =>
+          `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 &&
           (filterState === undefined || a.outing.some((o) => o.approved === filterState)) &&
-          (filterGrade === undefined || 
+          (filterGrade === undefined ||
             (filterGrade === true && a.user.grade === 1) ||
             (filterGrade === null && a.user.grade === 2) ||
             (filterGrade === false && a.user.grade === 3)
@@ -665,7 +736,7 @@ function ApplyStayPage() {
         ).map((apply) => {
           return (
             <StayApplyCard
-              opened={!isClosing && !!selectedApply && apply.id === selectedApply.id}
+              key={apply.id}
               outingCount={(selectedApply ? selectedApply.outing.length : null) || apply.outing.length}>
               <StayApplyCardSummary>
                 <div className="left" onClick={(e) => {
@@ -747,155 +818,13 @@ function ApplyStayPage() {
                   외출 {apply.outing.length}건
                 </div>
               </StayApplyCardSummary>
-              {selectedApply && selectedApply.id === apply.id ? (
-                <>
-                  <StayApplyDetail>
-                    <SeatBox ref={seatBoxRef}>
-                        {(() => {
-                        const table = genTable();
-                        const groupedRows: string[][][] = [];
-                        for (let i = 0; i < table.length; i += 2) {
-                          groupedRows.push(table.slice(i, i + 2));
-                        }
-                        return groupedRows.map((group, idx) => (
-                          <div key={idx} style={{ marginBottom: "16px" }}>
-                          {group.map((row, rowIdx) => (
-                            <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
-                            {row.map((seat, seatIdx) => {
-                              console.log(currentStay?.stay_seat_preset.stay_seat);
-                              const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${apply.user.grade}_${apply.user.gender}`);
-                              const taken = stayApplies.find(
-                              (sapply) =>
-                                sapply.stay_seat === seat &&
-                                sapply.stay_seat !== selectedApply.stay_seat
-                              );
-                              return (
-                              <span
-                                id={seat}
-                                ref={selectedApply.stay_seat === seat ? seatRef : null}
-                                className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
-                                onClick={() =>
-                                  setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
-                                }
-                                key={seat}
-                                style={{
-                                marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
-                                }}
-                              >
-                                {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
-                              </span>
-                              );
-                            })}
-                            </SeatRow>
-                          ))}
-                          </div>
-                        ));
-                        })()}
-                    </SeatBox>
-                  </StayApplyDetail>
-                  {selectedApply.outing.map((outing) => {
-                    const modify = (deleteTarget?: Outing) => {
-                      setSelectedApply((p) => {
-                        if (deleteTarget)
-                          return { ...p!, outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id) };
-                        else
-                          return { ...p!, outing: p!.outing.map((o) => {
-                              return o.id === outing.id ? {
-                                ...outing
-                              } : o;
-                            }) };
-                      });
-                    }
-
-                    return (
-                      <OutingBox>
-                        <InputRow>
-                          <Input type={"text"}
-                                 style={{width: "62%"}}
-                                 onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
-                                 value={outing.reason}
-                                 placeholder={"외출 사유를 입력하세요.."}/>
-                          <SelectionRow>
-                            <SelectionItem selected={outing.approved === true}
-                                           boundState={true}
-                                            onClick={() => {outing.approved = true; modify();}}>
-                              허가
-                            </SelectionItem>
-                            <SelectionItem selected={outing.approved === null}
-                                           boundState={null}
-                                           border={true}
-                                           onClick={() => {outing.approved = null; modify();}}>
-                              검토
-                            </SelectionItem>
-                            <SelectionItem selected={outing.approved === false}
-                                           boundState={false}
-                                           border={true}
-                                           onClick={() => {outing.approved = false; modify();}}>
-                              불허
-                            </SelectionItem>
-                          </SelectionRow>
-                          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                          {/* @ts-ignore */}
-                          <DeleteBtn onClick={() => {modify(outing)}}>
-                            삭제
-                          </DeleteBtn>
-                        </InputRow>
-                        <InputRow>
-                          <Input type={"datetime-local"}
-                                 onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
-                                 onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.from.split(/[+Z]/)[0]}
-                                 step={600}
-                                 min="2025-01-01T00:00"/>
-                          <p>부터&nbsp;&nbsp;</p>
-                          <Input type={"datetime-local"}
-                                 onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
-                                 onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                 value={outing.to.split(/[+Z]/)[0]}
-                                 step={600}
-                                 min="2025-01-01T00:00"/>
-                          <p>까지</p>
-                        </InputRow>
-                        <InputRow>
-                          <CheckBox canceled={outing.breakfast_cancel}
-                                    onClick={() => {outing.breakfast_cancel = !outing.breakfast_cancel; modify()}}>
-                            <CheckBoxOn />
-                            <p>아침 취소</p>
-                          </CheckBox>
-                          &nbsp;&nbsp;
-                          <CheckBox canceled={outing.lunch_cancel}
-                                    onClick={() => {outing.lunch_cancel = !outing.lunch_cancel; modify()}}>
-                            <CheckBoxOn />
-                            <p>점심 취소</p>
-                          </CheckBox>
-                          &nbsp;&nbsp;
-                          <CheckBox canceled={outing.dinner_cancel}
-                                    onClick={() => {outing.dinner_cancel = !outing.dinner_cancel; modify()}}>
-                            <CheckBoxOn />
-                            <p>저녁 취소</p>
-                          </CheckBox>
-                        </InputRow>
-                      </OutingBox>
-                    )
-                  })}
-                </>
-              ) : null}
-              <LightButton type={"yellow"} onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                setSelectedApply((p) => {
-                  return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
-                });
-              }}>외출추가</LightButton>
-              <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
-              <Button onClick={() => edit()}>{selectedApply?.id == "new" ? "생성하기" : "수정하기"}</Button>
             </StayApplyCard>
           );
         }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
       </StayApplyContainer>
       <ControllerContainer>
         <FitContainer>
-          <p style={{marginBottom: "8px"}}>잔류 일정</p>
+          <Text>잔류 일정</Text>
           <Select style={{height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
             {stayList !== null ? stayList.map((apply) => {
               return (
@@ -907,16 +836,61 @@ function ApplyStayPage() {
           </Select>
         </FitContainer>
         <FitContainer>
+          <Text>잔류 신청 추가</Text>
+          <InputWrapper>
+            <Input
+              type={"search"}
+              placeholder={"학생 이름을 입력해주세요."}
+              onFocus={() => setIsSuggestOpen(!!nameSearch)}
+              onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
+              onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
+              value={nameSearch}
+              style={{height: "5dvh", width: "100%"}}
+            />
+            {isSuggestOpen && (
+              <SuggestBox>
+                {nameLoading && (
+                  <SuggestItem key="loading" onMouseDown={(e) => e.preventDefault()}>
+                    <span>검색 중…</span>
+                    <span className="meta">잠시만요</span>
+                  </SuggestItem>
+                )}
+                {!nameLoading && nameResults.slice(0, 12).map((u) => (
+                  <SuggestItem
+                    key={u.id}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setNewUser(u);
+                      setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
+                      setIsSuggestOpen(false);
+                    }}
+                  >
+                    <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
+                  </SuggestItem>
+                ))}
+                {!nameLoading && nameResults.length === 0 && nameSearch && (
+                  <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
+                    <span>검색 결과가 없습니다</span>
+                    <span className="meta">다른 키워드를 입력해 보세요</span>
+                  </SuggestItem>
+                )}
+              </SuggestBox>
+            )}
+          </InputWrapper>
           <Button disabled={stayApplies === null || selectedApply?.id === "new"} style={{height: "5dvh", padding: 0}} onClick={() => {
-            const newApply = { id: "new", stay_seat: "null", outing: [], user: { email: null, id: null, name: null, permission: null } } as unknown as StayApply;
+            const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            setStayApplies((p) => [newApply, ...(p || [])]);
             setSelectedApply(newApply);
-          }}>잔류자 추가하기</Button>
+          }}>잔류 신청 추가하기</Button>
         </FitContainer>
         <StretchContainer>
-          <p style={{marginBottom: "8px"}}>잔류자 검색</p>
+          <Text>잔류자 검색</Text>
+          <Input type={"search"}
+                 onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
+                 placeholder={"검색할 학생명을 입력하세요."}
+                 value={filterText}
+                 style={{height: "5dvh"}}/>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={undefined}
                            selected={filterGrade === true}
@@ -956,11 +930,6 @@ function ApplyStayPage() {
               {`모두 (${stayApplies?.length || 0}건)`}
             </SelectionItem>
           </SelectionRow>
-          <Input type={"search"}
-                 onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
-                 placeholder={"검색할 학생명을 입력하세요."}
-                 value={filterText}
-                style={{height: "5dvh"}}/>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={true}
                            selected={filterState === true}
@@ -985,14 +954,8 @@ function ApplyStayPage() {
           </SelectionRow>
         </StretchContainer>
         <FitContainer>
-          <p style={{marginBottom: "8px"}}>파일 내보내기</p>
-          {/* {/* <ExportButton onClick={() => (stayApplies?.filter(apply => apply.id != 'new') && currentStay) ? ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new')) : undefined}>
-            학생 공지용 명단 내보내기
-          </ExportButton>
-          <ExportButton onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: true }), `${stayDate} 잔류 현황 (급식실).pdf`) : () => {}}>
-            급식실용 잔류자 명단 내보내기
-          </ExportButton> */}
-          <ExportButton> {/*  onClick={() => stayApplies ? renderHtml(stay2format(stayApplies, { date: stayDate, masking: false }), `${stayDate} 잔류 현황.pdf`) : () => {}} */}
+          <Text>파일 내보내기</Text>
+          <ExportButton>
             <Select style={{width: "70%", height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
               <option value="">선택하세요..</option>
               <option value="in">내부용</option>
@@ -1022,6 +985,159 @@ function ApplyStayPage() {
           </ExportButton>
         </FitContainer>
       </ControllerContainer>
+
+
+      <SelectionDialog isOpen={!!selectedApply && !isClosing} closeAction={() => close()} onOpen={() => { } }>
+        {selectedApply && stayApplies ? (
+          <>
+            <StayApplyDetail>
+              <p>{selectedApply.user.grade}{selectedApply.user.class}{("0"+selectedApply.user.number).slice(-2)} {selectedApply?.user.name}</p>
+              <SeatBox ref={seatBoxRef}>
+                {(() => {
+                  const table = genTable();
+                  const groupedRows: string[][][] = [];
+                  for (let i = 0; i < table.length; i += 2) {
+                    groupedRows.push(table.slice(i, i + 2));
+                  }
+                  return groupedRows.map((group, idx) => (
+                    <div key={idx} style={{ marginBottom: "16px" }}>
+                      {group.map((row, rowIdx) => (
+                        <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
+                          {row.map((seat, seatIdx) => {
+                            const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
+                            const taken = stayApplies.find(
+                              (sapply) =>
+                                sapply.stay_seat === seat &&
+                                sapply.stay_seat !== selectedApply.stay_seat
+                            );
+                            return (
+                              <span
+                                id={seat}
+                                ref={selectedApply.stay_seat === seat ? seatRef : null}
+                                className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
+                                onClick={() =>
+                                  setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
+                                }
+                                key={seat}
+                                style={{
+                                  marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
+                                }}
+                              >
+                            {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
+                          </span>
+                            );
+                          })}
+                        </SeatRow>
+                      ))}
+                    </div>
+                  ));
+                })()}
+              </SeatBox>
+              <OutingBox>
+                {selectedApply.outing.map((outing) => {
+                  const modify = (deleteTarget?: Outing) => {
+                    setSelectedApply((p) => {
+                      if (deleteTarget)
+                        return { ...p!, outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id) };
+                      else
+                        return { ...p!, outing: p!.outing.map((o) => {
+                            return o.id === outing.id ? {
+                              ...outing
+                            } : o;
+                          }) };
+                    });
+                  }
+
+                  return (
+                    <div key={outing.id}>
+                      <InputRow>
+                        <Input type={"text"}
+                               style={{width: "62%"}}
+                               onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
+                               value={outing.reason}
+                               placeholder={"외출 사유를 입력하세요.."}/>
+                        <SelectionRow>
+                          <SelectionItem selected={outing.approved === true}
+                                         boundState={true}
+                                         onClick={() => {outing.approved = true; modify();}}>
+                            허가
+                          </SelectionItem>
+                          <SelectionItem selected={outing.approved === null}
+                                         boundState={null}
+                                         border={true}
+                                         onClick={() => {outing.approved = null; modify();}}>
+                            검토
+                          </SelectionItem>
+                          <SelectionItem selected={outing.approved === false}
+                                         boundState={false}
+                                         border={true}
+                                         onClick={() => {outing.approved = false; modify();}}>
+                            불허
+                          </SelectionItem>
+                        </SelectionRow>
+                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                        {/* @ts-ignore */}
+                        <DeleteBtn onClick={() => {modify(outing)}}>
+                          삭제
+                        </DeleteBtn>
+                      </InputRow>
+                      <InputRow>
+                        <Input type={"datetime-local"}
+                               onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
+                               onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                               value={outing.from.split(/[+Z]/)[0]}
+                               step={600}
+                               min="2025-01-01T00:00"/>
+                        <p>부터&nbsp;&nbsp;</p>
+                        <Input type={"datetime-local"}
+                               onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
+                               onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                               value={outing.to.split(/[+Z]/)[0]}
+                               step={600}
+                               min="2025-01-01T00:00"/>
+                        <p>까지</p>
+                      </InputRow>
+                      <InputRow>
+                        <CheckBox canceled={outing.breakfast_cancel}
+                                  onClick={() => {outing.breakfast_cancel = !outing.breakfast_cancel; modify()}}>
+                          <CheckBoxOn />
+                          <p>아침 취소</p>
+                        </CheckBox>
+                        &nbsp;&nbsp;
+                        <CheckBox canceled={outing.lunch_cancel}
+                                  onClick={() => {outing.lunch_cancel = !outing.lunch_cancel; modify()}}>
+                          <CheckBoxOn />
+                          <p>점심 취소</p>
+                        </CheckBox>
+                        &nbsp;&nbsp;
+                        <CheckBox canceled={outing.dinner_cancel}
+                                  onClick={() => {outing.dinner_cancel = !outing.dinner_cancel; modify()}}>
+                          <CheckBoxOn />
+                          <p>저녁 취소</p>
+                        </CheckBox>
+                      </InputRow>
+                    </div>
+                  )
+                })}
+                {selectedApply.outing.length === 0 && (
+                  <NoOuting>외출 신청이 없습니다.</NoOuting>
+                )}
+              </OutingBox>
+              <ButtonBox>
+                <LightButton type={"yellow"} onClick={() => {
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  setSelectedApply((p) => {
+                    return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
+                  });
+                }}>외출추가</LightButton>
+                <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
+                <Button onClick={() => edit()}>{selectedApply?.id == "new" ? "생성하기" : "수정하기"}</Button>
+              </ButtonBox>
+            </StayApplyDetail>
+          </>
+        ) : null}
+      </SelectionDialog>
     </Wrapper>
   );
 }

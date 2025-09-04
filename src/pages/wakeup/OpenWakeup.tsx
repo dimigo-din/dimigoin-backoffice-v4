@@ -10,7 +10,7 @@ function OpenWakeup() {
     getTodayWakeup(gender).then((res) => {
       window.open(`https://www.youtube.com/watch?v=${res.video_id}`, "_blank");
     }).catch((e) => {
-      console.log(e)
+      console.error(e)
       showToast(e.response.data.error.message || e.response.data.error, "danger");
     });
   }
