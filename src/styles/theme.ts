@@ -7,11 +7,13 @@ const base = {
         Primary: "#ffffff",
         Secondary: "#f6f6fa",
         Tertiary: "#ebecf5",
+        Quaternary: "#f1f2ff",
       },
       Inverted: {
         Primary: "#000000",
         Secondary: "#101012",
         Tertiary: "#1f1f21",
+        Quaternary: "#2d2d30",
       },
     },
     Content: {

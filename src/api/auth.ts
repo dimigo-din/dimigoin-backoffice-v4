@@ -46,7 +46,7 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
     else
       res = (await axios.post("http://localhost:5000/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   }catch (e) {
-    console.log(e);
+    console.error(e);
     localStorage.clear();
     await logout();
     location.href = "/login";

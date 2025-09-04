@@ -58,3 +58,7 @@ export const createFrigoApply = async (data: FrigoApplyPayload): Promise<FrigoAp
 export const deleteFrigoApply = async (id: string): Promise<FrigoApply> => {
   return (await client.delete("/manage/frigo?id="+id)).data;
 }
+
+export const auditFrigo = async (id: string, approved: boolean | null, audit_reason?: string): Promise<FrigoApply> => {
+  return (await client.patch("/manage/frigo", { id: id, approved, audit_reason }));
+}
