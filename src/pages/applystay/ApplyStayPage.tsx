@@ -114,7 +114,7 @@ const StayApplyCard = styled.div<{outingCount: number}>`
   height: auto;
   width: 100%;
 
-  max-height: 8dvh;
+  height: 6dvh;
   flex: 0 0 auto;
 
   background-color: ${({theme}) => theme.Colors.Background.Tertiary};
@@ -127,13 +127,11 @@ const StayApplyCard = styled.div<{outingCount: number}>`
   align-items: center;
 
   padding: 0 1dvw 2dvh;
-  transition: max-height 0.3s ease;
-  will-change: max-height;
   overflow: hidden;
 `;
 
 const StayApplyCardSummary = styled.div`
-  height: 8dvh;
+  height: 6dvh;
   width: 100%;
 
   flex: 0 0 auto;
