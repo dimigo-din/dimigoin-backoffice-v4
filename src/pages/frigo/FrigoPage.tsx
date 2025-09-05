@@ -405,11 +405,19 @@ function FrigoPage() {
               야자2T
             </SelectionItem>
           </SelectionRow>
-          <Button disabled={!canApply} onClick={() => apply()}>신청하기</Button>
+          <Button
+            disabled={!canApply}
+            onClick={() => apply()}
+            style={{height: "5dvh", padding: 0}}>
+          신청하기</Button>
         </FitController>
         <FitController>
           <Text>분류</Text>
-          <Input value={filterName} onInput={(e) => setFilterName((e.target as HTMLInputElement).value)} placeholder={"이름을 입력해주세요."}/>
+          <Input
+            value={filterName}
+            onInput={(e) => setFilterName((e.target as HTMLInputElement).value)}
+            placeholder={"이름을 입력해주세요."}
+            style={{height: "5dvh", paddingTop: 0, paddingBottom: 0}}/>
           <SelectionRow width={"100%"}>
             <SelectionItem selected={filterGrade === 1}
                            onClick={() => setFilterGrade(1)}>
