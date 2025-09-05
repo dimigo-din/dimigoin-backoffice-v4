@@ -62,7 +62,7 @@ const Menu = styled.div`
     display:flex;
     align-items:center;
     gap:var(--gap);
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    color: ${({theme}) => theme.Colors.Content.Tertiary};
     font-family: sans-serif;
   }
 
@@ -72,14 +72,14 @@ const Menu = styled.div`
     flex:0 0 auto; /* 왼쪽 선은 짧게 */
     width:20px;
 
-    background-color: ${({theme}) => theme.Colors.Background.Secondary};
+    background-color: ${({theme}) => theme.Colors.Content.Tertiary};
   }
   .title::after{
     content:"";
     flex:1 1 0; /* 오른쪽 선은 길게 */
     border-top:var(--line-weight) solid var(--line-color);
 
-    background-color: ${({theme}) => theme.Colors.Background.Secondary};
+    background-color: ${({theme}) => theme.Colors.Content.Tertiary};
   }
   .title > span{
     white-space:nowrap;
