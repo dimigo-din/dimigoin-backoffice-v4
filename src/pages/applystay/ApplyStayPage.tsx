@@ -813,7 +813,7 @@ function ApplyStayPage() {
                     openEditor(apply);
                   }
                 }}>
-                  외출 {apply.outing.length}건
+                  {apply.stay_seat} | 외출 {apply.outing.length}건
                 </div>
               </StayApplyCardSummary>
             </StayApplyCard>
