@@ -62,7 +62,7 @@ const Menu = styled.div`
     display:flex;
     align-items:center;
     gap:var(--gap);
-    color: ${({theme}) => theme.Colors.Content.Tertiary};
+    color: ${({theme}) => theme.Colors.Content.Primary};
     font-family: sans-serif;
   }
 
