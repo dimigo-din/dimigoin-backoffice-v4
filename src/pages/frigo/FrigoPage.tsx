@@ -14,6 +14,7 @@ import { getPersonalInformation, type PersonalInformation } from "../../api/auth
 import {Button} from "../../styles/components/button.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
+import { ExportFrigoAppliesToExcel } from "../../utils/frigo2excel.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -29,9 +30,14 @@ const Wrapper = styled.div`
 `;
 
 const ApplyList = styled.div`
-  flex: 1;  
+  width: 65%;
+  
   
   height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
 
   border-radius: 8px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
@@ -42,8 +48,8 @@ const ApplyList = styled.div`
 `;
 
 const ControllerBox = styled.div`
+  flex: 1;
   height: 100%;
-  width: 30%;
   
   display: flex;
   flex-direction: column;
@@ -64,6 +70,29 @@ const FitController = styled.div`
   
   padding: 2dvh 2dvh;
   gap: 1dvh;
+`;
+
+const StretchController = styled.div`
+  flex: 1;
+  width: 100%;
+  
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 8px;
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  
+  padding: 2dvh 2dvh;
+  gap: 1dvh;
+`;
+
+const ExportButton = styled.div`
+  height: 5dvh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const SelectionRow = styled.div<{ height?: string, width?: string }>`
@@ -91,7 +120,7 @@ const SelectionItem = styled.div<{ border?: boolean, selected: boolean }>`
   text-align: center;
   align-content: center;
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({theme, selected}) => selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary};
   
   border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
   
@@ -101,7 +130,7 @@ const SelectionItem = styled.div<{ border?: boolean, selected: boolean }>`
 const Apply = styled.div`
   flex: 0 0 auto;
   
-  height: 7dvh;
+  height: 6dvh;
   
   display: flex;
   flex-direction: row;
@@ -295,45 +324,50 @@ function FrigoPage() {
           applies.filter((a) =>
             (filterGrade === null || filterGrade === a.user.grade) &&
             (filterGender === null || filterGender === a.user.gender) &&
-            (filterState === undefined || filterState === a.approved)
-          ).map((a) => {
+            (filterState === undefined || filterState === a.approved) &&
+            (filterName === "" || a.user.name.includes(filterName))
+          ).sort((a, b) => {
+            if (a.user.grade !== b.user.grade) return a.user.grade - b.user.grade;
+            if (a.user.class !== b.user.class) return a.user.class - b.user.class;
+            return a.user.number - b.user.number;
+          }).map((a) => {
           return (
-            <Apply>
+            <Apply key={a.id}>
               <div className={"left"}>
-                <div className="name">{a.user.gender === "male" ? "남" : "여"} {a.user.grade}{a.user.class}{("0"+a.user.number).slice(-2)} {a.user.name}</div>
-                <div className="detail">
-                  {a.reason}
-                  /&nbsp;
-                  <select className={"when"} value={a.timing} onInput={(e) => { updateFrigo({ user: a.user.id, timing: (e.target as HTMLInputElement).value as FrigoTiming, reason: a.reason }) }}>
-                    {/*"afterschool" | "dinner" | "after_1st_study" | "after_2nd_study";*/}
-                    <option value="afterschool">방과후</option>
-                    <option value="dinner">저녁시간</option>
-                    <option value="after_1st_study">야간자율학습 1타임 이후</option>
-                    <option value="after_2nd_study">야간자율학습 2타임 이후</option>
-                  </select>
-                </div>
+          <div className="name">{a.user.grade}{a.user.class}{("0"+a.user.number).slice(-2)} {a.user.name} ({a.user.gender === "male" ? "남" : "여"})</div>
+          <div className="detail">
+            {a.reason}
+            / &nbsp;
+            <select className={"when"} value={a.timing} onInput={(e) => { updateFrigo({ user: a.user.id, timing: (e.target as HTMLInputElement).value as FrigoTiming, reason: a.reason }) }}>
+              {/*"afterschool" | "dinner" | "after_1st_study" | "after_2nd_study";*/}
+              <option value="afterschool">방과후</option>
+              <option value="dinner">저녁시간</option>
+              <option value="after_1st_study">야간자율학습 1타임 이후</option>
+              <option value="after_2nd_study">야간자율학습 2타임 이후</option>
+            </select>
+          </div>
               </div>
               <div className={"right"}>
-                <SelectionRow width={"10dvw"}>
-                  <SelectionItem selected={a.approved == true}
-                                 onClick={() => {updateState(a.id, true)}}>
-                    허가
-                  </SelectionItem>
-                  <SelectionItem selected={a.approved == null}
-                                 border={true}
-                                 onClick={() => {updateState(a.id, null)}}>
-                    검토
-                  </SelectionItem>
-                  <SelectionItem selected={a.approved == false}
-                                 border={true}
-                                 onClick={() => {updateState(a.id, false)}}>
-                    반려
-                  </SelectionItem>
-                </SelectionRow>
+          <SelectionRow width={"10dvw"}>
+            <SelectionItem selected={a.approved == true}
+               onClick={() => {updateState(a.id, true)}}>
+              허가
+            </SelectionItem>
+            <SelectionItem selected={a.approved == null}
+               border={true}
+               onClick={() => {updateState(a.id, null)}}>
+              검토
+            </SelectionItem>
+            <SelectionItem selected={a.approved == false}
+               border={true}
+               onClick={() => {updateState(a.id, false)}}>
+              반려
+            </SelectionItem>
+          </SelectionRow>
               </div>
             </Apply>
           );
-        }) : Loading()}
+        }) : <Loading />}
       </ApplyList>
       <ControllerBox>
         <FitController>
@@ -411,7 +445,7 @@ function FrigoPage() {
             style={{height: "5dvh", padding: 0}}>
           신청하기</Button>
         </FitController>
-        <FitController>
+        <StretchController>
           <Text>분류</Text>
           <Input
             value={filterName}
@@ -476,6 +510,14 @@ function FrigoPage() {
               모두
             </SelectionItem>
           </SelectionRow>
+        </StretchController>
+        <FitController>
+          <Text>파일 내보내기</Text>
+          <ExportButton>
+            <Button style={{height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
+              ExportFrigoAppliesToExcel(applies || [], { filename: `금요귀가 신청 현황(${applies?.[0]?.week ? new Date(new Date(applies[0].week).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)})` });
+            }}>내보내기</Button>
+          </ExportButton>
         </FitController>
       </ControllerBox>
     </Wrapper>
