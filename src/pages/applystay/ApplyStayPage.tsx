@@ -114,7 +114,7 @@ const StayApplyCard = styled.div<{outingCount: number}>`
   height: auto;
   width: 100%;
 
-  max-height: 8dvh;
+  height: 6dvh;
   flex: 0 0 auto;
 
   background-color: ${({theme}) => theme.Colors.Background.Tertiary};
@@ -127,13 +127,11 @@ const StayApplyCard = styled.div<{outingCount: number}>`
   align-items: center;
 
   padding: 0 1dvw 2dvh;
-  transition: max-height 0.3s ease;
-  will-change: max-height;
   overflow: hidden;
 `;
 
 const StayApplyCardSummary = styled.div`
-  height: 8dvh;
+  height: 6dvh;
   width: 100%;
 
   flex: 0 0 auto;
@@ -503,7 +501,7 @@ function ApplyStayPage() {
     });
   }
 
-  const close = (callback?: () => void) => {
+  const close = (callback?: () => void, bypass?: boolean) => {
     const closeAction = () => {
       setIsClosing(true);
       setTimeout(() => {
@@ -522,6 +520,11 @@ function ApplyStayPage() {
     }
 
     if(!selectedApply) return;
+
+    if (bypass) {
+      closeAction();
+      return;
+    }
     
     const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k as keyof typeof a])).join("")).join("");
     sha256(merged).then((data) => {
@@ -640,7 +643,7 @@ function ApplyStayPage() {
     // @ts-ignore
     updateStayApply({...selectedApply, stay: currentStay.id!, user: selectedApply!.user.id}).then(() => {
       showToast("성공했습니다.", "info");
-      close();
+      close(undefined, true);
       updateScreen();
     }).catch((e) => {
       console.error(e);
@@ -652,14 +655,14 @@ function ApplyStayPage() {
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
     if (id === 'new') {
-      close();
+      close(undefined, true);
       updateScreen();
       return;
     }
 
     deleteStayApply(id).then(() => {
       showToast("성공했습니다.", "info");
-      close();
+      close(undefined, true);
       updateScreen();
     }).catch((e) => {
       console.error(e);
@@ -815,7 +818,7 @@ function ApplyStayPage() {
                     openEditor(apply);
                   }
                 }}>
-                  외출 {apply.outing.length}건
+                  {apply.stay_seat} | 외출 {apply.outing.length}건
                 </div>
               </StayApplyCardSummary>
             </StayApplyCard>
@@ -877,7 +880,7 @@ function ApplyStayPage() {
               </SuggestBox>
             )}
           </InputWrapper>
-          <Button disabled={stayApplies === null || selectedApply?.id === "new"} style={{height: "5dvh", padding: 0}} onClick={() => {
+          <Button disabled={newUser === null} style={{height: "5dvh", padding: 0}} onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
