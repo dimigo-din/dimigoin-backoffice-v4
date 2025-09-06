@@ -858,7 +858,7 @@ function ApplyStayPage() {
                     <span className="meta">잠시만요</span>
                   </SuggestItem>
                 )}
-                {!nameLoading && nameResults.slice(0, 12).map((u) => (
+                {!nameLoading && nameResults.slice(0, 12).filter(Boolean).map((u) => (
                   <SuggestItem
                     key={u.id}
                     onMouseDown={(e) => {
