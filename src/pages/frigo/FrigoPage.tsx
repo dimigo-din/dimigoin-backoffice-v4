@@ -183,6 +183,7 @@ const Apply = styled.div`
 
 const Text = styled.p`
   color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Callout.size};
 `;
 
 const InputWrapper = styled.div`
