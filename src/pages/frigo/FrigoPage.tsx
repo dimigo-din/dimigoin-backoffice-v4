@@ -183,6 +183,7 @@ const Apply = styled.div`
 
 const Text = styled.p`
   color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Callout.size};
 `;
 
 const InputWrapper = styled.div`
@@ -455,59 +456,59 @@ function FrigoPage() {
           <SelectionRow width={"100%"}>
             <SelectionItem selected={filterGrade === 1}
                            onClick={() => setFilterGrade(1)}>
-              1학년
+              1학년 ({applies && applies.filter((a) => a.user.grade === 1).length}건)
             </SelectionItem>
             <SelectionItem selected={filterGrade === 2}
                            border={true}
                            onClick={() => setFilterGrade(2)}>
-              2학년
+              2학년 ({applies && applies.filter((a) => a.user.grade === 2).length}건)
             </SelectionItem>
             <SelectionItem selected={filterGrade === 3}
                            border={true}
                            onClick={() => setFilterGrade(3)}>
-              3학년
+              3학년 ({applies && applies.filter((a) => a.user.grade === 3).length}건)
             </SelectionItem>
             <SelectionItem selected={filterGrade === null}
                            border={true}
                            onClick={() => setFilterGrade(null)}>
-              모두
+              모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
           <SelectionRow width={"100%"}>
             <SelectionItem selected={filterGender === "male"}
                            onClick={() => setFilterGender("male")}>
-              남
+              남 ({applies && applies.filter((a) => a.user.gender === "male").length}건)
             </SelectionItem>
             <SelectionItem selected={filterGender === "female"}
                            border={true}
                            onClick={() => setFilterGender("female")}>
-              여
+              여 ({applies && applies.filter((a) => a.user.gender === "female").length}건)
             </SelectionItem>
             <SelectionItem selected={filterGender === null}
                            border={true}
                            onClick={() => setFilterGender(null)}>
-              모두
+              모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
           <SelectionRow width={"100%"}>
             <SelectionItem selected={filterState === true}
                            onClick={() => setFilterState(true)}>
-              허가
+              허가 ({applies && applies.filter((a) => a.approved === true).length}건)
             </SelectionItem>
             <SelectionItem selected={filterState === null}
                            border={true}
                            onClick={() => setFilterState(null)}>
-              검토
+              검토 ({applies && applies.filter((a) => a.approved === null).length}건)
             </SelectionItem>
             <SelectionItem selected={filterState === false}
                            border={true}
                            onClick={() => setFilterState(false)}>
-              불허
+              불허 ({applies && applies.filter((a) => a.approved === false).length}건)
             </SelectionItem>
             <SelectionItem selected={filterState === undefined}
                            border={true}
                            onClick={() => setFilterState(undefined)}>
-              모두
+              모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
         </StretchController>
