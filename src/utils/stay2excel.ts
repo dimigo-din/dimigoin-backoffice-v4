@@ -97,6 +97,19 @@ function hhmmKST(s?: string) {
   return new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
 }
 
+// ---- KST day range helper ----
+function kstDayRange(d: Date) {
+  const ymd = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(d); // YYYY-MM-DD in KST
+  const start = new Date(`${ymd}T00:00:00+09:00`);
+  const end   = new Date(`${ymd}T23:59:59.999+09:00`);
+  return { start, end };
+}
+
 // ---- Grid styling ----
 function applyGridStyle(ws: XLSX.WorkSheet) {
   if (!ws["!ref"]) return;
@@ -210,13 +223,15 @@ export function ExportStayAppliesToExcel(currentStay: Stay, applies: StayApply[]
         const number = a.user.number ?? "";
         const hakbun = `${grade}${klass}${String(number).padStart(2, "0")}`;
 
-        // Only approved outings for the specific date
+        // Only approved outings that overlap the specific KST date
         const approved = (a.outing || []).filter(o => o.approved);
-        const dateStr  = date.toISOString().split('T')[0];
+        const { start: dayStart, end: dayEnd } = kstDayRange(date);
         const dateSpecificOutings = approved.filter(o => {
-          if (!o.from) return false;
-          const outingDate = new Date(o.from).toISOString().split('T')[0];
-          return outingDate === dateStr;
+          if (!o.from && !o.to) return false;
+          const from = o.from ? new Date(o.from) : new Date(o.to!);
+          const to   = o.to   ? new Date(o.to)   : from;
+          // overlap with [dayStart, dayEnd] in KST
+          return to >= dayStart && from <= dayEnd;
         });
         const outingText = dateSpecificOutings
           .map(o => `${hhmmKST(o.from)}~${hhmmKST(o.to)} (${o.reason ?? ""})`)
