@@ -5,6 +5,7 @@ const client = getInstance();
 export type LaundryTimelineListItem = {
   id: string;
   name: string;
+  enabled: boolean;
 }
 
 export type LaundryMachine = {
@@ -25,7 +26,7 @@ export type LaundryTime = {
 export type LaundryTimeline = {
   id: string;
   name: string;
-  triggeredOn: string;
+  triggeredOn: "primary" | "stay";
   enabled: boolean;
   times: LaundryTime[];
 }

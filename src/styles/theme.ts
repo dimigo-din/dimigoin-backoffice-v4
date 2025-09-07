@@ -7,7 +7,7 @@ const base = {
         Primary: "#ffffff",
         Secondary: "#f6f6fa",
         Tertiary: "#ebecf5",
-        Quaternary: "#f1f2ff",
+        Quaternary: "#cecfd8",
       },
       Inverted: {
         Primary: "#000000",

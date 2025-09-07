@@ -5,6 +5,7 @@ import ApplyStayPage from "../pages/applystay/ApplyStayPage.tsx";
 import WakeupPage from "../pages/wakeup/WakeupPage.tsx";
 import FrigoPage from "../pages/frigo/FrigoPage.tsx";
 import OpenWakeup from "../pages/wakeup/OpenWakeup.tsx";
+import LaundryTimelinePage from "../pages/laundry/LaundryTimelinePage.tsx";
 
 const AppRouter = () => {
 
@@ -16,6 +17,7 @@ const AppRouter = () => {
       <Route path="/wakeup" element={<WakeupPage/>}/>
       <Route path="/applyfrigo" element={<FrigoPage/>}/>
       <Route path="/openwakeup" element={<OpenWakeup/>}/>
+      <Route path="/laundrytimeline" element={<LaundryTimelinePage/>}/>
       <Route path="*" element={<EmptyPage/>}/>
     </Routes>
   );

@@ -130,7 +130,8 @@ function SideBar() {
     {
       title: "세탁",
       items: [
-        { key: "laundry", label: "세탁 관리" },
+        { key: "laundrytimeline", label: "세탁 시간표 관리" },
+        { key: "laundrymachine", label: "세탁기 관리" },
         { key: "applylaundry", label: "세탁 신청 관리" }
       ]
     },
