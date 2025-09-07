@@ -490,7 +490,11 @@ function ApplyStayPage() {
         });
 
         getStayApply(res1[currentStayIndex].id).then((res2) => {
-          setStayApplies(res2);
+          setStayApplies(res2.sort((a, b) => {
+            return a.user.grade - b.user.grade ||
+                   a.user.class - b.user.class ||
+                   a.user.number - b.user.number;
+          }));
         }).catch((e) => {
           showToast(e.response.data.error.message || e.response.data.error, "danger");
         });
