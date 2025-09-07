@@ -481,7 +481,7 @@ function ApplyStayPage() {
 
   const updateScreen = () => {
     getStayList().then((res1) => {
-      setStayList(res1);
+      setStayList(res1.sort((a, b) => new Date(b.stay_from).getTime() - new Date(a.stay_from).getTime()));
       if (res1.length > 0) {
         getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
@@ -828,7 +828,7 @@ function ApplyStayPage() {
       <ControllerContainer>
         <FitContainer>
           <Text>잔류 일정</Text>
-          <Select style={{height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
+          <Select style={{height: "5dvh"}} value={currentStayIndex} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
             {stayList !== null ? stayList.map((apply) => {
               return (
                 <option key={apply.id} value={stayList.indexOf(apply)}>

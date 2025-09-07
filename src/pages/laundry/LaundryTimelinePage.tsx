@@ -418,7 +418,7 @@ function LaundryTimelinePage() {
         return {
           time: time.time,
           grade: time.grade,
-          assigns: time.assigns.filter((assign) => time.id === timeid && assign.id !== machineid).map((assign) => assign.id),
+          assigns: time.assigns.filter((assign) => time.id !== timeid || (time.id === timeid && assign.id !== machineid)).map((assign) => assign.id),
         };
       }),
     };
