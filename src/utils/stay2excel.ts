@@ -330,8 +330,10 @@ export function ExportStayAppliesToExcel(currentStay: Stay, applies: StayApply[]
     // 열 너비
     (ws["!cols"] as XLSX.ColInfo[]) = headers.map(h => {
       if (h === "외출") return { wch: 60 };
-      if (h === "위치") return { wch: 18 };
-      if (h === "학번") return { wch: 12 };
+      if (h === "위치") return { wch: 12 };
+      if (h === "학번") return { wch: 8 };
+      if (h === "조식" || h === "중식" || h === "석식") return { wch: 6 };
+      if (h === "이름") return { wch: 10 };
       return { wch: 8 + (h.length > 2 ? 2 : 0) };
     });
 
