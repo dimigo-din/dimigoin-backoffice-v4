@@ -452,6 +452,18 @@ const Text = styled.p`
 function ApplyStayPage() {
   moment.locale("ko");
 
+  const KST_TZ = "Asia/Seoul";
+  // Convert an ISO UTC string (e.g., "2025-09-07T12:00:00Z") to a local input value for <input type="datetime-local">
+  const toLocalInput = (isoUtc?: string | null) => {
+    if (!isoUtc) return "";
+    return moment.utc(isoUtc).tz(KST_TZ).format("YYYY-MM-DDTHH:mm");
+  };
+  // Convert a local datetime-local string (no timezone) entered in KST to an ISO UTC string
+  const fromLocalInput = (local?: string | null) => {
+    if (!local) return "";
+    return moment.tz(local, "YYYY-MM-DDTHH:mm", KST_TZ).utc().format(); // ISO 8601 UTC
+  };
+
   const { showToast } = useNotification();
 
   const seatRef = useRef<HTMLSpanElement | null>(null);
@@ -476,7 +488,7 @@ function ApplyStayPage() {
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
-  
+
   const [newUser, setNewUser] = useState<User | null>(null);
 
   const updateScreen = () => {
@@ -525,7 +537,7 @@ function ApplyStayPage() {
       closeAction();
       return;
     }
-    
+
     const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k as keyof typeof a])).join("")).join("");
     sha256(merged).then((data) => {
       if (data !== selectedApplyChecksum && !confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?"))
@@ -1086,16 +1098,16 @@ function ApplyStayPage() {
                       </InputRow>
                       <InputRow>
                         <Input type={"datetime-local"}
-                               onInput={(e) => {outing.from = (e.target as HTMLInputElement).value; modify()}}
+                               onInput={(e) => { outing.from = fromLocalInput((e.target as HTMLInputElement).value); modify(); }}
                                onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                               value={outing.from.split(/[+Z]/)[0]}
+                               value={toLocalInput(outing.from)}
                                step={600}
                                min="2025-01-01T00:00"/>
                         <p>부터&nbsp;&nbsp;</p>
                         <Input type={"datetime-local"}
-                               onInput={(e) => {outing.to = (e.target as HTMLInputElement).value; modify();}}
+                               onInput={(e) => { outing.to = fromLocalInput((e.target as HTMLInputElement).value); modify(); }}
                                onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                               value={outing.to.split(/[+Z]/)[0]}
+                               value={toLocalInput(outing.to)}
                                step={600}
                                min="2025-01-01T00:00"/>
                         <p>까지</p>
