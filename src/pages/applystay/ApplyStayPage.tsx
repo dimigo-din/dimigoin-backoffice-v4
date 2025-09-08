@@ -7,7 +7,8 @@ import {
   type StayApply,
   type StayListItem,
   type Stay,
-  updateStayApply
+  updateStayApply,
+  changeStaySeat
 } from "../../api/stay.ts";
 import {searchUser, type User} from "../../api/user.ts";
 import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
@@ -1014,10 +1015,23 @@ function ApplyStayPage() {
                 placeholder="장소 입력..."/>
          </SpaceBetweenWrapper>
          <Button disabled={currentSeatChangeGrade === undefined || currentSeatChangeLocation == ""} style={{height: "5dvh", padding: 0}} onClick={() => {
-            // const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
-            // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // // @ts-ignore
-            // setSelectedApply(newApply);
+            const targets = stayApplies?.filter(apply => apply.user.grade === currentSeatChangeGrade);
+            if(!targets || targets.length === 0) {
+              showToast("해당 학년의 잔류자가 없습니다.", "warning");
+              return;
+            }
+            
+            if(!confirm(`정말로 ${currentSeatChangeGrade}학년 ${targets.length}명의 잔류장소를 '${currentSeatChangeLocation}'(으)로 일괄 변경하시겠습니까?`))
+              return;
+
+            const to = currentSeatChangeLocation;
+            changeStaySeat(targets.map(apply => apply.id), to).then(() => {
+              showToast("잔류장소 일괄 이동이 완료되었습니다.", "info");
+              setCurrentSeatChangeGrade(undefined);
+              setCurrentSeatChangeLocation("");
+            }).catch((e) => {
+              showToast(e, "danger");
+            });
           }}>잔류장소 일괄 이동</Button>
         </FitContainer>
         <FitContainer>
