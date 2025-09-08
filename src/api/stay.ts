@@ -213,3 +213,7 @@ export async function auditOuting(outing_id: string, reason: string, approved: b
 export async function setMealCancel(outing_id: string, breakfast_cancel: boolean, lunch_cancel: boolean, dinner_cancel: boolean): Promise<Outing> {
   return (await client.patch("/manage/stay/outing/meal_cancel", { id: outing_id, breakfast_cancel: breakfast_cancel, lunch_cancel: lunch_cancel, dinner_cancel: dinner_cancel })).data;
 }
+
+export async function changeStaySeat(targets: string[], to: string): Promise<StayApply> {
+  return (await client.patch("/manage/stay/change_seat", { targets, to })).data;
+}
