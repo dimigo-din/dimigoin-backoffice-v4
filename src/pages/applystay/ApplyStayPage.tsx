@@ -16,6 +16,8 @@ import {useEffect, useRef, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
 import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
+import { stay2pdf } from "../../utils/stay2pdf.ts";
+import { renderHtml } from "../../api/user.ts";
 import {sha256} from "../../utils/sha256.ts";
 import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
@@ -66,24 +68,26 @@ const ControllerContainer = styled.div`
   display: flex;
   flex-direction: column;
 
+  overflow-y: scroll;
+
   gap: 2dvh;
 
   color: ${({theme}) => theme.Colors.Content.Primary};
 `;
 
-const StretchContainer = styled.div`
-  flex: 1;
-  width: 100%;
+// const StretchContainer = styled.div`
+//   flex: 1;
+//   width: 100%;
 
-  display: flex;
-  flex-direction: column;
-  gap: 1dvh;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1dvh;
 
-  border-radius: 8px;
+//   border-radius: 8px;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  padding: 2dvh 2dvh;
-`;
+//   background-color: ${({theme}) => theme.Colors.Background.Secondary};
+//   padding: 2dvh 2dvh;
+// `;
 
 const FitContainer = styled.div`
   height: fit-content;
@@ -334,7 +338,7 @@ const CheckBox = styled.div<{ canceled: boolean }>`
   }
 `;
 
-const ExportButton = styled.div`
+const SpaceBetweenWrapper = styled.div`
   height: 5dvh;
   width: 100%;
 
@@ -488,6 +492,9 @@ function ApplyStayPage() {
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
+  
+  const [currentSeatChangeGrade, setCurrentSeatChangeGrade] = useState<number | undefined>(0);
+  const [currentSeatChangeLocation, setCurrentSeatChangeLocation] = useState<string>("");
 
   const [newUser, setNewUser] = useState<User | null>(null);
 
@@ -903,7 +910,7 @@ function ApplyStayPage() {
             setSelectedApply(newApply);
           }}>잔류 신청 추가하기</Button>
         </FitContainer>
-        <StretchContainer>
+        <FitContainer>
           <Text>잔류자 검색</Text>
           <Input type={"search"}
                  onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
@@ -949,6 +956,9 @@ function ApplyStayPage() {
               {`모두 (${stayApplies?.length || 0}건)`}
             </SelectionItem>
           </SelectionRow>
+        </FitContainer>
+        <FitContainer>
+          <Text>외출 검색</Text>
           <SelectionRow height={"4dvh"} width={"100%"}>
             <SelectionItem boundState={true}
                            selected={filterState === true}
@@ -971,14 +981,37 @@ function ApplyStayPage() {
               {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
             </SelectionItem>
           </SelectionRow>
-        </StretchContainer>
+        </FitContainer>
+        <FitContainer>
+          <Text>잔류장소 일괄 이동</Text>
+          <SpaceBetweenWrapper>
+            <Select style={{width: "40%", height: "5dvh"}} value={currentSeatChangeGrade} onChange={(e) => {close(); setCurrentSeatChangeGrade(parseInt(e.target.value))}}>
+              <option value={undefined}>학년 선택</option>
+              <option value={1}>1학년</option>
+              <option value={2}>2학년</option>
+              <option value={3}>3학년</option>
+            </Select>
+            <Input type={"text"}
+                style={{width: "57%", height: "5dvh"}}
+                onInput={(e) => setCurrentSeatChangeLocation((e.target as HTMLInputElement).value)}
+                value={currentSeatChangeLocation}
+                placeholder="장소 입력..."/>
+         </SpaceBetweenWrapper>
+         <Button disabled={currentSeatChangeGrade === undefined || currentSeatChangeLocation == ""} style={{height: "5dvh", padding: 0}} onClick={() => {
+            // const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
+            // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // // @ts-ignore
+            // setSelectedApply(newApply);
+          }}>잔류장소 일괄 이동</Button>
+        </FitContainer>
         <FitContainer>
           <Text>파일 내보내기</Text>
-          <ExportButton>
+          <SpaceBetweenWrapper>
             <Select style={{width: "70%", height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
               <option value="">선택하세요..</option>
               <option value="in">내부용</option>
-              <option value="out">외부용</option>
+              <option value="out">외부용 (엑셀)</option>
+              <option value="out_pdf">외부용 (PDF)</option>
               <option value="dorm">생활관용</option>
             </Select>
             <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
@@ -987,6 +1020,11 @@ function ApplyStayPage() {
               }else if(currentSelectedFileOutput === "in"){
                 if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
                   ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new'));
+                else
+                  showToast("내보낼 데이터가 없습니다.", "warning");
+              }else if(currentSelectedFileOutput === "out_pdf"){
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                  renderHtml(stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }), `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }else if(currentSelectedFileOutput === "out"){
@@ -1001,7 +1039,7 @@ function ApplyStayPage() {
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }
             }}>내보내기</Button>
-          </ExportButton>
+          </SpaceBetweenWrapper>
         </FitContainer>
       </ControllerContainer>
 
@@ -1115,6 +1153,39 @@ function ApplyStayPage() {
                                step={600}
                                min="2025-01-01T00:00"/>
                         <p>까지</p>
+
+                        <Button type={"normal"} style={{marginLeft: "20px", height: "4dvh", width: "15dvh", padding: "0", fontSize: "12px"}} onClick={() => {
+                          if (!currentStay) return;
+                          const stayFromDate = new Date(currentStay.stay_from);
+                          const stayToDate = new Date(currentStay.stay_to);
+
+                          // Find the Sunday during the stay period
+                          let sunday = new Date(stayFromDate);
+                          while (sunday.getDay() !== 0) { // 0 = Sunday
+                            sunday.setDate(sunday.getDate() + 1);
+                          }
+
+                          // If Sunday is after the stay period, use the first Sunday before
+                          if (sunday > stayToDate) {
+                            sunday = new Date(stayFromDate);
+                            while (sunday.getDay() !== 0) {
+                              sunday.setDate(sunday.getDate() - 1);
+                            }
+                          }
+
+                          // Set from time to Sunday 10:20
+                          const fromTime = new Date(sunday);
+                          fromTime.setHours(10, 20, 0, 0);
+
+                          // Set to time to Sunday 14:00
+                          const toTime = new Date(sunday);
+                          toTime.setHours(14, 0, 0, 0);
+
+                          outing.reason = "자기계발외출";
+                          outing.from = fromTime.toISOString();
+                          outing.to = toTime.toISOString();
+                          modify();
+                        }}>자기계발외출 입력</Button>
                       </InputRow>
                       <InputRow>
                         <CheckBox canceled={outing.breakfast_cancel}
