@@ -1153,6 +1153,39 @@ function ApplyStayPage() {
                                step={600}
                                min="2025-01-01T00:00"/>
                         <p>까지</p>
+
+                        <Button type={"normal"} style={{marginLeft: "20px", height: "4dvh", width: "15dvh", padding: "0", fontSize: "12px"}} onClick={() => {
+                          if (!currentStay) return;
+                          const stayFromDate = new Date(currentStay.stay_from);
+                          const stayToDate = new Date(currentStay.stay_to);
+
+                          // Find the Sunday during the stay period
+                          let sunday = new Date(stayFromDate);
+                          while (sunday.getDay() !== 0) { // 0 = Sunday
+                            sunday.setDate(sunday.getDate() + 1);
+                          }
+
+                          // If Sunday is after the stay period, use the first Sunday before
+                          if (sunday > stayToDate) {
+                            sunday = new Date(stayFromDate);
+                            while (sunday.getDay() !== 0) {
+                              sunday.setDate(sunday.getDate() - 1);
+                            }
+                          }
+
+                          // Set from time to Sunday 10:20
+                          const fromTime = new Date(sunday);
+                          fromTime.setHours(10, 20, 0, 0);
+
+                          // Set to time to Sunday 14:00
+                          const toTime = new Date(sunday);
+                          toTime.setHours(14, 0, 0, 0);
+
+                          outing.reason = "자기계발외출";
+                          outing.from = fromTime.toISOString();
+                          outing.to = toTime.toISOString();
+                          modify();
+                        }}>자기계발외출 입력</Button>
                       </InputRow>
                       <InputRow>
                         <CheckBox canceled={outing.breakfast_cancel}
