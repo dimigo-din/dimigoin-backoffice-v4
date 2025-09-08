@@ -402,6 +402,22 @@ const DeleteBtn = styled.div`
   margin-left: 1%;
 `;
 
+const PresetBtn = styled.div`
+  height: 4dvh;
+  width: 20%;
+
+  text-align: center;
+  align-content: center;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Blue};
+
+  border: 1px solid ${({theme}) => theme.Colors.Solid.Blue};
+  border-radius: 12px;
+
+  margin-left: 3%;
+`;
+
 const InputWrapper = styled.div`
   position: relative;
   width: 100%;
@@ -498,7 +514,7 @@ function ApplyStayPage() {
 
   const [newUser, setNewUser] = useState<User | null>(null);
 
-  const updateScreen = () => {
+  const updateScreen = async () => {
     getStayList().then((res1) => {
       setStayList(res1.sort((a, b) => new Date(b.stay_from).getTime() - new Date(a.stay_from).getTime()));
       if (res1.length > 0) {
@@ -1014,27 +1030,35 @@ function ApplyStayPage() {
               <option value="out_pdf">외부용 (PDF)</option>
               <option value="dorm">생활관용</option>
             </Select>
-            <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
+            <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={async () => {
               if(currentSelectedFileOutput === "") {
                 showToast("내보내기 형식을 선택하세요.", "danger");
               }else if(currentSelectedFileOutput === "in"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
+                  await updateScreen();
                   ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new'));
+                }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }else if(currentSelectedFileOutput === "out_pdf"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
+                  await updateScreen();
                   renderHtml(stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }), `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
+                }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }else if(currentSelectedFileOutput === "out"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
+                  await updateScreen();
                   stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: true});
+                }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }else if(currentSelectedFileOutput === "dorm"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay)
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
+                  await updateScreen();
                   stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: false});
+                }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
               }
@@ -1154,12 +1178,12 @@ function ApplyStayPage() {
                                min="2025-01-01T00:00"/>
                         <p>까지</p>
 
-                        <Button type={"normal"} style={{marginLeft: "20px", height: "4dvh", width: "15dvh", padding: "0", fontSize: "12px"}} onClick={() => {
+                        <PresetBtn onClick={() => {
                           if (!currentStay) return;
                           const stayFromDate = new Date(currentStay.stay_from);
                           const stayToDate = new Date(currentStay.stay_to);
 
-                          // Find the Sunday during the stay period
+                          // Find the Sunday during the stay period 
                           let sunday = new Date(stayFromDate);
                           while (sunday.getDay() !== 0) { // 0 = Sunday
                             sunday.setDate(sunday.getDate() + 1);
@@ -1185,7 +1209,7 @@ function ApplyStayPage() {
                           outing.from = fromTime.toISOString();
                           outing.to = toTime.toISOString();
                           modify();
-                        }}>자기계발외출 입력</Button>
+                        }}>자기계발외출 입력</PresetBtn>
                       </InputRow>
                       <InputRow>
                         <CheckBox canceled={outing.breakfast_cancel}
