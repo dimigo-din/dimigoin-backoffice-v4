@@ -15,8 +15,8 @@ export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolea
 for (let grade=1;grade<=6;grade++) {
     for (let uclass=1;uclass<=6;uclass++) {
       data[`${grade}_${uclass}_COUNT`] = apply.filter((a) => a.user.grade === grade && a.user.class === uclass).length;
-      data[`${grade}_${uclass}_MALE`] = apply.filter((a) => a.user.grade === grade && a.user.class === uclass && a.user.gender === "male").map((a) => opt.masking ? maskName(a.user.name) : a.user.name).join("   ");
-      data[`${grade}_${uclass}_FEMALE`] = apply.filter((a) => a.user.grade === grade && a.user.class === uclass && a.user.gender === "female").map((a) => opt.masking ? maskName(a.user.name) : a.user.name).join("   ");
+      data[`${grade}_${uclass}_MALE`] = apply.filter((a) => a.user.grade === grade && a.user.class === uclass && a.user.gender === "male").map((a) => opt.masking ? maskName(a.user.name) : a.user.name).join("&nbsp;&nbsp;");
+      data[`${grade}_${uclass}_FEMALE`] = apply.filter((a) => a.user.grade === grade && a.user.class === uclass && a.user.gender === "female").map((a) => opt.masking ? maskName(a.user.name) : a.user.name).join("&nbsp;&nbsp;");
     }
   }
 
