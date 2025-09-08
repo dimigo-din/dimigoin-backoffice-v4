@@ -215,5 +215,5 @@ export async function setMealCancel(outing_id: string, breakfast_cancel: boolean
 }
 
 export async function changeStaySeat(targets: string[], to: string): Promise<StayApply> {
-  return (await client.patch("/manage/stay/change_seat", { targets, to })).data;
+  return (await client.post("/manage/stay/change_seat", { targets, to })).data;
 }
