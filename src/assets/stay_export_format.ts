@@ -1464,7 +1464,7 @@ export const stayFormat = `
 </table>
 <p class=HStyle0><span class="hnc_page_break" style="display:relative;word-spacing:-0.5em;">&nbsp;</span></p>
 
-<p style="font-size: 12px">● 주말잔류 신청은 매주 일요일 18시에 시작해 월요일 22시에 마감합니다.<br/>● 신청 기간 이후에는 원자재 주문 문제로 급식 취소가 불가능합니다.<br/>● 잔류 관련 문의: 한국디지털미디어고등학교 생활관 (학봉관: 031-363-7877, 우정학사: 031-363-7879)</p>
+<p style="font-size: 12px">● 주말잔류 신청은 매주 일요일 18시에 시작해 월요일 22시에 마감합니다.<br/>● 신청 기간 이후에는 급식 자재 선주문으로 인해 급식 취소가 불가능합니다.<br/>● 잔류 관련 문의: 한국디지털미디어고등학교 생활관 (학봉관: 031-363-7877, 우정학사: 031-363-7879)</p>
 
 <svg class="logo" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283.46 56.69">
   <defs>
