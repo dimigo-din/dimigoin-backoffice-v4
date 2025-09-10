@@ -217,27 +217,3 @@ export async function setMealCancel(outing_id: string, breakfast_cancel: boolean
 export async function changeStaySeat(targets: string[], to: string): Promise<StayApply> {
   return (await client.post("/manage/stay/change_seat", { targets, to })).data;
 }
-
-export const renderHtml = async (html: string, filename: string) => {
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = client.defaults.baseURL+"/manage/stay/renderHtml";
-  form.target = "_blank";
-  form.style.display = "none";
-
-  const htmlInput = document.createElement("input");
-  htmlInput.name = "html";
-  htmlInput.value = html;
-  htmlInput.type = "hidden";
-
-  const filenameInput = document.createElement("input");
-  filenameInput.name = "filename";
-  filenameInput.value = filename;
-  filenameInput.type = "hidden";
-
-  form.appendChild(htmlInput);
-  form.appendChild(filenameInput);
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-};
