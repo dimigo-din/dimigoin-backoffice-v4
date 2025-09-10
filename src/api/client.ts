@@ -30,7 +30,6 @@ export function getInstance(): AxiosInstance {
           }).catch(() => {
             isRefreshing = false;
             refreshSubscribers = [];
-            localStorage.clear();
             location.href = "/login";
             return Promise.reject(err);
           });

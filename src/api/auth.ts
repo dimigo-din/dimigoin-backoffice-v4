@@ -32,7 +32,6 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
 }
 
 export async function logout(): Promise<void> {
-  localStorage.clear();
   await client.get("/auth/logout");
 }
 
@@ -47,7 +46,6 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
       res = (await axios.post("http://localhost:5000/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   }catch (e) {
     console.error(e);
-    localStorage.clear();
     await logout();
     location.href = "/login";
 
