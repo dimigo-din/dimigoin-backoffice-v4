@@ -201,7 +201,7 @@ export default function SideBar() {
     }
   }, [name, navigate]);
 
-  const [openSection, setOpenSection] = useState<string | null>(() => getLS("sidebar.openSection"));
+  const [openSection, setOpenSection] = useState<string | null>(() => window.localStorage.getItem("sidebar.openSection"));
 
   useEffect(() => {
     for (const menu of menuList) {
