@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {ping} from "../api/auth.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import Divider from "./Divider.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -48,73 +48,84 @@ const UserWrapper = styled.div`
   }
 `;
 
-const Menu = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1dvh;
-  
-  .title{
-    --line-color:#e5e7eb; /* 선 색 */
-    --line-weight:1px; /* 선 두께 */
-    --gap: .75rem; /* 글자-선 사이 간격 */
-
-
-    display:flex;
-    align-items:center;
-    gap:var(--gap);
-    color: ${({theme}) => theme.Colors.Content.Primary};
-    font-family: sans-serif;
-  }
-
-  .title::before{
-    content:"";
-    border-top:var(--line-weight) solid var(--line-color);
-    flex:0 0 auto; /* 왼쪽 선은 짧게 */
-    width:20px;
-
-    background-color: ${({theme}) => theme.Colors.Content.Tertiary};
-  }
-  .title::after{
-    content:"";
-    flex:1 1 0; /* 오른쪽 선은 길게 */
-    border-top:var(--line-weight) solid var(--line-color);
-
-    background-color: ${({theme}) => theme.Colors.Content.Tertiary};
-  }
-  .title > span{
-    white-space:nowrap;
-    font-weight:600;
-  }
-`;
 const MenuWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 3dvh;
+  gap: 8px;
+`;
+
+const AccordionSection = styled.div`
+  border-radius: 8px;
+  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  overflow: hidden;
+`;
+
+const AccordionHeader = styled.div<{ isOpen: boolean }>`
+  height: 5dvh;
+  width: 100%;
+  padding: 0 1dvw;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  background-color: ${({theme, isOpen}) => isOpen ? theme.Colors.Background.Tertiary : theme.Colors.Background.Secondary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Title.size};
+  font-weight: 600;
+  
+  cursor: pointer;
+  transition: background-color 500ms ease;
+  
+  &:hover {
+    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  }
+`;
+
+const AccordionIcon = styled.div<{ isOpen: boolean }>`
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  transform: ${({isOpen}) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+  transition: transform 300ms ease;
+`;
+
+const AccordionContent = styled.div<{ isOpen: boolean }>`
+  max-height: ${({isOpen}) => isOpen ? '300px' : '0'};
+  overflow: hidden;
+  transition: max-height 500ms ease;
 `;
 
 const MenuItem = styled.div<{ selected: boolean }>`
-  height: 5dvh;
+  height: 4.5dvh;
   width: 100%;
   
-  padding: 0 1dvw;
+  padding: 0 2dvw;
   
   color: ${({theme}) => theme.Colors.Content.Primary};
-  background-color: ${({theme, selected}) => selected ? theme.Colors.Background.Tertiary : theme.Colors.Background.Secondary};
-  border-radius: 8px;
+  background-color: ${({theme, selected}) => selected ? theme.Colors.Background.Tertiary : 'transparent'};
   
   align-content: center;
+  cursor: pointer;
   
   transition: background-color 200ms ease;
-
-  font-size: ${({theme}) => theme.Font.Headline.size};
+  font-size: ${({theme}) => theme.Font.Headline.size || '14px'};
+  
+  &:hover {
+    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 function SideBar() {
   let navigate = useNavigate();
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
   const menuList = [
     {
       title: "잔류",
+      key: "stay-section",
       items: [
         { key: "stay", label: "잔류 관리" },
         { key: "applystay", label: "잔류 신청 관리" },
@@ -123,6 +134,7 @@ function SideBar() {
     },
     {
       title: "금요귀가",
+      key: "frigo-section",
       items: [
         { key: "frigo", label: "금요귀가 관리" },
         { key: "applyfrigo", label: "금요귀가 신청 관리" }
@@ -130,6 +142,7 @@ function SideBar() {
     },
     {
       title: "세탁",
+      key: "laundry-section",
       items: [
         { key: "laundrytimeline", label: "세탁 시간표 관리" },
         { key: "laundrymachine", label: "세탁기 관리" },
@@ -138,6 +151,7 @@ function SideBar() {
     },
     {
       title: "기상송",
+      key: "wakeup-section",
       items: [
         { key: "wakeup", label: "기상송 열람 및 관리" }
       ]
@@ -150,11 +164,25 @@ function SideBar() {
     }
   }, []);
 
+  useEffect(() => {
+    const currentPath = location.pathname;
+    for (const menu of menuList) {
+      if (menu.items.some(item => currentPath.startsWith(`/${item.key}`))) {
+        setOpenSection(menu.key);
+        break;
+      }
+    }
+  }, []);
+
   if (!location.pathname.startsWith("/login") && !location.pathname.startsWith("/openwakeup") && !localStorage.getItem("name")) {
     location.href = "/login";
-  }else if (location.pathname.startsWith("/login") || location.pathname.startsWith("/openwakeup")) {
+  } else if (location.pathname.startsWith("/login") || location.pathname.startsWith("/openwakeup")) {
     return null;
   }
+
+  const toggleSection = (sectionKey: string) => {
+    setOpenSection(openSection === sectionKey ? null : sectionKey);
+  };
 
   return (
     <Wrapper>
@@ -169,29 +197,33 @@ function SideBar() {
       </UserWrapper>
       <Divider />
       <MenuWrapper>
-        
-        {/* {Object.keys(menuList).map((item) => (
-          <MenuItem onClick={() => navigate(`/${item}`)} selected={location.pathname.startsWith(`/${item}`)}>
-            {menuList[item as keyof typeof menuList]}
-          </MenuItem>
-        ))} */}
-
         {menuList.map((menu) => (
-          <div key={menu.title}>
-            <Menu>
-              <div className="title">
-                <span>{menu.title}</span>
-              </div>
+          <AccordionSection key={menu.key}>
+            <AccordionHeader 
+              isOpen={openSection === menu.key}
+              onClick={() => toggleSection(menu.key)}
+            >
+              <span>{menu.title}</span>
+              <AccordionIcon isOpen={openSection === menu.key}>
+                ▼
+              </AccordionIcon>
+            </AccordionHeader>
+            <AccordionContent isOpen={openSection === menu.key}>
               {menu.items.map((item) => (
-                <MenuItem onClick={() => navigate(`/${item.key}`)} selected={location.pathname.startsWith(`/${item.key}`)}>
+                <MenuItem 
+                  key={item.key}
+                  onClick={() => navigate(`/${item.key}`)} 
+                  selected={location.pathname.startsWith(`/${item.key}`)}
+                >
                   {item.label}
                 </MenuItem>
               ))}
-            </Menu>
-          </div>
+            </AccordionContent>
+          </AccordionSection>
         ))}
       </MenuWrapper>
     </Wrapper>
   );
 }
+
 export default SideBar;
