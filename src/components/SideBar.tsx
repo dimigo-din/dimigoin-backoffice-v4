@@ -117,7 +117,8 @@ function SideBar() {
       title: "잔류",
       items: [
         { key: "stay", label: "잔류 관리" },
-        { key: "applystay", label: "잔류 신청 관리" }
+        { key: "applystay", label: "잔류 신청 관리" },
+        { key: "viewstayseat", label: "열람실 좌석" }
       ]
     },
     {

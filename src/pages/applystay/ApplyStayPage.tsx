@@ -211,7 +211,7 @@ const SeatRow = styled.div<{seat: string | null}>`
     padding: 12px 0;
     margin: 4px;
 
-    background-color: ${({theme}) => theme.Colors.Background.Primary};
+    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
     border-radius: 8px;
 
     text-align: center;
@@ -222,12 +222,12 @@ const SeatRow = styled.div<{seat: string | null}>`
   }
 
   > span.taken {
-    color: white;
-    background-color: ${({theme}) => theme.Colors.Solid.Black};
+    color: ${({theme}) => theme.Colors.Content.Secondary};
+    background-color: ${({theme}) => theme.Colors.Components.Fill.Tertiary};
   }
 
   > span:active {
-    background-color: ${({theme}) => theme.Colors.Solid.Blue};
+    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
   }
 
   > span#${({seat}) => seat} {
@@ -425,6 +425,7 @@ const InputWrapper = styled.div`
 `;
 
 const SuggestBox = styled.div`
+  width: 100%;
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -436,11 +437,11 @@ const SuggestBox = styled.div`
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.18);
   z-index: 20;
-  min-width: 36rem;
   max-width: 80dvw;
 `;
 
 const SuggestItem = styled.div`
+  width: 100%;
   padding: 10px 12px;
   font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
   color: ${({theme}) => theme.Colors.Content.Primary};
@@ -787,71 +788,7 @@ function ApplyStayPage() {
                     openEditor(apply);
                   }
                 }}>
-                  {apply.id === "new" ? (
-                    <InputWrapper>
-                      <Input
-                        type={"search"}
-                        onFocus={() => setIsSuggestOpen(!!nameSearch)}
-                        onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
-                        onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
-                        placeholder={"이름으로 검색하세요."}
-                        value={nameSearch}
-                        style={{height: "5dvh"}}
-                      />
-                      {isSuggestOpen && (
-                        <SuggestBox>
-                          {nameLoading && (
-                            <SuggestItem key="loading" onMouseDown={(e) => e.preventDefault()}>
-                              <span>검색 중…</span>
-                              <span className="meta">잠시만요</span>
-                            </SuggestItem>
-                          )}
-                          {!nameLoading && nameResults.filter((u) => u).slice(0, 12).map((u) => {
-                            const already = stayApplies?.find((sa) => sa.user && sa.user.id === u.id);
-                            return (
-                              <SuggestItem
-                                key={u.id}
-                                onMouseDown={(e) => {
-                                  e.preventDefault();
-                                  if (already) {
-                                    setSelectedApply(already);
-                                    setIsSuggestOpen(false);
-                                    setNameSearch("");
-                                    openEditor(already);
-                                    return;
-                                  }
-                                  const newApply = {
-                                    id: "new",
-                                    stay_seat: null,
-                                    outing: [],
-                                    user: u,
-                                  } as unknown as StayApply;
-                                  console.log(newApply);
-                                  setStayApplies((p) => {
-                                    const filtered = p ? p.filter((x) => x.id !== "new") : [];
-                                    return [newApply, ...filtered];
-                                  });
-                                  setSelectedApply(newApply);
-                                  setIsSuggestOpen(false);
-                                  setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
-                                }}
-                              >
-                                <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
-                              </SuggestItem>
-                            );
-                          })}
-                          {!nameLoading && nameResults.length === 0 && nameSearch && (
-                            <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
-                              <span>검색 결과가 없습니다</span>
-                              <span className="meta">다른 키워드를 입력해 보세요</span>
-                            </SuggestItem>
-                          )}
-                        </SuggestBox>
-                      )}
-                    </InputWrapper>
-                  ) : (
-                    <>{apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}</>
-                  )}
+                  <>{apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}</>
                 </div>
                 <div className="right" onClick={(e) => {
                   if (e.currentTarget === e.target) {
