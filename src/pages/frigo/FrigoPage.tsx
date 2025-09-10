@@ -516,7 +516,7 @@ function FrigoPage() {
           <Text>파일 내보내기</Text>
           <ExportButton>
             <Button style={{height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
-              ExportFrigoAppliesToExcel(applies || [], { filename: `금요귀가 신청 현황(${applies?.[0]?.week ? new Date(new Date(applies[0].week).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)})` });
+              ExportFrigoAppliesToExcel(applies?.filter(a => a.approved === true) || [], { filename: `금요귀가 신청 현황(${applies?.[0]?.week ? new Date(new Date(applies[0].week).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)})` });
             }}>내보내기</Button>
           </ExportButton>
         </FitController>
