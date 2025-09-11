@@ -598,7 +598,7 @@ function ApplyStayPage() {
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
-        setSelectedApplySeat(currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
+        setSelectedApplySeat(applyCopy.id === "new" ? true : currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
       });
       return;
     }
