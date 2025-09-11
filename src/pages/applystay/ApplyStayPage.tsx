@@ -166,11 +166,7 @@ const StayApplyDetail = styled.div`
   height: fit-content;
   width: 100%;
 
-  > p {
-    font-size: ${({theme}) => theme.Font.Title.size};
-    font-weight: ${({theme}) => theme.Font.Title.weight};
-    margin-bottom: 2dvh;
-  }
+  overflow-y: hidden;
 
   > button {
     display: block;
@@ -185,6 +181,18 @@ const StayApplyDetail = styled.div`
   color: ${({theme}) => theme.Colors.Content.Primary};
 `;
 
+const StayApplyHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  > p {
+    font-size: ${({theme}) => theme.Font.Title.size};
+    font-weight: ${({theme}) => theme.Font.Title.weight};
+    margin-bottom: 2dvh;
+  }
+`;
 
 const SeatBox = styled.div`
   flex: 0 0 auto;
@@ -219,6 +227,7 @@ const SeatRow = styled.div<{seat: string | null}>`
 
   > span.inactive {
     filter: brightness(0.9);
+    color: ${({theme}) => theme.Colors.Content.Secondary};
   }
 
   > span.taken {
@@ -244,13 +253,9 @@ const OutingBox = styled.div`
   border-radius: 8px;
   margin-top: 2dvh;
 
-  height: 45dvh;
-
   overflow-y: scroll;
 
   > div {
-    flex: 0 0 auto;
-
     height: 15dvh;
     width: 100%;
 
@@ -508,6 +513,7 @@ function ApplyStayPage() {
 
   const [selectedApply, setSelectedApply] = useState<StayApply | null>(null);
   const [selectedApplyChecksum, setSelectedApplyChecksum] = useState<string | null>(null);
+  const [selectedApplySeat, setSelectedApplySeat] = useState<boolean | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
   
@@ -592,6 +598,7 @@ function ApplyStayPage() {
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
+        setSelectedApplySeat(currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
       });
       return;
     }
@@ -668,14 +675,21 @@ function ApplyStayPage() {
       return;
     }
 
-    // 좌석 검사: 해당 학년에 맞는지
-    const isValidSeat = currentStay?.stay_seat_preset.stay_seat.some((target) =>
-      isInRange(target.range.split(":"), selectedApply.stay_seat) &&
-      target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`
+    const userTarget = `${selectedApply.user.grade}_${selectedApply.user.gender}`;
+    const validSeatRanges = currentStay?.stay_seat_preset.stay_seat.filter(
+      (target) => target.target === userTarget
     );
 
-    if (!isValidSeat) {
-      if(!confirm("해당 학년의 좌석이 아닙니다. 정말로 저장하시겠습니까?")) {
+    const isSeatInValidRange = validSeatRanges?.some((target) => 
+      isInRange(target.range.split(":"), selectedApply.stay_seat)
+    ) ?? false;
+
+    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat.some((target) => 
+      isInRange(target.range.split(":"), selectedApply.stay_seat)
+    ) ?? false;
+
+    if (isSeatInAnyRange && !isSeatInValidRange) {
+      if (!window.confirm("해당 학년의 좌석이 아닙니다. 정말로 저장하시겠습니까?")) {
         return;
       }
     }
@@ -1023,49 +1037,74 @@ function ApplyStayPage() {
         {selectedApply && stayApplies ? (
           <>
             <StayApplyDetail>
-              <p>{selectedApply.user.grade}{selectedApply.user.class}{("0"+selectedApply.user.number).slice(-2)} {selectedApply?.user.name}</p>
-              <SeatBox ref={seatBoxRef}>
-                {(() => {
-                  const table = genTable();
-                  const groupedRows: string[][][] = [];
-                  for (let i = 0; i < table.length; i += 2) {
-                    groupedRows.push(table.slice(i, i + 2));
-                  }
-                  return groupedRows.map((group, idx) => (
-                    <div key={idx} style={{ marginBottom: "16px" }}>
-                      {group.map((row, rowIdx) => (
-                        <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
-                          {row.map((seat, seatIdx) => {
-                            const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
-                            const taken = stayApplies.find(
-                              (sapply) =>
-                                sapply.stay_seat === seat &&
-                                sapply.stay_seat !== selectedApply.stay_seat
-                            );
-                            return (
-                              <span
-                                id={seat}
-                                ref={selectedApply.stay_seat === seat ? seatRef : null}
-                                className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
-                                onClick={() =>
-                                  setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
-                                }
-                                key={seat}
-                                style={{
-                                  marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
-                                }}
-                              >
-                            {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
-                          </span>
-                            );
-                          })}
-                        </SeatRow>
-                      ))}
-                    </div>
-                  ));
-                })()}
-              </SeatBox>
-              <OutingBox>
+              <StayApplyHeader>
+                <p>{selectedApply.user.grade}{selectedApply.user.class}{("0"+selectedApply.user.number).slice(-2)} {selectedApply?.user.name}</p>
+                <SelectionRow height={"4dvh"} width={"25%"} style={{marginBottom: "2dvh"}}>
+                  <SelectionItem selected={selectedApplySeat === true}
+                                  boundState={undefined}
+                                  onClick={() => {setSelectedApplySeat(true);}}>
+                    열람실
+                  </SelectionItem>
+                  <SelectionItem selected={selectedApplySeat === false}
+                                  boundState={null}
+                                  border={true}
+                                  onClick={() => {setSelectedApplySeat(false);}}>
+                    좌석 미선택
+                  </SelectionItem>
+                </SelectionRow>
+              </StayApplyHeader>
+              { selectedApplySeat ? (
+                <SeatBox ref={seatBoxRef}>
+                  {(() => {
+                    const table = genTable();
+                    const groupedRows: string[][][] = [];
+                    for (let i = 0; i < table.length; i += 2) {
+                      groupedRows.push(table.slice(i, i + 2));
+                    }
+                    return groupedRows.map((group, idx) => (
+                      <div key={idx} style={{ marginBottom: "16px" }}>
+                        {group.map((row, rowIdx) => (
+                          <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
+                            {row.map((seat, seatIdx) => {
+                              const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
+                              const taken = stayApplies.find(
+                                (sapply) =>
+                                  sapply.stay_seat === seat &&
+                                  sapply.stay_seat !== selectedApply.stay_seat
+                              );
+                              return (
+                                <span
+                                  id={seat}
+                                  ref={selectedApply.stay_seat === seat ? seatRef : null}
+                                  className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
+                                  onClick={() =>
+                                    setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
+                                  }
+                                  key={seat}
+                                  style={{
+                                    marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
+                                  }}
+                                >
+                              {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
+                            </span>
+                              );
+                            })}
+                          </SeatRow>
+                        ))}
+                      </div>
+                    ));
+                  })()}
+                </SeatBox>
+              ) : (
+                <Input
+                  type={"text"}
+                  style={{ width: "100%", fontSize: "14px", height: "8dvh" }}
+                  placeholder={"좌석 미선택 사유나 잔류 위치를 입력하세요."} 
+                  value={currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), selectedApply.stay_seat)) ? "" : selectedApply.stay_seat}
+                  onInput={(e) => {selectedApply.stay_seat = (e.target as HTMLInputElement).value; setSelectedApply({ ...selectedApply })}}
+                />
+              )}
+              <OutingBox style={{height: selectedApplySeat === true ? "45dvh" : "72dvh"}}>
                 {selectedApply.outing.map((outing) => {
                   const modify = (deleteTarget?: Outing) => {
                     setSelectedApply((p) => {

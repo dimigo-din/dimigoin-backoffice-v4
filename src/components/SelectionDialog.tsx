@@ -58,7 +58,6 @@ const DialogPanel = styled.div<{ $isClosing: boolean }>`
     animation: ${$isClosing ? slideOutRight : slideInRight} 0.3s ease forwards;
   `}
 
-  overflow: auto;
   -webkit-overflow-scrolling: touch;
 
   padding: 20px 16px;
