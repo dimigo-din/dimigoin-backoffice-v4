@@ -32,7 +32,6 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
 }
 
 export async function logout(): Promise<void> {
-  localStorage.clear();
   await client.get("/auth/logout");
 }
 
@@ -46,12 +45,13 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
     else
       res = (await axios.post("http://localhost:5000/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
   }catch (e) {
-    console.error(e);
-    localStorage.clear();
-    await logout();
-    location.href = "/login";
-
-    throw new Error();
+    if (axios.isAxiosError(e) && e.response?.status === 401) {
+      await logout();
+      location.href = "/login";
+    } else {
+      console.error(e);
+    }
+    return [];
   }
   return res.map((personalInformation): PersonalInformation | null => {
     if (!personalInformation) return null;

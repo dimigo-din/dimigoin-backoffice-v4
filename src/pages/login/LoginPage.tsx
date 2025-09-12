@@ -88,7 +88,6 @@ function LoginPage() {
       showToast("로그인중입니다...", "info");
       googleLogin(code).then(({accessToken}) => {
         const payload = parseJwt(accessToken);
-        console.log(payload)
 
         // 권한 체크
         if(payload.permission != 2 && payload.permission != 7) {
@@ -111,7 +110,7 @@ function LoginPage() {
         showToast("로그인에 성공하였습니다.", "info");
         setTimeout(() => {
           location.href = "/";
-        }, 3000)
+        }, 3000);
       }).catch((e) => {
         console.error(e);
         showToast("로그인에 실패했습니다.", "danger");
