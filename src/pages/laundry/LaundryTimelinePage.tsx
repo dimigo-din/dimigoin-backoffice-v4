@@ -43,8 +43,9 @@ const FitController = styled.div`
   display: flex;
   flex-direction: column;
 
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 2dvh 2dvh;
   gap: 1dvh;
@@ -57,8 +58,9 @@ const StretchController = styled.div`
   display: flex;
   flex-direction: column;
 
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 2dvh 2dvh;
   gap: 1dvh;
@@ -104,12 +106,13 @@ const TimelineListItemBlock = styled.div<{ selected: boolean }>`
   justify-content: space-between;
   align-items: center;
   
-  border-radius: 8px;
+  border-radius: 12px;
   
   font-size: ${({theme}) => theme.Font.Headline.size};
   background-color: ${({theme, selected}) => selected ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Tertiary};
   color: ${({theme}) => theme.Colors.Content.Primary};
   padding: 0 1dvw;
+  box-shadow: ${({selected}) => selected ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 1px 4px rgba(0, 0, 0, 0.08)'};
 `;
 
 const TimelineListItemEnableIndicator = styled.div<{ enabled?: boolean }>`
@@ -119,7 +122,7 @@ const TimelineListItemEnableIndicator = styled.div<{ enabled?: boolean }>`
   
   padding: 0.5dvh 0.5dvw;
   
-  border-radius: 6px;
+  border-radius: 8px;
 `;
 
 const TimelineDetail = styled.div`
@@ -131,7 +134,8 @@ const TimelineDetail = styled.div`
   gap: 1dvh;
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 1dvh 1dvh;
   
@@ -151,12 +155,15 @@ const Time = styled.div`
   color: ${({theme}) => theme.Colors.Content.Primary};
   
   background-color: ${({theme}) => theme.Colors.Background.Tertiary};
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
   padding: 1dvh 1dvw;
   
   input {
     padding: 0 1dvh;
+    border-radius: 8px;
+    border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
   }
 
   input[type="time"]::-webkit-calendar-picker-indicator {
@@ -171,10 +178,10 @@ const Select = styled.select`
   -webkit-appearance: none;
   -moz-appearance: none;
   color: ${({theme}) => theme.Colors.Content.Secondary};
-  border: none;
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
   border-radius: 8px;
 
-  padding: 2px;
+  padding: 4px 8px;
 
   width: auto;
 `;
@@ -182,12 +189,13 @@ const Select = styled.select`
 const Text = styled.p`
   color: ${({theme}) => theme.Colors.Content.Primary};
   font-size: ${({theme}) => theme.Font.Callout.size};
+  font-weight: 600;
 `;
 
 const DeleteTime = styled.div`
   margin-left: auto;
   
-  border-radius: 6px;
+  border-radius: 8px;
   
   background-color: ${({theme}) => theme.Colors.Core.Status.Negative};
   color: ${({theme}) => theme.Colors.Content.Primary};
@@ -200,7 +208,12 @@ const LaundryTimeChildMachine = styled.div`
   flex-direction: row;
   align-items: center;
   
+  gap: 0.5dvw;
+  
   margin-left: 2dvh;
+  padding: 0.8dvh 1dvw;
+  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  border-radius: 8px;
 `;
 
 const UnassignMachineButton = styled.div`
@@ -439,7 +452,10 @@ function LaundryTimelinePage() {
   return (
     <Wrapper>
       <TimelineDetail>
-        {currentTimeline && currentTimeline.times.filter((time) => filterGrade === null || time.grade === filterGrade).map((time) => {
+        {currentTimeline && currentTimeline.times.sort((a, b) => {
+          if (a.grade !== b.grade) return a.grade - b.grade;
+          return a.time.localeCompare(b.time);
+        }).filter((time) => filterGrade === null || time.grade === filterGrade).map((time) => {
           return (
             <>
               <Time>
@@ -457,6 +473,7 @@ function LaundryTimelinePage() {
               {time.assigns.map((assign) => {
                 return (
                   <LaundryTimeChildMachine>
+                    <div/>
                     <Text>ㄴ</Text>
                     <Select value={assign.id}>
                       {machineList && machineList.map((machine) => {
@@ -470,6 +487,7 @@ function LaundryTimelinePage() {
                 );
               })}
               <LaundryTimeChildMachine>
+                <div/>
                 <Text>ㄴ</Text>
                 <Select value={"add"} onInput={(e) => assignMachine(time.id, (e.target as HTMLSelectElement).value)}>
                   <option value={"add"}>추가하기</option>
@@ -485,6 +503,9 @@ function LaundryTimelinePage() {
         })}
       </TimelineDetail>
       <ControllerBox>
+        <FitController>
+          <Text>🚨 세탁 일정이 변경되면 신청된 세탁이 모두 초기화됩니다!</Text>
+        </FitController>
         <StretchController>
           <Text>세탁 일정 목록</Text>
           {timelineList !== null ? timelineList.map((tli) => {
