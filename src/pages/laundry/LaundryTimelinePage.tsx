@@ -274,7 +274,7 @@ function LaundryTimelinePage() {
       times: currentTimeline.times.map((time) => {
         return {
           time: time.time,
-          grade: time.id === id ? grade : time.grade,
+          grade: time.id === id ? [grade] : time.grade,
           assigns: time.assigns.map((assign) => assign.id),
         };
       })
@@ -377,7 +377,7 @@ function LaundryTimelinePage() {
           grade: time.grade,
           assigns: time.assigns.map((assign) => assign.id),
         };
-      }).concat({ time: new_time, grade: new_grade, assigns: [] }),
+      }).concat({ time: new_time, grade: [new_grade], assigns: [] }),
     };
 
     updateLaundryTimeline(payload).then(() => {
@@ -453,9 +453,9 @@ function LaundryTimelinePage() {
     <Wrapper>
       <TimelineDetail>
         {currentTimeline && currentTimeline.times.sort((a, b) => {
-          if (a.grade !== b.grade) return a.grade - b.grade;
+          if (a.grade !== b.grade) return a.grade[0] - b.grade[0];
           return a.time.localeCompare(b.time);
-        }).filter((time) => filterGrade === null || time.grade === filterGrade).map((time) => {
+        }).filter((time) => filterGrade === null || time.grade.indexOf(filterGrade) !== -1).map((time) => {
           return (
             <>
               <Time>
@@ -463,7 +463,7 @@ function LaundryTimelinePage() {
                 &nbsp;
                 -
                 &nbsp;
-                <Select value={time.grade} onInput={(e) => {updateGradeForTime(time.id, parseInt((e.target as HTMLSelectElement).value) as 1 | 2 | 3)}}>
+                <Select value={time.grade[0]} onInput={(e) => {updateGradeForTime(time.id, parseInt((e.target as HTMLSelectElement).value) as 1 | 2 | 3)}}>
                   <option value="1">1학년</option>
                   <option value="2">2학년</option>
                   <option value="3">3학년</option>
@@ -526,17 +526,17 @@ function LaundryTimelinePage() {
               <SelectionRow width={"100%"}>
                 <SelectionItem selected={filterGrade === 1}
                                onClick={() => setFilterGrade(1)}>
-                  1학년 ({currentTimeline.times.filter((time) => time.grade === 1).length}건)
+                  1학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(1) !== -1).length}건)
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === 2}
                                border={true}
                                onClick={() => setFilterGrade(2)}>
-                  2학년 ({currentTimeline.times.filter((time) => time.grade === 2).length}건)
+                  2학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(2) !== -1).length}건)
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === 3}
                                border={true}
                                onClick={() => setFilterGrade(3)}>
-                  3학년 ({currentTimeline.times.filter((time) => time.grade === 3).length}건)
+                  3학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(3) !== -1).length}건)
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === null}
                                border={true}

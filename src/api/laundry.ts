@@ -19,7 +19,7 @@ export type LaundryMachine = {
 export type LaundryTime = {
   id: string;
   time: string;
-  grade: 1 | 2 | 3;
+  grade: (1 | 2 | 3)[];
   assigns: LaundryMachine[];
 }
 
@@ -36,7 +36,7 @@ export type LaundryTimelinePayload = {
   triggeredOn: "primary" | "stay";
   times: {
     time: string;
-    grade: 1 | 2 | 3;
+    grade: (1 | 2 | 3)[];
     assigns: string[];
   }[];
 }
