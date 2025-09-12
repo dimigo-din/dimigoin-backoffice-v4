@@ -147,9 +147,9 @@ function WakeupPage() {
   const updateScreen = () => {
     getWakeupSongList().then((data) => {
       setApplies(data.sort((a, b) =>
-        (b.wakeupSongVote.filter((v) => v.upvote).length - b.wakeupSongVote.filter((v) => !v.upvote).length)
+        (b.wakeupSongVote.filter((v) => v.upvote).length)
           -
-        (a.wakeupSongVote.filter((v) => v.upvote).length - a.wakeupSongVote.filter((v) => !v.upvote).length)
+        (a.wakeupSongVote.filter((v) => v.upvote).length)
       ));
     }).catch((e) => {
       console.error(e);
