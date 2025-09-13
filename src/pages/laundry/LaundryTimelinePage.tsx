@@ -257,9 +257,11 @@ function LaundryTimelinePage() {
     getLaundryTimelineList().then((data) => {
       setTimelineList(data);
 
-      if (currentTimeline) {
+      if(!currentTimeline && data.length > 0)
+        getTimeline(data.filter((tli) => tli.enabled)[0]?.id || data[0].id);
+      else if (currentTimeline)
         getTimeline(currentTimeline.id);
-      }
+
     }).catch((e) => {
       console.error(e);
       showToast(e.response.data.error.message || e.response.data.error, "danger");
