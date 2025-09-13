@@ -11,7 +11,7 @@ let instance: AxiosInstance;
 export function getInstance(): AxiosInstance {
   if (!instance) {
     instance = axios.create({
-      baseURL: location.host !== "localhost:5173" ? `https://api.${location.host.split(".").reverse().filter((_, i) => i <= 1 ).reverse().join(".")}` : "http://localhost:3000",
+      baseURL: (location.host !== "localhost:5173" && location.host !== "localhost:5174") ? `https://api.${location.host.split(".").reverse().filter((_, i) => i <= 1 ).reverse().join(".")}` : "http://localhost:3000",
       timeout: 5000,
       withCredentials: true,
     });
