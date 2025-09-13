@@ -11,6 +11,7 @@ import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
 import {Input} from "../../styles/components/input.ts";
 import { Button } from "../../styles/components/button.ts";
+import CheckBox from "../../components/CheckBox.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -169,6 +170,16 @@ const Time = styled.div`
   input[type="time"]::-webkit-calendar-picker-indicator {
     filter: ${window.matchMedia("(prefers-color-scheme: dark)").matches ? "invert(1)" : "none"};
   }
+
+  div {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5dvw;
+
+    padding-left: 2dvh;
+
+    width: fit-content;
+  }
 `;
 
 const Select = styled.select`
@@ -264,7 +275,7 @@ function LaundryTimelinePage() {
     });;
   }
 
-  const updateGradeForTime = (id: string, grade: 1 | 2 | 3) => {
+  const updateGradeForTime = (id: string, grade: (1 | 2 | 3)[]) => {
     if (!currentTimeline) return;
 
     const payload: LaundryTimelinePayload & { id: string } = {
@@ -274,7 +285,7 @@ function LaundryTimelinePage() {
       times: currentTimeline.times.map((time) => {
         return {
           time: time.time,
-          grade: time.id === id ? [grade] : time.grade,
+          grade: time.id === id ? grade : time.grade,
           assigns: time.assigns.map((assign) => assign.id),
         };
       })
@@ -460,14 +471,38 @@ function LaundryTimelinePage() {
             <>
               <Time>
                 <Input type={"time"} value={time.time} onChange={(e) => updateTimeForTime(time.id, e.target.value)} />
-                &nbsp;
-                -
-                &nbsp;
-                <Select value={time.grade[0]} onInput={(e) => {updateGradeForTime(time.id, parseInt((e.target as HTMLSelectElement).value) as 1 | 2 | 3)}}>
-                  <option value="1">1학년</option>
-                  <option value="2">2학년</option>
-                  <option value="3">3학년</option>
-                </Select>
+                <div>
+                  <CheckBox text="1학년" canceled={time.grade.includes(1)} onClick={() => {
+                    let new_grade: (1 | 2 | 3)[] = [];
+                    if (time.grade.includes(1)) {
+                      new_grade = time.grade.filter((g) => g !== 1);
+                    } else {
+                      new_grade = time.grade.concat(1);
+                    }
+
+                    updateGradeForTime(time.id, new_grade.sort());
+                  }} />
+                  <CheckBox text="2학년" canceled={time.grade.includes(2)} onClick={() => {
+                    let new_grade: (1 | 2 | 3)[] = [];
+                    if (time.grade.includes(2)) {
+                      new_grade = time.grade.filter((g) => g !== 2);
+                    } else {
+                      new_grade = time.grade.concat(2);
+                    }
+
+                    updateGradeForTime(time.id, new_grade.sort());
+                  }} />
+                  <CheckBox text="3학년" canceled={time.grade.includes(3)} onClick={() => {
+                    let new_grade: (1 | 2 | 3)[] = [];
+                    if (time.grade.includes(3)) {
+                      new_grade = time.grade.filter((g) => g !== 3);
+                    } else {
+                      new_grade = time.grade.concat(3);
+                    }
+
+                    updateGradeForTime(time.id, new_grade.sort());
+                  }} />
+                </div>
                 <DeleteTime onClick={() => deleteTime(time.id)}>삭제</DeleteTime>
               </Time>
               {time.assigns.map((assign) => {
