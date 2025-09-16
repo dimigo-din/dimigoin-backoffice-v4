@@ -23,7 +23,7 @@ import {sha256} from "../../utils/sha256.ts";
 import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
 import {Select} from "../../styles/components/select.ts";
-import CheckBoxOn from "../../assets/icons/checkbox/check_box_checked.svg?react"
+import CheckBox from "../../components/CheckBox.tsx";
 import {Button, LightButton} from "../../styles/components/button.ts";
 import {makeid} from "../../utils/makeid.ts";
 import moment from "moment-timezone";
@@ -319,28 +319,6 @@ const InputRow = styled.div<{width?: string}>`
 
   > Input {
     padding: 0 8px;
-  }
-`;
-
-const CheckBox = styled.div<{ canceled: boolean }>`
-  height: 3vh;
-  width: 32%;
-
-  border-radius: 12px;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
-  line-height: ${({theme}) => theme.Font.Paragraph_Large.lineHeight};
-  font-weight: ${({theme, canceled}) => canceled ? theme.Font.Paragraph_Large.weight.regular : theme.Font.Paragraph_Large.weight.weak};
-  transition: border-color 0.3s ease, font-weight 0.3s ease;
-
-  display: flex;
-  gap: 6%;
-  align-items: center;
-  justify-content: center;
-
-  path {
-    fill: ${({theme, canceled}) => canceled ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Quaternary};
-    transition: fill 0.3s ease;
   }
 `;
 
@@ -1202,22 +1180,16 @@ function ApplyStayPage() {
                         }}>자기계발외출 입력</PresetBtn>
                       </InputRow>
                       <InputRow>
-                        <CheckBox canceled={outing.breakfast_cancel}
+                        <CheckBox text="아침 취소" canceled={outing.breakfast_cancel}
                                   onClick={() => {outing.breakfast_cancel = !outing.breakfast_cancel; modify()}}>
-                          <CheckBoxOn />
-                          <p>아침 취소</p>
                         </CheckBox>
                         &nbsp;&nbsp;
-                        <CheckBox canceled={outing.lunch_cancel}
+                        <CheckBox text="점심 취소" canceled={outing.lunch_cancel}
                                   onClick={() => {outing.lunch_cancel = !outing.lunch_cancel; modify()}}>
-                          <CheckBoxOn />
-                          <p>점심 취소</p>
                         </CheckBox>
                         &nbsp;&nbsp;
-                        <CheckBox canceled={outing.dinner_cancel}
+                        <CheckBox text="저녁 취소" canceled={outing.dinner_cancel}
                                   onClick={() => {outing.dinner_cancel = !outing.dinner_cancel; modify()}}>
-                          <CheckBoxOn />
-                          <p>저녁 취소</p>
                         </CheckBox>
                       </InputRow>
                     </div>
