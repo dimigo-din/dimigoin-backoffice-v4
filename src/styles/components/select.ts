@@ -10,6 +10,8 @@ export const Select = styled.select`
   line-height: ${({theme}) => theme.Font.Paragraph_Large.lineHeight};
   font-weight: ${({theme}) => theme.Font.Paragraph_Large.weight.regular};
   transition: border-color 0.3s ease;
+  
+  height: "5dvh";
 
   &::placeholder {
     color: ${({theme}) => theme.Colors.Content.Secondary};
