@@ -461,7 +461,7 @@ function LaundryApplyPage() {
                   .sort((a, b) => a.time.localeCompare(b.time))
                   .map((time) => {
                     const user = applies.find(a => a.laundryMachine.id === cancleMachineId && a.laundryTime.id === time.id)?.user;
-                    return <option key={time.id} value={time.id}>{`${time.time} ${user ? ` (${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name})` : ""}`}</option>
+                    return <option key={time.id} value={time.id}>{`${time.time} ${user?.number ? ` (${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name})` : user?.name}`}</option>
                   })
                 }
               </Select>
