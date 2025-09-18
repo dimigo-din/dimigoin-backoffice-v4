@@ -341,38 +341,38 @@ function LaundryApplyPage() {
               <Text>분류</Text>
               <SelectionRow width={"100%"}>
                 <SelectionItem selected={filterGrade === 1}
-                              onClick={() => setFilterGrade(1)}>
+                              onClick={() => {setFilterGrade(1); setSelectedMachine(null)}}>
                   1학년
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === 2}
                               border={true}
-                              onClick={() => setFilterGrade(2)}>
+                              onClick={() => {setFilterGrade(2); setSelectedMachine(null)}}>
                   2학년
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === 3}
                               border={true}
-                              onClick={() => setFilterGrade(3)}>
+                              onClick={() => {setFilterGrade(3); setSelectedMachine(null)}}>
                   3학년
                 </SelectionItem>
                 <SelectionItem selected={filterGrade === null}
                               border={true}
-                              onClick={() => setFilterGrade(null)}>
+                              onClick={() => {setFilterGrade(null); setSelectedMachine(null)}}>
                   모두
                 </SelectionItem>
               </SelectionRow>
               <SelectionRow width={"100%"}>
                 <SelectionItem selected={filterGender === "male"}
-                              onClick={() => setFilterGender("male")}>
+                              onClick={() => {setFilterGender("male"); setSelectedMachine(null)}}>
                   남자
                 </SelectionItem>
                 <SelectionItem selected={filterGender === "female"}
                               border={true}
-                              onClick={() => setFilterGender("female")}>
+                              onClick={() => {setFilterGender("female"); setSelectedMachine(null)}}>
                   여자
                 </SelectionItem>
                 <SelectionItem selected={filterGender === null}
                               border={true}
-                              onClick={() => setFilterGender(null)}>
+                              onClick={() => {setFilterGender(null); setSelectedMachine(null)}}>
                   모두
                 </SelectionItem>
               </SelectionRow>
