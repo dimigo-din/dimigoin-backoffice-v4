@@ -10,8 +10,8 @@ import {
   updateStayApply,
   changeStaySeat
 } from "../../api/stay.ts";
-import {searchUser, type User} from "../../api/user.ts";
-import {getPersonalInformation, type PersonalInformation} from "../../api/auth.ts";
+import {type User} from "../../api/user.ts";
+import {type PersonalInformation} from "../../api/auth.ts";
 import styled from "styled-components";
 import {useEffect, useRef, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
@@ -34,6 +34,7 @@ import 'moment/dist/locale/ko';
 import {stay2excel} from "../../utils/stay2format.ts";
 import { flushSync } from "react-dom";
 import SelectionDialog from "../../components/SelectionDialog.tsx";
+import SearchStudent from "../../components/SearchStudent.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -402,44 +403,6 @@ const PresetBtn = styled.div`
   margin-left: 3%;
 `;
 
-const InputWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const SuggestBox = styled.div`
-  width: 100%;
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  max-height: 30dvh;
-  overflow-y: auto;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  border-radius: 8px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
-  z-index: 20;
-  max-width: 80dvw;
-`;
-
-const SuggestItem = styled.div`
-  width: 100%;
-  padding: 10px 12px;
-  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 120ms ease;
-
-  &:hover { background-color: ${({theme}) => theme.Colors.Components.Interaction.Hover}; }
-  &:active { background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed}; }
-
-  .meta { color: ${({theme}) => theme.Colors.Content.Tertiary}; font-size: ${({theme}) => theme.Font.Footnote.size}; }
-`;
-
 const NoOuting = styled.div`
   height: 100%;
   width: 100%;
@@ -479,10 +442,9 @@ function ApplyStayPage() {
   const [filterState, setFilterState] = useState<boolean | null | undefined>(undefined);
   const [filterGrade, setFilterGrade] = useState<boolean | null | undefined>(undefined);
   const [filterGender, setFilterGender] = useState<boolean | null | undefined>(undefined);
-  const [isSuggestOpen, setIsSuggestOpen] = useState(false);
-  const [nameSearch, setNameSearch] = useState<string>("");
   const [nameResults, setNameResults] = useState<(User & PersonalInformation)[]>([]);
   const [nameLoading, setNameLoading] = useState<boolean>(false);
+  const [nameSearch, setNameSearch] = useState<string>("");
 
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
@@ -707,34 +669,6 @@ function ApplyStayPage() {
     updateScreen();
   }, [currentStayIndex]);
 
-  useEffect(() => {
-    setIsSuggestOpen(!!nameSearch);
-  }, [nameSearch]);
-
-  useEffect(() => {
-    if (!nameSearch) { setNameResults([]); return; }
-    let alive = true;
-    const t = setTimeout(async () => {
-      try {
-        setNameLoading(true);
-        const res = await searchUser(nameSearch);
-        if (!alive) return;
-        if (res) {
-          getPersonalInformation(res.map((r) => r.email)).then((u) => {
-            setNameResults(res.map((r, i) => { return u[i] ? { ...r, ...u[i] } : null; }) as (User & PersonalInformation)[]);
-          });
-        }else {
-          setNameResults([]);
-        }
-      } catch (e) {
-        console.error(e);
-        setNameResults([]);
-      } finally {
-        setNameLoading(false);
-      }
-    }, 180);
-    return () => { alive = false; clearTimeout(t); };
-  }, [nameSearch]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -809,46 +743,7 @@ function ApplyStayPage() {
         </FitContainer>
         <FitContainer>
           <Text>잔류 신청 추가</Text>
-          <InputWrapper>
-            <Input
-              type={"search"}
-              placeholder={"학생 이름을 입력해주세요."}
-              onFocus={() => setIsSuggestOpen(!!nameSearch)}
-              onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
-              onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
-              value={nameSearch}
-              style={{height: "5dvh", width: "100%"}}
-            />
-            {isSuggestOpen && (
-              <SuggestBox>
-                {nameLoading && (
-                  <SuggestItem key="loading" onMouseDown={(e) => e.preventDefault()}>
-                    <span>검색 중…</span>
-                    <span className="meta">잠시만요</span>
-                  </SuggestItem>
-                )}
-                {!nameLoading && nameResults.slice(0, 12).filter(Boolean).map((u) => (
-                  <SuggestItem
-                    key={u.id}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setNewUser(u);
-                      setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
-                      setIsSuggestOpen(false);
-                    }}
-                  >
-                    <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
-                  </SuggestItem>
-                ))}
-                {!nameLoading && nameResults.length === 0 && nameSearch && (
-                  <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
-                    <span>검색 결과가 없습니다</span>
-                    <span className="meta">다른 키워드를 입력해 보세요</span>
-                  </SuggestItem>
-                )}
-              </SuggestBox>
-            )}
-          </InputWrapper>
+          <SearchStudent setNewUser={setNewUser} nameResults={nameResults} setNameResults={setNameResults} nameLoading={nameLoading} setNameLoading={setNameLoading} nameSearch={nameSearch} setNameSearch={setNameSearch} />
           <Button disabled={newUser === null} style={{height: "5dvh", padding: 0}} onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

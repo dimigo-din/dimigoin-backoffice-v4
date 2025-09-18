@@ -1,4 +1,6 @@
 import {getInstance} from "./client.ts";
+import {getPersonalInformation, type PersonalInformation} from "./auth.ts";
+import type {User} from "./user.ts";
 
 const client = getInstance();
 
@@ -48,6 +50,27 @@ export type LaundryMachinePayload = {
   enabled: boolean;
 }
 
+export type LaundryApply = {
+  id: string;
+  date: string;
+  laundryTimeline: LaundryTimeline;
+  laundryTime: LaundryTime;
+  laundryMachine: LaundryMachine;
+  user: User & PersonalInformation;
+  created_at: string;
+}
+
+export type CreateLaundryApplyPayload = {
+  laundryTime: string;
+  machine: string;
+  user: string;
+}
+
+export type UpdateLaundryApplyPayload = {
+  id: string;
+  userId: string;
+}
+
 export const getLaundryTimelineList = async (): Promise<LaundryTimelineListItem[]> => {
   return (await client.get("/manage/laundry/timeline/list")).data;
 }
@@ -86,4 +109,23 @@ export const updateLaundryMachine = async (data: LaundryMachinePayload & { id: s
 
 export const deleteLaundryMachine = async (id: string): Promise<LaundryMachine> => {
   return (await client.delete("/manage/laundry/machine?id="+id)).data;
+}
+
+export const getLaundryApplyList = async (): Promise<LaundryApply[]> => {
+  const apply: LaundryApply[] = (await client.get("/manage/laundry/apply/list")).data;
+  const users: string[] = apply.map((a) => a.user.email);
+  const personalInformation = await getPersonalInformation(users);
+  return apply.map((a, i) => { return {...a,  user: {...a.user, ...personalInformation[i]}}; });
+}
+
+export const createLaundryApply = async (data: CreateLaundryApplyPayload): Promise<LaundryApply> => {
+  return (await client.post("/manage/laundry/apply", data)).data;
+}
+
+export const updateLaundryApply = async (data: UpdateLaundryApplyPayload): Promise<LaundryApply> => {
+  return (await client.patch("/manage/laundry/apply", data)).data;
+}
+
+export const deleteLaundryApply = async (id: string): Promise<LaundryApply> => {
+  return (await client.delete("/manage/laundry/apply?id="+id)).data;
 }
