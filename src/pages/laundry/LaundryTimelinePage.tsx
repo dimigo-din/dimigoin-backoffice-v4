@@ -280,6 +280,8 @@ function LaundryTimelinePage() {
   const updateGradeForTime = (id: string, grade: (1 | 2 | 3)[]) => {
     if (!currentTimeline) return;
 
+    if(!confirm("정말로 변경하시겠습니까? 변경 시 신청된 세탁이 모두 초기화됩니다.")) return;
+
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
@@ -304,6 +306,8 @@ function LaundryTimelinePage() {
 
   const updateTimeForTime = (id: string, changed_time: string) => {
     if (!currentTimeline) return;
+
+    if(!confirm("정말로 변경하시겠습니까? 변경 시 신청된 세탁이 모두 초기화됩니다.")) return;
 
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
@@ -330,6 +334,8 @@ function LaundryTimelinePage() {
   const deleteTime = (id: string) => {
     if (!currentTimeline) return;
 
+    if(!confirm("정말로 삭제하시겠습니까? 삭제 시 신청된 세탁이 모두 초기화됩니다.")) return;
+
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
@@ -354,6 +360,8 @@ function LaundryTimelinePage() {
 
   const addTime = () => {
     if (!currentTimeline) return;
+
+    if(!confirm("정말로 추가하시겠습니까? 추가 시 신청된 세탁이 모두 초기화됩니다.")) return;
 
     let new_grade = null;
     let new_time = null;
@@ -405,6 +413,8 @@ function LaundryTimelinePage() {
   const assignMachine = (timeid: string, machineid: string) => {
     if (!currentTimeline || machineid === "add") return;
 
+    if(!confirm("정말로 변경하시겠습니까? 변경 시 신청된 세탁이 모두 초기화됩니다.")) return;
+
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
@@ -435,6 +445,8 @@ function LaundryTimelinePage() {
 
   const unassignMachine = (timeid: string, machineid: string) => {
     if (!currentTimeline) return;
+
+    if(!confirm("정말로 변경하시겠습니까? 변경 시 신청된 세탁이 모두 초기화됩니다.")) return;
 
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
