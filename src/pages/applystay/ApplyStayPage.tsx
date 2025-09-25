@@ -464,7 +464,20 @@ function ApplyStayPage() {
 
   const updateScreen = async () => {
     getStayList().then((res1) => {
-      setStayList(res1.sort((a, b) => new Date(b.stay_from).getTime() - new Date(a.stay_from).getTime()));
+      const now = new Date();
+      setStayList(res1.sort((a, b) => {
+        const dateA = new Date(a.stay_from);
+        const dateB = new Date(b.stay_from);
+        
+        const isAfterA = dateA >= now;
+        const isAfterB = dateB >= now;
+        
+        if (isAfterA && !isAfterB) return -1;
+        if (!isAfterA && isAfterB) return 1;
+        
+        return dateA.getTime() - dateB.getTime();
+      }));
+
       if (res1.length > 0) {
         getStay(res1[currentStayIndex].id).then((res3) => {
           setCurrentStay(res3);
