@@ -28,14 +28,14 @@ export type LaundryTime = {
 export type LaundryTimeline = {
   id: string;
   name: string;
-  triggeredOn: "primary" | "stay";
+  scheduler: "primary" | "stay" | "vacation" | "etc";
   enabled: boolean;
   times: LaundryTime[];
 }
 
 export type LaundryTimelinePayload = {
   name: string;
-  triggeredOn: "primary" | "stay";
+  scheduler: "primary" | "stay" | "vacation" | "etc";
   times: {
     time: string;
     grade: (1 | 2 | 3)[];

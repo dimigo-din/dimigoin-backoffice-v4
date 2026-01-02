@@ -285,7 +285,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.map((time) => {
         return {
           time: time.time,
@@ -312,7 +312,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.map((time) => {
         return {
           time: time.id === id ? changed_time : time.time,
@@ -339,7 +339,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.filter((time) => time.id !== id).map((time) => {
         return {
           time: time.time,
@@ -391,7 +391,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.map((time) => {
         return {
           time: time.time,
@@ -418,7 +418,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.map((time) => {
         if (time.id === timeid)
           return {
@@ -451,7 +451,7 @@ function LaundryTimelinePage() {
     const payload: LaundryTimelinePayload & { id: string } = {
       id: currentTimeline.id,
       name: currentTimeline.name,
-      triggeredOn: currentTimeline.triggeredOn,
+      scheduler: currentTimeline.scheduler,
       times: currentTimeline.times.map((time) => {
         return {
           time: time.time,
