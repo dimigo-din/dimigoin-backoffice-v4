@@ -1,5 +1,5 @@
 import {getInstance} from "./client.ts";
-import moment from "moment";
+import { format } from "date-fns";
 
 const client = getInstance();
 
@@ -39,6 +39,6 @@ export const deleteWakeupSong = async (id: string): Promise<WakeupApply> => {
 }
 
 export const getTodayWakeup = async (gender: "male" | "female"): Promise<WakeupHistory> => {
-  const date = moment().format("YYYY-MM-DD");
+  const date = format(new Date(), "yyyy-MM-dd");
   return (await client.get("/wakeup/history?date="+date+"&gender="+gender)).data;
 }

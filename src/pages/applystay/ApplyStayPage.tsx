@@ -26,11 +26,9 @@ import {Select} from "../../styles/components/select.ts";
 import CheckBox from "../../components/CheckBox.tsx";
 import {Button, LightButton} from "../../styles/components/button.ts";
 import {makeid} from "../../utils/makeid.ts";
-import moment from "moment-timezone";
+import { TZDate } from "@date-fns/tz";
+import { format } from "date-fns";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import 'moment/dist/locale/ko';
 import {stay2excel} from "../../utils/stay2format.ts";
 import { flushSync } from "react-dom";
 import SelectionDialog from "../../components/SelectionDialog.tsx";
@@ -418,18 +416,16 @@ const Text = styled.p`
 `;
 
 function ApplyStayPage() {
-  moment.locale("ko");
-
   const KST_TZ = "Asia/Seoul";
   // Convert an ISO UTC string (e.g., "2025-09-07T12:00:00Z") to a local input value for <input type="datetime-local">
   const toLocalInput = (isoUtc?: string | null) => {
     if (!isoUtc) return "";
-    return moment.utc(isoUtc).tz(KST_TZ).format("YYYY-MM-DDTHH:mm");
+    return format(new TZDate(isoUtc, KST_TZ), "yyyy-MM-dd'T'HH:mm");
   };
   // Convert a local datetime-local string (no timezone) entered in KST to an ISO UTC string
   const fromLocalInput = (local?: string | null) => {
     if (!local) return "";
-    return moment.tz(local, "YYYY-MM-DDTHH:mm", KST_TZ).utc().format(); // ISO 8601 UTC
+    return new Date(new TZDate(local, KST_TZ)).toISOString(); // ISO 8601 UTC
   };
 
   const { showToast } = useNotification();
