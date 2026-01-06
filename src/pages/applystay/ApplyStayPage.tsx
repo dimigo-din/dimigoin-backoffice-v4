@@ -18,7 +18,6 @@ import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import Loading from "../../components/Loading.tsx";
 import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
 import { stay2pdf } from "../../utils/stay2pdf.ts";
-import { renderHtml } from "../../api/user.ts";
 import {sha256} from "../../utils/sha256.ts";
 import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
@@ -452,7 +451,7 @@ function ApplyStayPage() {
   const [selectedApplySeat, setSelectedApplySeat] = useState<boolean | null>(null);
 
   const [currentSelectedFileOutput, setCurrentSelectedFileOutput] = useState<string>("");
-  
+
   const [currentSeatChangeGrade, setCurrentSeatChangeGrade] = useState<number | undefined>(0);
   const [currentSeatChangeLocation, setCurrentSeatChangeLocation] = useState<string>("");
 
@@ -464,13 +463,13 @@ function ApplyStayPage() {
       setStayList(res1.sort((a, b) => {
         const dateA = new Date(a.stay_from);
         const dateB = new Date(b.stay_from);
-        
+
         const isAfterA = dateA >= now;
         const isAfterB = dateB >= now;
-        
+
         if (isAfterA && !isAfterB) return -1;
         if (!isAfterA && isAfterB) return 1;
-        
+
         return dateA.getTime() - dateB.getTime();
       }));
 
@@ -629,11 +628,11 @@ function ApplyStayPage() {
       (target) => target.target === userTarget
     );
 
-    const isSeatInValidRange = validSeatRanges?.some((target) => 
+    const isSeatInValidRange = validSeatRanges?.some((target) =>
       isInRange(target.range.split(":"), selectedApply.stay_seat)
     ) ?? false;
 
-    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat.some((target) => 
+    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat.some((target) =>
       isInRange(target.range.split(":"), selectedApply.stay_seat)
     ) ?? false;
 
@@ -853,7 +852,7 @@ function ApplyStayPage() {
               showToast("해당 학년의 잔류자가 없습니다.", "warning");
               return;
             }
-            
+
             if(!confirm(`정말로 ${currentSeatChangeGrade}학년 ${targets.length}명의 잔류장소를 '${currentSeatChangeLocation}'(으)로 일괄 변경하시겠습니까?`))
               return;
 
@@ -890,7 +889,7 @@ function ApplyStayPage() {
               }else if(currentSelectedFileOutput === "out_pdf"){
                 if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
                   await updateScreen();
-                  renderHtml(stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }), `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
+                  stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }, `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
                 }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
@@ -981,7 +980,7 @@ function ApplyStayPage() {
                 <Input
                   type={"text"}
                   style={{ width: "100%", fontSize: "14px", height: "8dvh" }}
-                  placeholder={"좌석 미선택 사유나 잔류 위치를 입력하세요."} 
+                  placeholder={"좌석 미선택 사유나 잔류 위치를 입력하세요."}
                   value={currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), selectedApply.stay_seat)) ? "" : selectedApply.stay_seat}
                   onInput={(e) => {selectedApply.stay_seat = (e.target as HTMLInputElement).value; setSelectedApply({ ...selectedApply })}}
                 />
@@ -1055,7 +1054,7 @@ function ApplyStayPage() {
                           const stayFromDate = new Date(currentStay.stay_from);
                           const stayToDate = new Date(currentStay.stay_to);
 
-                          // Find the Sunday during the stay period 
+                          // Find the Sunday during the stay period
                           let sunday = new Date(stayFromDate);
                           while (sunday.getDay() !== 0) { // 0 = Sunday
                             sunday.setDate(sunday.getDate() + 1);
