@@ -13,12 +13,8 @@ import Loading from "../../components/Loading.tsx";
 import {genTable} from "../../utils/staySeatUtil.ts";
 import {Select} from "../../styles/components/select.ts";
 import {Button} from "../../styles/components/button.ts";
-import moment from "moment-timezone";
+import { format } from "date-fns";
 import html2canvas from "html2canvas";
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import 'moment/dist/locale/ko';
 
 const Wrapper = styled.div`
   height: 100%;
@@ -122,8 +118,6 @@ const Text = styled.p`
 `;
  
 function ViewStaySeatPage() {
-  moment.locale("ko");
-
   const { showToast } = useNotification();
 
   const seatBoxRef = useRef<HTMLDivElement | null>(null);
@@ -213,7 +207,7 @@ function ViewStaySeatPage() {
             
             const link = document.createElement("a");
             link.href = dataUrl;
-            link.download = `${currentStay?.name || 'seat-layout'} (${moment(currentStay?.stay_from).format('MM-DD')}~${moment(currentStay?.stay_to).format('MM-DD')}).png`;
+            link.download = `${currentStay?.name || 'seat-layout'} (${format(new Date(currentStay?.stay_from || new Date()), 'MM-dd')}~${format(new Date(currentStay?.stay_to || new Date()), 'MM-dd')}).png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

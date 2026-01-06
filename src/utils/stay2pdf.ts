@@ -1,6 +1,7 @@
 import { stayFormat } from "../assets/stay_export_format.ts";
 import type {Stay, StayApply} from "../api/stay.ts";
-import moment from "moment";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import {maskName} from "./maskName.ts";
 
 export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolean} = {}) {
@@ -8,8 +9,10 @@ export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolea
 
   const data: {[key: string] : number | string} = {};
 
-  data["DATE"] = `${moment(stay.stay_from).format("MM-DD(dd)") || moment().format("YYYY년 MM월 DD일 dd")} ~ ${moment(stay.stay_to).format("MM-DD(dd)") || moment().format("YYYY년 MM월 DD일 dd")} ${stay.name} 현황`;
-  data["TODAY"] = moment().format("YYYY. MM. DD. 기준");  
+  const formatDate = (d?: string | Date) => d ? format(new Date(d), "MM-dd(eee)", { locale: ko }) : format(new Date(), "yyyy년 MM월 dd일 eee", { locale: ko });
+
+  data["DATE"] = `${formatDate(stay.stay_from)} ~ ${formatDate(stay.stay_to)} ${stay.name} 현황`;
+  data["TODAY"] = format(new Date(), "yyyy. MM. dd. 기준");  
 
 // per class
 for (let grade=1;grade<=6;grade++) {

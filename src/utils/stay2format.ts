@@ -3,7 +3,6 @@
 
 import XLSX from "xlsx-js-style";
 import JSZip from "jszip";
-import "moment"; // side-effect import만 사용
 import type { StayApply, Stay } from "../api/stay.ts";
 
 // ===== 유틸: 날짜 처리 (Intl, ko-KR) =====
