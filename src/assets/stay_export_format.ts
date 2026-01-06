@@ -741,8 +741,7 @@ export const stayFormat = `
     }
 
     .title {
-    
-      width: 738px;
+      width: 100%;
       text-align: center;
       margin-bottom: 20px;
 
@@ -769,7 +768,6 @@ export const stayFormat = `
         text-align: right;
         margin-top: -15px;
       }
-    
     }
 
     .logo {
@@ -911,7 +909,7 @@ export const stayFormat = `
   <tr>
     <td rowspan="2" valign="middle" style='overflow:hidden;width:36px;height:44px;border-left: #8e8e8e 0.425250pt solid;border-right: #8e8e8e 0.425250pt solid;border-top: #000000 0.425250pt none;border-bottom: #8e8e8e 0.425250pt solid;padding:0.0pt 0.0pt 0.0pt 0.0pt'>
       <p class=HStyle30><span style='position:relative;font-family:"맑은 고딕"'>2반</span><span class="hnc_page_break" style="display:relative;word-spacing:-0.5em;">&nbsp;</span></p>
-    </td> 
+    </td>
     <td rowspan="2" valign="middle" style='overflow:hidden;width:54px;height:44px;border-left: #8e8e8e 0.425250pt solid;border-right: #8e8e8e 0.425250pt solid;border-top: #000000 0.425250pt none;border-bottom: #8e8e8e 0.425250pt solid;padding:0.0pt 0.0pt 0.0pt 0.0pt'>
       <p class=HStyle30><span style='position:relative;font-family:"맑은 고딕"'>{1_2_COUNT}명</span><span class="hnc_page_break" style="display:relative;word-spacing:-0.5em;">&nbsp;</span></p>
     </td>
