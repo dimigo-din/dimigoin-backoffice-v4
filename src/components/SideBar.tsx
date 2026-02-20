@@ -314,7 +314,15 @@ export default function SideBar({ mobileOpen = false, onClose, onNavigate }: { m
           <img src={picture} />
         </div>
         <div className="right">
-          <p className="name">{name ? `${name} 선생님` : ""}</p>
+          {
+            checkPermission("manage_permission") ? (
+              <p className="name">{name ? `${name} 선생님` : ""}</p>
+            ) : checkPermission("dienen") ? (
+              <p className="name">{name ? `${name} 디넌` : ""}</p>
+            ) : (
+              <p className="name">{name ? `${name} 선생님` : ""}</p>
+            )
+          }
           <p className="hello">환영합니다.</p>
         </div>
       </UserWrapper>
