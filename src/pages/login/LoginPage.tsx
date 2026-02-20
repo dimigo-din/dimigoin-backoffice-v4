@@ -99,14 +99,6 @@ function LoginPage() {
         localStorage.setItem("name", payload.name);
         localStorage.setItem("picture", payload.picture);
 
-        if (!localStorage.getItem("personalInformationKey")) {
-          let token;
-          while (!token) {
-            token = prompt("선생님 전용 토큰을 입력해주세요.");
-          }
-          localStorage.setItem("personalInformationKey", token);
-        }
-
         showToast("로그인에 성공하였습니다.", "info");
         setTimeout(() => {
           location.href = "/";
