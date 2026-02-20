@@ -156,7 +156,7 @@ function StudentInfoPage() {
         console.log("파싱 결과:", results.data);
 
         setPersonalInformationsState(results.data.map((row: any) => ({
-          gender: row[Object.keys(row)[2]],
+          gender: row[Object.keys(row)[2]] == "남" ? "male" : "female",
           mail: row[Object.keys(row)[0]],
           name: row[Object.keys(row)[3]],
           grade: parseInt(row[Object.keys(row)[1]].substring(0, 1)),
@@ -250,7 +250,7 @@ function StudentInfoPage() {
                     <tr key={index}>
                       <td>{info.mail}</td>
                       <td>{`${info.grade}${info.class}${info.number.toString().padStart(2, "0")}`}</td>
-                      <td>{info.gender}</td>
+                      <td>{info.gender === "male" ? "남" : "여"}</td>
                       <td>{info.name}</td>
                     </tr>
                   ))}

@@ -2,7 +2,7 @@ import Scenery from "../../assets/imgs/schoolscenery.svg?react"
 import styled from "styled-components";
 import GoogleLogo from "../../assets/icons/google.svg?react";
 import Logo from "../../assets/icons/dimigoin.svg?react";
-import {getRedirectUri, googleLogin} from "../../api/auth.ts";
+import {getRedirectUri, googleLogin, getPermission, logout} from "../../api/auth.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import {useEffect} from "react";
 import {useSearchParams} from "react-router-dom";
@@ -89,20 +89,26 @@ function LoginPage() {
       googleLogin(code).then(({accessToken}) => {
         const payload = parseJwt(accessToken);
 
-        // 권한 체크
-        if(payload.permission != 2 && payload.permission != 7) {
-          showToast("권한이 없습니다.", "danger");
-          return;
-        }
+        getPermission().then((res) => {
+          const permissions = res;
 
-        localStorage.setItem("id", payload.id);
-        localStorage.setItem("name", payload.name);
-        localStorage.setItem("picture", payload.picture);
+          // 권한 체크
+          if(permissions.length === 0) {
+            showToast("권한이 없습니다.", "danger");
+            logout();
+            return;
+          }
 
-        showToast("로그인에 성공하였습니다.", "info");
-        setTimeout(() => {
-          location.href = "/";
-        }, 3000);
+          localStorage.setItem("id", payload.id);
+          localStorage.setItem("name", payload.name);
+          localStorage.setItem("picture", payload.picture);
+          localStorage.setItem("permissions", JSON.stringify(permissions));
+
+          showToast("로그인에 성공하였습니다.", "info");
+          setTimeout(() => {
+            location.href = "/";
+          }, 3000);
+        })
       }).catch((e) => {
         console.error(e);
         showToast("로그인에 실패했습니다.", "danger");
@@ -110,6 +116,7 @@ function LoginPage() {
       });
     }
   }, []);
+
   return (
     <Wrapper>
       <Brand>

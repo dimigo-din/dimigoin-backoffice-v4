@@ -41,6 +41,14 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
   return (await client.post("/auth/login/google/callback", {code, redirect_uri: location.protocol + "//" + location.host + "/login"})).data;
 }
 
+export async function getPermission(): Promise<string[]> {
+  return (await client.get("/auth/permission")).data.permissions;
+}
+
+export function checkPermission(permission: string) {
+  return localStorage.getItem("permissions")?.includes(permission) ?? false;
+}
+
 export async function logout(): Promise<void> {
   await client.get("/auth/logout");
 }

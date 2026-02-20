@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import { ping } from "../api/auth.ts";
+import { checkPermission, ping } from "../api/auth.ts";
 import Divider from "./Divider.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -144,39 +144,66 @@ export default function SideBar() {
   const location = useLocation();
 
   const menuList: readonly MenuSection[] = useMemo(
-    () => [
-      {
-        title: "잔류",
-        key: "stay-section",
-        items: [
-          { key: "stay", label: "잔류 관리" },
-          { key: "applystay", label: "잔류 신청 관리" },
-          { key: "viewstayseat", label: "열람실 좌석" },
-        ],
-      },
-      {
-        title: "금요귀가",
-        key: "frigo-section",
-        items: [
-          { key: "frigo", label: "금요귀가 관리" },
-          { key: "applyfrigo", label: "금요귀가 신청 관리" },
-        ],
-      },
-      {
-        title: "세탁",
-        key: "laundry-section",
-        items: [
-          { key: "laundrytimeline", label: "세탁 시간표 관리" },
-          { key: "laundrymachine", label: "세탁기 관리" },
-          { key: "applylaundry", label: "세탁 신청 관리" },
-        ],
-      },
-      {
-        title: "기상송",
-        key: "wakeup-section",
-        items: [{ key: "wakeup", label: "기상송 열람 및 관리" }],
-      },
-    ],
+    () => {
+      const sections_manage: MenuSection[] = [
+        {
+          title: "잔류",
+          key: "stay-section",
+          items: [
+            { key: "stay", label: "잔류 관리" },
+            { key: "applystay", label: "잔류 신청 관리" },
+            { key: "viewstayseat", label: "열람실 좌석" },
+          ],
+        },
+        {
+          title: "금요귀가",
+          key: "frigo-section",
+          items: [
+            { key: "frigo", label: "금요귀가 관리" },
+            { key: "applyfrigo", label: "금요귀가 신청 관리" },
+          ],
+        },
+        {
+          title: "세탁",
+          key: "laundry-section",
+          items: [
+            { key: "laundrytimeline", label: "세탁 시간표 관리" },
+            { key: "laundrymachine", label: "세탁기 관리" },
+            { key: "applylaundry", label: "세탁 신청 관리" },
+          ],
+        },
+        {
+          title: "기상송",
+          key: "wakeup-section",
+          items: [{ key: "wakeup", label: "기상송 열람 및 관리" }],
+        },
+      ];
+
+      const sections_dienen: MenuSection[] = [
+        {
+          title: "디넌",
+          key: "dienen-section",
+          items: [
+            { key: "dienen_time", label: "급식 시간 조회" },
+            { key: "dienen_edittime", label: "급식 시간 관리" },
+            { key: "dienen_delaytime", label: "급식 시간 미루기" },
+          ],
+        },
+      ];
+
+      // 권한에 따라 메뉴 필터링
+      const hasManagePermission = checkPermission("manage_permission");
+      const hasDienenPermission = checkPermission("dienen");
+
+      const sections = [];
+      if (hasManagePermission) {
+        sections.push(...sections_manage);
+      }
+      if (hasDienenPermission) {
+        sections.push(...sections_dienen);
+      }
+      return sections;
+    },
     []
   );
 
@@ -321,13 +348,15 @@ export default function SideBar() {
         })}
       </MenuWrapper>
       <Divider />
-      <AccordionHeaderButton
-        type="button"
-        onClick={() => navigate("/studentinfo")}
-        $isOpen={false}
-      >
-        학생정보 등록
-      </AccordionHeaderButton>
+      {checkPermission("manage_permission") && (
+        <AccordionHeaderButton
+          type="button"
+          onClick={() => navigate("/studentinfo")}
+          $isOpen={false}
+        >
+          학생정보 등록
+        </AccordionHeaderButton>
+      )}
       <p style={{ fontSize: "12px", color: "#888", textAlign: "center" }}>© 2026 DIMIGOIN Backoffice</p>
     </Wrapper>
   );
