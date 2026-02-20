@@ -45,7 +45,7 @@ const ContentWrapper = styled.div`
   padding: 0 2dvh 2dvh;
 `;
 
-const WakeupList = styled.div`
+const ProcedureList = styled.div`
   flex: 1;
   height: 100%;
   
@@ -59,7 +59,7 @@ const WakeupList = styled.div`
   padding: 1dvh;
 `;
 
-const WakeupItem = styled.div`
+const ProcedureItem = styled.div`
   flex: 0 0 auto;
   
   min-height: 10dvh;
@@ -111,6 +111,11 @@ const WakeupItem = styled.div`
     &:hover {
       background-color: ${({theme}) => theme.Colors.Core.Brand.Primary}aa;
     }
+
+    &:disabled {
+      background-color: ${({theme}) => theme.Colors.Line.Outline};
+      cursor: not-allowed;
+    }
   }
 
   table {
@@ -138,7 +143,7 @@ const WakeupItem = styled.div`
   }
 `;
 
-function WakeupPage() {
+function StudentInfoPage() {
   const { showToast } = useNotification();
 
   const [personalInformations, setPersonalInformationsState] = useState<PersonalInformation[]>([]);
@@ -181,8 +186,8 @@ function WakeupPage() {
         <div>학생정보 등록</div>
       </TitleBar>
       <ContentWrapper>
-        <WakeupList>
-          <WakeupItem>
+        <ProcedureList>
+          <ProcedureItem>
             <div>
               <h1>1. 엑셀 양식 다운로드</h1>
               <p>양식에 맞게 정보를 채워주세요.</p>
@@ -199,8 +204,8 @@ function WakeupPage() {
             >
               양식 다운로드
             </button>
-          </WakeupItem>
-          <WakeupItem>
+          </ProcedureItem>
+          <ProcedureItem>
             <div>
               <h1>2. 양식 업로드</h1>
               <p>입력한 양식을 저장 후, 업로드해주세요.</p>
@@ -225,8 +230,8 @@ function WakeupPage() {
             >
               양식 업로드
             </button>
-          </WakeupItem>
-          <WakeupItem>
+          </ProcedureItem>
+          <ProcedureItem>
             <div>
               <h1>3. 업로드 내용 확인</h1>
               <p>업로드된 내용이 맞는지 확인후 맞으면 버튼을 눌러주세요.</p>
@@ -244,7 +249,7 @@ function WakeupPage() {
                   {personalInformations.map((info, index) => (
                     <tr key={index}>
                       <td>{info.mail}</td>
-                      <td>{`${info.grade}${info.class}${info.number}`}</td>
+                      <td>{`${info.grade}${info.class}${info.number.toString().padStart(2, "0")}`}</td>
                       <td>{info.gender}</td>
                       <td>{info.name}</td>
                     </tr>
@@ -260,11 +265,11 @@ function WakeupPage() {
                 적용
               </button>
             </div>
-          </WakeupItem>
-        </WakeupList>
+          </ProcedureItem>
+        </ProcedureList>
       </ContentWrapper>
     </Wrapper>
   );
 }
 
-export default WakeupPage;
+export default StudentInfoPage;

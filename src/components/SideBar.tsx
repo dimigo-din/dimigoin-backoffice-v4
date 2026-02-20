@@ -75,7 +75,7 @@ const AccordionHeaderButton = styled.button<{ $isOpen: boolean }>`
   font-weight: 600;
 
   cursor: pointer;
-  border: solid 1.5px #d4d4d4;
+  border: solid 1.5px ${({theme}) => theme.Colors.Line.Outline};
   border-radius: 8px;
   text-align: left;
   transition: background-color 300ms ease;
