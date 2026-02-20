@@ -75,7 +75,8 @@ const AccordionHeaderButton = styled.button<{ $isOpen: boolean }>`
   font-weight: 600;
 
   cursor: pointer;
-  border: none;
+  border: solid 1.5px #d4d4d4;
+  border-radius: 8px;
   text-align: left;
   transition: background-color 300ms ease;
 
@@ -319,6 +320,15 @@ export default function SideBar() {
           );
         })}
       </MenuWrapper>
+      <Divider />
+      <AccordionHeaderButton
+        type="button"
+        onClick={() => navigate("/studentinfo")}
+        $isOpen={false}
+      >
+        학생정보 등록
+      </AccordionHeaderButton>
+      <p style={{ fontSize: "12px", color: "#888", textAlign: "center" }}>© 2026 DIMIGOIN Backoffice</p>
     </Wrapper>
   );
 }

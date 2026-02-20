@@ -1,6 +1,7 @@
 import {Routes, Route} from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../components/Loading.tsx";
+import StudentInfo from "../pages/studentinfo/StudentInfo.tsx";
 
 const LoginPage = lazy(() => import("../pages/login/LoginPage.tsx"));
 const EmptyPage = lazy(() => import("../pages/EmptyPage.tsx"));
@@ -26,6 +27,7 @@ const AppRouter = () => {
         <Route path="/openwakeup" element={<OpenWakeup/>}/>
         <Route path="/laundrytimeline" element={<LaundryTimelinePage/>}/>
         <Route path="/applylaundry" element={<LaundryApplyPage/>}/>
+        <Route path="/studentinfo" element={<StudentInfo/>}/>
         <Route path="*" element={<EmptyPage/>}/>
       </Routes>
     </Suspense>

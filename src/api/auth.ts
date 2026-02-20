@@ -71,3 +71,50 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
     return email.map(() => null);
   }
 }
+
+export async function setPersonalInformations(info: PersonalInformation[]): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    for (const item of info) {
+      await db.put(PERSONAL_INFO_STORE, item);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function deletePersonalInformation(email: string): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    await db.delete(PERSONAL_INFO_STORE, email);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function deletePersonalInformationAll(): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    await db.clear(PERSONAL_INFO_STORE);
+  } catch (e) {
+    console.error(e);
+  }
+}
