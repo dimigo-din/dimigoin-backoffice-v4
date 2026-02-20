@@ -4,7 +4,7 @@ import { checkPermission, ping } from "../api/auth.ts";
 import Divider from "./Divider.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Wrapper = styled.aside`
+const Wrapper = styled.aside<{ $mobileOpen: boolean }>`
   height: 100%;
   width: 17dvw;
 
@@ -15,6 +15,21 @@ const Wrapper = styled.aside`
   background-color: ${({ theme }) => theme.Colors.Background.Primary};
   border-radius: 18px;
   padding: 2.5dvh 1.8dvw;
+  
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 80dvw;
+    max-width: 360px;
+    padding: 16px;
+    border-radius: 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    transform: translateX(${({ $mobileOpen }) => ($mobileOpen ? "0" : "-100%")});
+    transition: transform 250ms ease;
+    z-index: 9;
+  }
 `;
 
 const UserWrapper = styled.div`
@@ -131,6 +146,24 @@ const MenuItem = styled.button<{ $selected: boolean }>`
   }
 `;
 
+const CloseButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: ${({theme}) => theme.Colors.Background.Secondary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+
+  @media (max-width: 768px) {
+    display: inline-flex;
+  }
+`;
+
 type MenuItemType = { key: string; label: string };
 
 type MenuSection = {
@@ -139,7 +172,7 @@ type MenuSection = {
   items: MenuItemType[];
 };
 
-export default function SideBar() {
+export default function SideBar({ mobileOpen = false, onClose, onNavigate }: { mobileOpen?: boolean; onClose?: () => void; onNavigate?: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -274,7 +307,8 @@ export default function SideBar() {
   }, [pathname, menuList]);
 
   return (
-    <Wrapper>
+    <Wrapper $mobileOpen={!!mobileOpen}>
+      <CloseButton aria-label="Close sidebar" onClick={() => onClose?.()}>✕</CloseButton>
       <UserWrapper>
         <div className="left">
           <img src={picture} />
@@ -335,7 +369,7 @@ export default function SideBar() {
                         type="button"
                         $selected={selected}
                         aria-current={selected ? "page" : undefined}
-                        onClick={() => navigate(`/${item.key}`)}
+                        onClick={() => { navigate(`/${item.key}`); onNavigate?.(); }}
                       >
                         {item.label}
                       </MenuItem>
@@ -351,7 +385,7 @@ export default function SideBar() {
       {checkPermission("manage_permission") && (
         <AccordionHeaderButton
           type="button"
-          onClick={() => navigate("/studentinfo")}
+          onClick={() => { navigate("/studentinfo"); onNavigate?.(); }}
           $isOpen={false}
         >
           학생정보 등록
