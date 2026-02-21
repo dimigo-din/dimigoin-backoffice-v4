@@ -19,42 +19,64 @@ import { ExportFrigoAppliesToExcel } from "../../utils/frigo2excel.ts";
 const Wrapper = styled.div`
   height: 100%;
   width: 100%;
-  
+
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  
-  padding: 2dvh;
-  
-  gap: 2dvh;
+  align-items: stretch;
+
+  gap: 24px;
+  padding: 24px;
+  overflow-y: auto;
+
+  @media (max-width: 1200px) {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  @media (max-width: 900px) {
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    padding: 12px;
+  }
 `;
 
 const ApplyList = styled.div`
   width: 65%;
-  
-  
+  min-width: 0;
   height: 100%;
 
   display: flex;
   flex-direction: column;
-  gap: 1dvh;
+  gap: 8px;
 
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  
-  padding: 1dvh;
-  
-  overflow-y: scroll;
+
+  padding: 10px;
+
+  overflow-y: auto;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    height: auto;
+    min-height: 340px;
+  }
 `;
 
 const ControllerBox = styled.div`
   flex: 1;
+  min-width: 0;
   height: 100%;
   
   display: flex;
   flex-direction: column;
   
-  gap: 2dvh;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    height: auto;
+  }
 `;
 
 
@@ -65,11 +87,11 @@ const FitController = styled.div`
   display: flex;
   flex-direction: column;
 
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  
-  padding: 2dvh 2dvh;
-  gap: 1dvh;
+
+  padding: 16px;
+  gap: 8px;
 `;
 
 const StretchController = styled.div`
@@ -79,11 +101,11 @@ const StretchController = styled.div`
   display: flex;
   flex-direction: column;
 
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  
-  padding: 2dvh 2dvh;
-  gap: 1dvh;
+
+  padding: 16px;
+  gap: 8px;
 `;
 
 const ExportButton = styled.div`

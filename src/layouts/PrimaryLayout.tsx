@@ -5,20 +5,20 @@ import SideBar from "../components/SideBar.tsx";
 import {MobileNotificationProvider} from "../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
-  position: absolute;
+  position: fixed;
   inset: 0;
-
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-
-  padding: 10dvh 0;
+  gap: 32px;
+  padding: 58px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
 
   @media (max-width: 768px) {
-    padding: 0; /* mobile: full-bleed */
+    padding: 0;
+    gap: 0;
     justify-content: flex-start;
     align-items: stretch;
   }
@@ -26,12 +26,15 @@ const Wrapper = styled.div`
 
 const ContentWrapper = styled.div`
   height: 100%;
-  width: 70dvw;
+  flex: 1;
+  min-width: 0;
 
   background-color: ${({theme}) => theme.Colors.Background.Primary};
-  border-radius: 18px;
+  border-radius: 12px;
 
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: 768px) {
     width: 100dvw;
@@ -40,15 +43,22 @@ const ContentWrapper = styled.div`
   }
 `;
 
+const MainContent = styled.main`
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+`;
+
 const TopBar = styled.div`
   display: none;
   @media (max-width: 768px) {
     display: flex;
+    position: relative;
     align-items: center;
-    gap: 12px;
     height: 56px;
     padding: 0 16px;
     border-bottom: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+    background: ${({theme}) => theme.Colors.Background.Primary};
   }
 `;
 
@@ -63,6 +73,41 @@ const HamburgerButton = styled.button`
     border-radius: 8px;
     background: ${({theme}) => theme.Colors.Background.Secondary};
     color: ${({theme}) => theme.Colors.Content.Primary};
+    z-index: 1;
+  }
+`;
+
+const TopBarTitle = styled.span`
+  display: none;
+  @media (max-width: 768px) {
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 600;
+    color: ${({theme}) => theme.Colors.Content.Primary};
+    pointer-events: none;
+  }
+`;
+
+const RightSpacer = styled.span`
+  display: none;
+  @media (max-width: 768px) {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    z-index: 1;
+  }
+`;
+
+const SideBarHost = styled.div`
+  height: 100%;
+  width: 268px;
+  flex: 0 0 268px;
+
+  @media (max-width: 768px) {
+    width: auto;
+    flex: 0 0 auto;
   }
 `;
 
@@ -86,10 +131,10 @@ function PrimaryLayout({ children } : { children: ReactNode }) {
   return (
     <Wrapper>
       <MobileNotificationProvider>
-        {/* Sidebar: desktop always visible, mobile as drawer */}
-        <SideBar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} onNavigate={() => setMobileOpen(false)} />
+        <SideBarHost>
+          <SideBar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} onNavigate={() => setMobileOpen(false)} />
+        </SideBarHost>
 
-        {/* Backdrop for mobile drawer */}
         <Backdrop $visible={mobileOpen} onClick={() => setMobileOpen(false)} />
 
         <ContentWrapper>
@@ -97,9 +142,12 @@ function PrimaryLayout({ children } : { children: ReactNode }) {
             <HamburgerButton aria-label="Open sidebar" onClick={() => setMobileOpen(true)}>
               ☰
             </HamburgerButton>
-            <span style={{ fontWeight: 600 }}>DIMIGOIN Backoffice</span>
+            <TopBarTitle>디미고인</TopBarTitle>
+            <RightSpacer aria-hidden="true" />
           </TopBar>
-          {children}
+          <MainContent>
+            {children}
+          </MainContent>
         </ContentWrapper>
       </MobileNotificationProvider>
     </Wrapper>

@@ -4,29 +4,30 @@ import Logo from "../assets/icons/dimigoin.svg?react";
 const Wrapper = styled.div`
   height: 100%;
   width: 100%;
-  
+
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  background: ${({theme}) => theme.Colors.Background.Primary};
 `;
 
 const Title = styled.div`
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
-
   justify-content: center;
   align-items: center;
 
-  gap: 1dvw;
+  gap: 10px;
 
-  font-size: ${({theme}) => theme.Font.Display.size};
+  font-size: ${({theme}) => theme.Font.Title.size};
   font-weight: ${({theme}) => theme.Font.Display.weight.strong};
   
   color: ${({theme}) => theme.Colors.Content.Primary};
   
   > svg {
-    height: 5dvh;
-    width: 5dvh;
+    height: 28px;
+    width: 28px;
   }
 `;
 

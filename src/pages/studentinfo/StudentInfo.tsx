@@ -6,13 +6,19 @@ import Papa from "papaparse";
 
 const Wrapper = styled.div`
   height: 100%;
-  
+  width: 100%;
   display: flex;
   flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    padding: 12px;
+  }
 `;
 
 const TitleBar = styled.div`
-  height: 10%;
+  min-height: 56px;
   
   display: flex;
   flex-direction: row;
@@ -34,15 +40,12 @@ const TitleBar = styled.div`
 const ContentWrapper = styled.div`
   flex: 1;
   width: 100%;
-  height: 90%;
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 
-  gap: 1dvh;
-
-  padding: 0 2dvh 2dvh;
+  gap: 12px;
 `;
 
 const ProcedureList = styled.div`
@@ -51,12 +54,13 @@ const ProcedureList = styled.div`
   
   display: flex;
   flex-direction: column;
-  gap: 1dvh;
+  gap: 8px;
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   
-  padding: 1dvh;
+  padding: 10px;
+  overflow: auto;
 `;
 
 const ProcedureItem = styled.div`

@@ -21,7 +21,6 @@ import { stay2pdf } from "../../utils/stay2pdf.ts";
 import {sha256} from "../../utils/sha256.ts";
 import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
 import {Input} from "../../styles/components/input.ts";
-import {Select} from "../../styles/components/select.ts";
 import CheckBox from "../../components/CheckBox.tsx";
 import {Button, LightButton} from "../../styles/components/button.ts";
 import {makeid} from "../../utils/makeid.ts";
@@ -32,6 +31,7 @@ import {stay2excel} from "../../utils/stay2format.ts";
 import { flushSync } from "react-dom";
 import SelectionDialog from "../../components/SelectionDialog.tsx";
 import SearchStudent from "../../components/SearchStudent.tsx";
+import {UIButton, UIInputField, UISelectField, UISegmentedControl} from "../../components/ui";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -39,39 +39,65 @@ const Wrapper = styled.div`
 
   display: flex;
   flex-direction: row;
+  align-items: stretch;
 
-  gap: 2dvh;
+  gap: 24px;
+  padding: 24px;
+  overflow-y: auto;
 
-  padding: 2dvh 2dvh;
+  @media (max-width: 1200px) {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  @media (max-width: 900px) {
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    padding: 12px;
+  }
 `;
 
 const StayApplyContainer = styled.div`
   height: 100%;
   width: 65%;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
 
-  gap: 1dvh;
-  padding: 1dvh 1dvh;
+  gap: 8px;
+  padding: 10px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border-radius: 8px;
+  border-radius: 12px;
 
-  overflow-y: scroll;
+  overflow-y: auto;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    height: auto;
+    min-height: 340px;
+  }
 `;
 
 const ControllerContainer = styled.div`
   flex: 1;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
 
-  overflow-y: scroll;
+  overflow-y: auto;
 
-  gap: 2dvh;
+  gap: 16px;
 
   color: ${({theme}) => theme.Colors.Content.Primary};
+
+  @media (max-width: 900px) {
+    height: auto;
+    overflow: visible;
+  }
 `;
 
 // const StretchContainer = styled.div`
@@ -92,14 +118,14 @@ const FitContainer = styled.div`
   height: fit-content;
   width: 100%;
 
-  border-radius: 8px;
+  border-radius: 12px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  padding: 2dvh 2dvh;
+  padding: 16px;
 
   display: flex;
   flex-direction: column;
-  gap: 1dvh;
+  gap: 8px;
 `;
 
 const NoApply = styled.div`
@@ -329,45 +355,6 @@ const SpaceBetweenWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const SelectionRow = styled.div<{ height?: string, width?: string }>`
-  margin-left: ${({width}) => width ? "none" : "2%"};
-
-  height: ${({height}) => height || "4dvh"};
-  width: ${({width}) => width || "18%"};
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-  font-size: ${({theme}) => theme.Font.Callout.size};
-
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  border-radius: 12px;
-
-  overflow: hidden;
-`;
-
-const SelectionItem = styled.div<{ boundState?: boolean | null, border?: boolean, selected: boolean }>`
-  flex: 1;
-
-  height: 100%;
-
-  text-align: center;
-  align-content: center;
-
-  border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
-
-  background-color: ${({theme, selected, boundState}) =>
-    selected ?
-      boundState === true ? theme.Colors.Core.Status.Positive :
-        boundState === false ? theme.Colors.Core.Status.Negative :
-          boundState === null ? theme.Colors.Core.Status.Warning :
-            theme.Colors.Core.Brand.Primary
-      : "none"
-  };
-
-  color: ${({theme, selected}) => selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary};
-`;
-
 const DeleteBtn = styled.div`
   height: 4dvh;
   width: 7%;
@@ -454,6 +441,20 @@ function ApplyStayPage() {
 
   const [currentSeatChangeGrade, setCurrentSeatChangeGrade] = useState<number | undefined>(0);
   const [currentSeatChangeLocation, setCurrentSeatChangeLocation] = useState<string>("");
+
+  const gradeSegmentValue =
+    filterGrade === true ? "1" :
+      filterGrade === null ? "2" :
+        filterGrade === false ? "3" : "all";
+
+  const genderSegmentValue =
+    filterGender === true ? "male" :
+      filterGender === false ? "female" : "all";
+
+  const stateSegmentValue =
+    filterState === true ? "approved" :
+      filterState === null ? "review" :
+        filterState === false ? "rejected" : "all";
 
   const [newUser, setNewUser] = useState<User | null>(null);
 
@@ -739,112 +740,102 @@ function ApplyStayPage() {
       <ControllerContainer>
         <FitContainer>
           <Text>잔류 일정</Text>
-          <Select style={{height: "5dvh"}} value={currentStayIndex} onChange={(e) => {close(); setCurrentStayIndex(parseInt(e.target.value))}}>
-            {stayList !== null ? stayList.map((apply) => {
-              return (
-                <option key={apply.id} value={stayList.indexOf(apply)}>
-                  <span>{`${apply.name}`}</span> <span style={{color: "#888"}}>{`(${apply.stay_from} ~ ${apply.stay_to})`}</span>
-                </option>
-              );
-            }) : Loading()}
-          </Select>
+          <UISelectField
+            value={String(currentStayIndex)}
+            onChange={(e) => {
+              close();
+              setCurrentStayIndex(parseInt(e.target.value));
+            }}
+            options={stayList !== null
+              ? stayList.map((apply, index) => ({
+                  value: String(index),
+                  label: `${apply.name} (${apply.stay_from} ~ ${apply.stay_to})`
+                }))
+              : [{ value: "0", label: "불러오는 중..." }]
+            }
+          />
         </FitContainer>
         <FitContainer>
           <Text>잔류 신청 추가</Text>
           <SearchStudent setNewUser={setNewUser} nameResults={nameResults} setNameResults={setNameResults} nameLoading={nameLoading} setNameLoading={setNameLoading} nameSearch={nameSearch} setNameSearch={setNameSearch} />
-          <Button disabled={newUser === null} style={{height: "5dvh", padding: 0}} onClick={() => {
+          <UIButton disabled={newUser === null} size="medium" fullWidth onClick={() => {
             const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             setSelectedApply(newApply);
-          }}>잔류 신청 추가하기</Button>
+          }}>잔류 신청 추가하기</UIButton>
         </FitContainer>
         <FitContainer>
           <Text>잔류자 검색</Text>
-          <Input type={"search"}
-                 onInput={(e) => {setFilterText((e.target as HTMLInputElement).value)}}
-                 placeholder={"검색할 학생명을 입력하세요."}
-                 value={filterText}
-                 style={{height: "5dvh"}}/>
-          <SelectionRow height={"4dvh"} width={"100%"}>
-            <SelectionItem boundState={undefined}
-                           selected={filterGrade === true}
-                           onClick={() => setFilterGrade(true)}>
-              {`1학년 (${stayApplies?.filter(apply => apply.user.grade === 1).length || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterGrade === null}
-                           onClick={() => setFilterGrade(null)}>
-              {`2학년 (${stayApplies?.filter(apply => apply.user.grade === 2).length || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterGrade === false}
-                           onClick={() => setFilterGrade(false)}>
-              {`3학년 (${stayApplies?.filter(apply => apply.user.grade === 3).length || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterGrade === undefined}
-                           onClick={() => setFilterGrade(undefined)}>
-              {`모두 (${stayApplies?.length || 0}건)`}
-            </SelectionItem>
-          </SelectionRow>
-          <SelectionRow height={"4dvh"} width={"100%"}>
-            <SelectionItem boundState={undefined}
-                           selected={filterGender === true}
-                           onClick={() => setFilterGender(true)}>
-              {`남자 (${stayApplies?.filter(apply => apply.user.gender === "male").length || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterGender === false}
-                           onClick={() => setFilterGender(false)}>
-              {`여자 (${stayApplies?.filter(apply => apply.user.gender === "female").length || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterGender === undefined}
-                           onClick={() => setFilterGender(undefined)}>
-              {`모두 (${stayApplies?.length || 0}건)`}
-            </SelectionItem>
-          </SelectionRow>
+          <UIInputField
+            placeholder="검색할 학생명을 입력하세요."
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+          <UISegmentedControl
+            items={[
+              { label: `1학년 (${stayApplies?.filter(apply => apply.user.grade === 1).length || 0}건)`, value: "1" },
+              { label: `2학년 (${stayApplies?.filter(apply => apply.user.grade === 2).length || 0}건)`, value: "2" },
+              { label: `3학년 (${stayApplies?.filter(apply => apply.user.grade === 3).length || 0}건)`, value: "3" },
+              { label: `모두 (${stayApplies?.length || 0}건)`, value: "all" },
+            ]}
+            value={gradeSegmentValue}
+            onChange={(value) => {
+              setFilterGrade(value === "1" ? true : value === "2" ? null : value === "3" ? false : undefined);
+            }}
+          />
+          <UISegmentedControl
+            items={[
+              { label: `남자 (${stayApplies?.filter(apply => apply.user.gender === "male").length || 0}건)`, value: "male" },
+              { label: `여자 (${stayApplies?.filter(apply => apply.user.gender === "female").length || 0}건)`, value: "female" },
+              { label: `모두 (${stayApplies?.length || 0}건)`, value: "all" },
+            ]}
+            value={genderSegmentValue}
+            onChange={(value) => {
+              setFilterGender(value === "male" ? true : value === "female" ? false : undefined);
+            }}
+          />
         </FitContainer>
         <FitContainer>
           <Text>외출 검색</Text>
-          <SelectionRow height={"4dvh"} width={"100%"}>
-            <SelectionItem boundState={true}
-                           selected={filterState === true}
-                           onClick={() => setFilterState(true)}>
-              {`허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === true).length, 0) || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={null}
-                           selected={filterState === null}
-                           onClick={() => setFilterState(null)}>
-              {`검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === null).length, 0) || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={false}
-                           selected={filterState === false}
-                           onClick={() => setFilterState(false)}>
-              {`불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === false).length, 0) || 0}건)`}
-            </SelectionItem>
-            <SelectionItem boundState={undefined}
-                           selected={filterState === undefined}
-                           onClick={() => setFilterState(undefined)}>
-              {`모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`}
-            </SelectionItem>
-          </SelectionRow>
+          <UISegmentedControl
+            items={[
+              { label: `허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === true).length, 0) || 0}건)`, value: "approved" },
+              { label: `검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === null).length, 0) || 0}건)`, value: "review" },
+              { label: `불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === false).length, 0) || 0}건)`, value: "rejected" },
+              { label: `모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`, value: "all" },
+            ]}
+            value={stateSegmentValue}
+            onChange={(value) => {
+              setFilterState(value === "approved" ? true : value === "review" ? null : value === "rejected" ? false : undefined);
+            }}
+          />
         </FitContainer>
         <FitContainer>
           <Text>잔류장소 일괄 이동</Text>
           <SpaceBetweenWrapper>
-            <Select style={{width: "40%", height: "5dvh"}} value={currentSeatChangeGrade} onChange={(e) => {close(); setCurrentSeatChangeGrade(parseInt(e.target.value))}}>
-              <option value={undefined}>학년 선택</option>
-              <option value={1}>1학년</option>
-              <option value={2}>2학년</option>
-              <option value={3}>3학년</option>
-            </Select>
-            <Input type={"text"}
-                style={{width: "57%", height: "5dvh"}}
-                onInput={(e) => setCurrentSeatChangeLocation((e.target as HTMLInputElement).value)}
+            <div style={{width: "40%"}}>
+              <UISelectField
+                value={currentSeatChangeGrade ? String(currentSeatChangeGrade) : ""}
+                onChange={(e) => {
+                  close();
+                  setCurrentSeatChangeGrade(e.target.value === "" ? undefined : parseInt(e.target.value));
+                }}
+                options={[
+                  { value: "", label: "학년 선택" },
+                  { value: "1", label: "1학년" },
+                  { value: "2", label: "2학년" },
+                  { value: "3", label: "3학년" },
+                ]}
+              />
+            </div>
+            <div style={{width: "57%"}}>
+              <UIInputField
+                onChange={(e) => setCurrentSeatChangeLocation(e.target.value)}
                 value={currentSeatChangeLocation}
-                placeholder="장소 입력..."/>
+                placeholder="장소 입력..."
+              />
+            </div>
          </SpaceBetweenWrapper>
          <Button disabled={currentSeatChangeGrade === undefined || currentSeatChangeLocation == ""} style={{height: "5dvh", padding: 0}} onClick={() => {
             const targets = stayApplies?.filter(apply => apply.user.grade === currentSeatChangeGrade);
@@ -869,13 +860,19 @@ function ApplyStayPage() {
         <FitContainer>
           <Text>파일 내보내기</Text>
           <SpaceBetweenWrapper>
-            <Select style={{width: "70%", height: "5dvh"}} value={currentSelectedFileOutput} onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}>
-              <option value="">선택하세요..</option>
-              <option value="in">내부용</option>
-              <option value="out">외부용 (엑셀)</option>
-              <option value="out_pdf">외부용 (PDF)</option>
-              <option value="dorm">생활관용</option>
-            </Select>
+            <div style={{width: "70%"}}>
+              <UISelectField
+                value={currentSelectedFileOutput}
+                onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}
+                options={[
+                  { value: "", label: "선택하세요.." },
+                  { value: "in", label: "내부용" },
+                  { value: "out", label: "외부용 (엑셀)" },
+                  { value: "out_pdf", label: "외부용 (PDF)" },
+                  { value: "dorm", label: "생활관용" },
+                ]}
+              />
+            </div>
             <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={async () => {
               if(currentSelectedFileOutput === "") {
                 showToast("내보내기 형식을 선택하세요.", "danger");
@@ -920,19 +917,16 @@ function ApplyStayPage() {
             <StayApplyDetail>
               <StayApplyHeader>
                 <p>{selectedApply.user.grade}{selectedApply.user.class}{("0"+selectedApply.user.number).slice(-2)} {selectedApply?.user.name}</p>
-                <SelectionRow height={"4dvh"} width={"25%"} style={{marginBottom: "2dvh"}}>
-                  <SelectionItem selected={selectedApplySeat === true}
-                                  boundState={undefined}
-                                  onClick={() => {setSelectedApplySeat(true);}}>
-                    열람실
-                  </SelectionItem>
-                  <SelectionItem selected={selectedApplySeat === false}
-                                  boundState={null}
-                                  border={true}
-                                  onClick={() => {setSelectedApplySeat(false);}}>
-                    좌석 미선택
-                  </SelectionItem>
-                </SelectionRow>
+                <div style={{width: "25%", marginBottom: "2dvh"}}>
+                  <UISegmentedControl
+                    items={[
+                      { label: "열람실", value: "seat" },
+                      { label: "좌석 미선택", value: "none" },
+                    ]}
+                    value={selectedApplySeat === true ? "seat" : "none"}
+                    onChange={(value) => setSelectedApplySeat(value === "seat")}
+                  />
+                </div>
               </StayApplyHeader>
               { selectedApplySeat ? (
                 <SeatBox ref={seatBoxRef}>
@@ -1008,25 +1002,20 @@ function ApplyStayPage() {
                                onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
                                value={outing.reason}
                                placeholder={"외출 사유를 입력하세요.."}/>
-                        <SelectionRow>
-                          <SelectionItem selected={outing.approved === true}
-                                         boundState={true}
-                                         onClick={() => {outing.approved = true; modify();}}>
-                            허가
-                          </SelectionItem>
-                          <SelectionItem selected={outing.approved === null}
-                                         boundState={null}
-                                         border={true}
-                                         onClick={() => {outing.approved = null; modify();}}>
-                            검토
-                          </SelectionItem>
-                          <SelectionItem selected={outing.approved === false}
-                                         boundState={false}
-                                         border={true}
-                                         onClick={() => {outing.approved = false; modify();}}>
-                            불허
-                          </SelectionItem>
-                        </SelectionRow>
+                        <div style={{width: "18%"}}>
+                          <UISegmentedControl
+                            items={[
+                              { label: "허가", value: "approved" },
+                              { label: "검토", value: "review" },
+                              { label: "불허", value: "rejected" },
+                            ]}
+                            value={outing.approved === true ? "approved" : outing.approved === null ? "review" : "rejected"}
+                            onChange={(value) => {
+                              outing.approved = value === "approved" ? true : value === "review" ? null : false;
+                              modify();
+                            }}
+                          />
+                        </div>
                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                         {/* @ts-ignore */}
                         <DeleteBtn onClick={() => {modify(outing)}}>
