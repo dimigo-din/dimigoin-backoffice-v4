@@ -22,35 +22,52 @@ const Wrapper = styled.div`
 
   display: flex;
   flex-direction: row;
+  align-items: stretch;
 
-  gap: 2dvh;
+  gap: 24px;
+  padding: 24px;
 
-  padding: 2dvh 2dvh;
+  @media (max-width: 1200px) {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    padding: 12px;
+  }
 `;
 
 const StayApplyContainer = styled.div`
   height: 100%;
   width: 65%;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
 
-  gap: 1dvh;
-  padding: 1dvh 1dvh;
+  gap: 8px;
+  padding: 10px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border-radius: 8px;
+  border-radius: 12px;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    min-height: 360px;
+  }
 `;
 
 const ControllerContainer = styled.div`
   flex: 1;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
 
-  overflow-y: scroll;
+  overflow-y: auto;
 
-  gap: 2dvh;
+  gap: 16px;
 
   color: ${({theme}) => theme.Colors.Content.Primary};
 `;
@@ -59,14 +76,14 @@ const FitContainer = styled.div`
   height: fit-content;
   width: 100%;
 
-  border-radius: 8px;
+  border-radius: 12px;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  padding: 2dvh 2dvh;
+  padding: 16px;
 
   display: flex;
   flex-direction: column;
-  gap: 1dvh;
+  gap: 8px;
 `;
 
 const SeatBox = styled.div`
@@ -76,7 +93,7 @@ const SeatBox = styled.div`
   width: 100%;
 
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border-radius: 8px;
+  border-radius: 12px;
 
   overflow: scroll;
 `;

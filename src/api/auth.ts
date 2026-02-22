@@ -1,5 +1,5 @@
 import {getInstance} from "./client.ts";
-import axios from "axios";
+import { openDB, type DBSchema } from "idb";
 
 const client = getInstance();
 
@@ -11,6 +11,16 @@ export type PersonalInformation = {
   class: number;
   number: number;
 };
+
+const PERSONAL_INFO_DB = "dimigoin";
+const PERSONAL_INFO_STORE = "personalInformation";
+
+interface PersonalInfoDB extends DBSchema {
+  personalInformation: {
+    key: string;
+    value: PersonalInformation;
+  };
+}
 
 export async function ping(): Promise<"퐁"> {
   return (await client.get("/auth/ping")).data;
@@ -31,38 +41,88 @@ export async function googleLogin(code: string): Promise<{ accessToken: string, 
   return (await client.post("/auth/login/google/callback", {code, redirect_uri: location.protocol + "//" + location.host + "/login"})).data;
 }
 
+export async function getPermission(): Promise<string[]> {
+  return (await client.get("/auth/permission")).data.permissions;
+}
+
+export function checkPermission(permission: string) {
+  return localStorage.getItem("permissions")?.includes(permission) ?? false;
+}
+
 export async function logout(): Promise<void> {
   await client.get("/auth/logout");
 }
 
 export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
-  let res: ({gender: "male" | "female", mail: string, name: string, number: string} | null)[];
   try {
-    if (location.host === "admin.dimigoin.io")
-      res = (await axios.post("https://dimiauth.findflag.kr/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
-    else if (location.host === "admin.dimigo.site")
-      res = (await axios.post("https://dimiauth.dimigo.site/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
-    else
-      res = (await axios.post("http://localhost:5000/personalInformation", { mail: [...email] }, { headers: { "Authorization": "Bearer "+localStorage.getItem("personalInformationKey") } })).data;
-  }catch (e) {
-    if (axios.isAxiosError(e) && e.response?.status === 401) {
-      await logout();
-      location.href = "/login";
-    } else {
-      console.error(e);
+    if (email.length === 0) return [];
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    const all = await db.getAll(PERSONAL_INFO_STORE);
+
+    const map = new Map<string, PersonalInformation>();
+    for (const item of all) {
+      if (!item || typeof item !== "object") continue;
+      const rec = item as PersonalInformation;
+      if (!rec.mail || !rec.name || !rec.gender) continue;
+      map.set(rec.mail, rec);
     }
-    return [];
+
+    return email.map((mail) => map.get(mail) ?? null);
+  } catch (e) {
+    console.error(e);
+    return email.map(() => null);
   }
-  return res.map((personalInformation): PersonalInformation | null => {
-    if (!personalInformation) return null;
-    const parsedNumber = {
-      grade: parseInt(personalInformation.number.substring(0, 1)),
-      class: parseInt(personalInformation.number.substring(1, 2)),
-      number: parseInt(personalInformation.number.substring(2, 4)),
+}
+
+export async function setPersonalInformations(info: PersonalInformation[]): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    for (const item of info) {
+      await db.put(PERSONAL_INFO_STORE, item);
     }
-    return {
-      ...personalInformation,
-      ...parsedNumber,
-    };
-  });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function deletePersonalInformation(email: string): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    await db.delete(PERSONAL_INFO_STORE, email);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function deletePersonalInformationAll(): Promise<void> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+    await db.clear(PERSONAL_INFO_STORE);
+  } catch (e) {
+    console.error(e);
+  }
 }

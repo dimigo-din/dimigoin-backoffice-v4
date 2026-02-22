@@ -1,6 +1,7 @@
 import {Routes, Route} from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../components/Loading.tsx";
+import StudentInfo from "../pages/studentinfo/StudentInfo.tsx";
 
 const LoginPage = lazy(() => import("../pages/login/LoginPage.tsx"));
 const EmptyPage = lazy(() => import("../pages/EmptyPage.tsx"));
@@ -11,6 +12,10 @@ const FrigoPage = lazy(() => import("../pages/frigo/FrigoPage.tsx"));
 const OpenWakeup = lazy(() => import("../pages/wakeup/OpenWakeup.tsx"));
 const LaundryTimelinePage = lazy(() => import("../pages/laundry/LaundryTimelinePage.tsx"));
 const LaundryApplyPage = lazy(() => import("../pages/laundry/LaundryApplyPage.tsx"));
+const UiKitPage = lazy(() => import("../pages/uikit/UiKitPage.tsx"));
+const DienenTimePage = lazy(() => import("../pages/dienen/DienenTimePage.tsx"));
+const DienenManageTimePage = lazy(() => import("../pages/dienen/DienenManageTimePage.tsx"));
+const DienenDelayTimePage = lazy(() => import("../pages/dienen/DienenDelayTimePage.tsx"));
 
 const AppRouter = () => {
 
@@ -26,6 +31,11 @@ const AppRouter = () => {
         <Route path="/openwakeup" element={<OpenWakeup/>}/>
         <Route path="/laundrytimeline" element={<LaundryTimelinePage/>}/>
         <Route path="/applylaundry" element={<LaundryApplyPage/>}/>
+        <Route path="/dienen_time" element={<DienenTimePage/>}/>
+        <Route path="/dienen_edittime" element={<DienenManageTimePage/>}/>
+        <Route path="/dienen_delaytime" element={<DienenDelayTimePage/>}/>
+        <Route path="/studentinfo" element={<StudentInfo/>}/>
+        <Route path="/uikit" element={<UiKitPage/>}/>
         <Route path="*" element={<EmptyPage/>}/>
       </Routes>
     </Suspense>

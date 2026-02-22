@@ -2,21 +2,29 @@ import styled from "styled-components";
 import {useEffect, useState} from "react";
 import {deleteWakeupSong, getWakeupSongList, selectWakeupSong, type WakeupApply} from "../../api/wakeup.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
+import {UIButton} from "../../components/ui";
 
 const Wrapper = styled.div`
   height: 100%;
-  
+  width: 100%;
   display: flex;
   flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    padding: 12px;
+  }
 `;
 
 const TitleBar = styled.div`
-  height: 10%;
+  min-height: 64px;
   
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   
   div {
     width: 50%;
@@ -28,20 +36,34 @@ const TitleBar = styled.div`
     
     align-content: center;
   }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    div {
+      width: 100%;
+      font-size: ${({theme}) => theme.Font.Headline.size};
+      text-align: left;
+      padding-left: 4px;
+    }
+  }
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
   width: 100%;
-  height: 90%;
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 
-  gap: 1dvh;
+  gap: 12px;
 
-  padding: 0 2dvh 2dvh;
+  @media (max-width: 900px) {
+    flex-direction: column;
+    min-height: 0;
+  }
 `;
 
 const WakeupList = styled.div`
@@ -50,19 +72,19 @@ const WakeupList = styled.div`
   
   display: flex;
   flex-direction: column;
-  gap: 1dvh;
+  gap: 8px;
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
-  overflow-y: scroll;
+  overflow-y: auto;
   
-  padding: 1dvh;
+  padding: 10px;
 `;
 
 const WakeupItem = styled.div`
   flex: 0 0 auto;
   
-  height: 12dvh;
+  min-height: 110px;
   width: 100%;
   
   background-color: ${({theme}) => theme.Colors.Background.Primary};
@@ -75,6 +97,10 @@ const WakeupItem = styled.div`
   color: ${({theme}) => theme.Colors.Content.Primary};
   
   overflow: hidden;
+
+  @media (max-width: 900px) {
+    min-height: 100px;
+  }
   
   > .left {
     height: 100%;
@@ -88,7 +114,9 @@ const WakeupItem = styled.div`
     padding: 1dvh 2dvh;
     
     img {
-      height: 10dvh;
+      height: 84px;
+      width: 126px;
+      object-fit: cover;
       
       cursor: pointer;
     }
@@ -104,39 +132,25 @@ const WakeupItem = styled.div`
   }
   
   > .right {
-    width: 20%;
-    
+    width: 22%;
+    min-width: 168px;
+    padding: 8px;
+
     display: flex;
     flex-direction: row;
-    justify-content: right;
-    
-    > div {
-      width: 50%;
-      text-align: center;
-      align-content: center;
-      text-orientation: upright;
-    }
-    
-    > .delete {
-      background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
-      border-left: 1px solid ${({theme}) => theme.Colors.Line.Divider};
-      
-      transition: background-color 300ms ease;
-    }
-    > .select {
-      background-color: ${({theme}) => theme.Colors.Core.Brand.Tertiary};
-      border-left: 1px solid ${({theme}) => theme.Colors.Line.Divider};
-      
-      transition: background-color 300ms ease;
-    }
+    align-items: stretch;
+    gap: 8px;
 
-    > .delete:hover {
-      background-color: ${({theme}) => theme.Colors.Solid.Red};
-    }
-    > .select:hover {
-      background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+    @media (max-width: 900px) {
+      width: 34%;
+      min-width: 144px;
     }
   }
+`;
+
+const ActionButton = styled(UIButton)`
+  min-width: 0;
+  width: 100%;
 `;
 
 function WakeupPage() {
@@ -206,8 +220,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
+                  <ActionButton variant="danger" size="small" fullWidth onClick={() => deleteSong(apply.id)}>삭제</ActionButton>
+                  <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>확정</ActionButton>
                 </div>
               </WakeupItem>
             );
@@ -228,8 +242,8 @@ function WakeupPage() {
                   </div>
                 </div>
                 <div className="right">
-                  <div className="delete" onClick={() => deleteSong(apply.id)}>삭제</div>
-                  <div className="select" onClick={() => selectSong(apply.id)}>확정</div>
+                  <ActionButton variant="danger" size="small" fullWidth onClick={() => deleteSong(apply.id)}>삭제</ActionButton>
+                  <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>확정</ActionButton>
                 </div>
               </WakeupItem>
             );

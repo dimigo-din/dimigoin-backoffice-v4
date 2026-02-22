@@ -12,6 +12,7 @@ import Loading from "../../components/Loading.tsx";
 import {Input} from "../../styles/components/input.ts";
 import { Button } from "../../styles/components/button.ts";
 import CheckBox from "../../components/CheckBox.tsx";
+import {UISegmentedControl} from "../../components/ui";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -19,21 +20,32 @@ const Wrapper = styled.div`
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  align-items: stretch;
 
-  padding: 2dvh;
+  padding: 24px;
 
-  gap: 2dvh;
+  gap: 24px;
+
+  @media (max-width: 1200px) {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    padding: 12px;
+  }
 `;
 
 const ControllerBox = styled.div`
   flex: 1;
+  min-width: 0;
   height: 100%;
   
   display: flex;
   flex-direction: column;
   
-  gap: 2dvh;
+  gap: 16px;
 `;
 
 
@@ -48,8 +60,8 @@ const FitController = styled.div`
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
-  padding: 2dvh 2dvh;
-  gap: 1dvh;
+  padding: 16px;
+  gap: 8px;
 `;
 
 const StretchController = styled.div`
@@ -63,46 +75,14 @@ const StretchController = styled.div`
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
-  padding: 2dvh 2dvh;
-  gap: 1dvh;
-`;
-
-const SelectionRow = styled.div<{ height?: string, width?: string }>`
-  margin-left: ${({width}) => width ? "none" : "2%"};
-  
-  height: ${({height}) => height || "4dvh"};
-  width: ${({width}) => width || "18%"};
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-  font-size: ${({theme}) => theme.Font.Callout.size};
-  
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  border-radius: 12px;
-  
-  overflow: hidden;
-`;
-
-const SelectionItem = styled.div<{ border?: boolean, selected: boolean }>`
-  flex: 1;
-  
-  height: 100%;
-  
-  text-align: center;
-  align-content: center;
-  
-  color: ${({theme, selected}) => selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary};
-  
-  border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
-  
-  background-color: ${({theme, selected}) => selected ? theme.Colors.Core.Brand.Primary : "none"};
+  padding: 16px;
+  gap: 8px;
 `;
 
 const TimelineListItemBlock = styled.div<{ selected: boolean }>`
   height: 5dvh;
   width: 100%;
-  
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -129,18 +109,30 @@ const TimelineListItemEnableIndicator = styled.div<{ enabled?: boolean }>`
 const TimelineDetail = styled.div`
   height: 100%;
   width: 65%;
+  min-width: 0;
   
   display: flex;
-  flex-direction: column;
-  gap: 1dvh;
+  padding: 16px;
+  gap: 8px;
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
-  padding: 1dvh 1dvh;
-  
-  overflow-y: scroll;
+  min-width: 0;
+  padding: 10px;
+
+  overflow-y: auto;
+  gap: 8px;
+  @media (max-width: 900px) {
+  padding: 10px;
+    min-height: 360px;
+  overflow-y: auto;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    min-height: 360px;
+  }
 `;
 
 const Time = styled.div`
@@ -165,10 +157,6 @@ const Time = styled.div`
     padding: 0 1dvh;
     border-radius: 8px;
     border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  }
-
-  input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: ${window.matchMedia("(prefers-color-scheme: dark)").matches ? "invert(1)" : "none"};
   }
 
   div {
@@ -246,6 +234,7 @@ function LaundryTimelinePage() {
   const [machineList, setMachineList] = useState<LaundryMachine[] | null>(null);
 
   const [filterGrade, setFilterGrade] = useState<1 | 2 | 3 | null>(null);
+  const gradeSegmentValue = filterGrade ? String(filterGrade) : "all";
 
   const updateScreen = () => {
     getLaundryMachineList().then((data) => {
@@ -572,27 +561,16 @@ function LaundryTimelinePage() {
           <>
             <FitController>
               <Text>분류</Text>
-              <SelectionRow width={"100%"}>
-                <SelectionItem selected={filterGrade === 1}
-                               onClick={() => setFilterGrade(1)}>
-                  1학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(1) !== -1).length}건)
-                </SelectionItem>
-                <SelectionItem selected={filterGrade === 2}
-                               border={true}
-                               onClick={() => setFilterGrade(2)}>
-                  2학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(2) !== -1).length}건)
-                </SelectionItem>
-                <SelectionItem selected={filterGrade === 3}
-                               border={true}
-                               onClick={() => setFilterGrade(3)}>
-                  3학년 ({currentTimeline.times.filter((time) => time.grade.indexOf(3) !== -1).length}건)
-                </SelectionItem>
-                <SelectionItem selected={filterGrade === null}
-                               border={true}
-                               onClick={() => setFilterGrade(null)}>
-                  모두 ({currentTimeline.times.length}건)
-                </SelectionItem>
-              </SelectionRow>
+              <UISegmentedControl
+                items={[
+                  { label: `1학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(1) !== -1).length}건)`, value: "1" },
+                  { label: `2학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(2) !== -1).length}건)`, value: "2" },
+                  { label: `3학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(3) !== -1).length}건)`, value: "3" },
+                  { label: `모두 (${currentTimeline.times.length}건)`, value: "all" },
+                ]}
+                value={gradeSegmentValue}
+                onChange={(value) => setFilterGrade(value === "all" ? null : parseInt(value) as 1 | 2 | 3)}
+              />
             </FitController>
             <FitController>
               <Button onClick={() => addTime()}>세탁시간 추가하기</Button>
