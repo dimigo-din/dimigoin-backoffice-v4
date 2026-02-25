@@ -158,7 +158,7 @@ export default function DienenTimePage() {
               ) : (
                 items.map((item, index) => (
                   <TimelineRow key={`${item.time}-${index}`}>
-                    <strong>{item.time}</strong>
+                    <strong>{item.delayed_time ? `${item.delayed_time} (${item.time}에서 지연)` : item.time}</strong>
                     <span>{item.class.join(", ")}반</span>
                   </TimelineRow>
                 ))

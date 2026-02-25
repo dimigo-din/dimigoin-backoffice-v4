@@ -4,6 +4,7 @@ const client = getInstance();
 
 export type MealTimelineItem = {
   time: string;
+  delayed_time: string | null;
   class: number[];
 };
 
