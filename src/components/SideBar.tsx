@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { checkPermission, ping } from "../api/auth.ts";
+import { checkPermission, logout, ping } from "../api/auth.ts";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/icons/dimigoin.svg?react";
 
@@ -315,6 +315,17 @@ export default function SideBar({
             학생정보 등록
           </UtilityButton>
         ) : null}
+        <UtilityButton
+            type="button"
+            $selected={pathname.startsWith("/logout")}
+            onClick={() => {
+              logout();
+              navigate("/login");
+              onNavigate?.();
+            }}
+          >
+            로그아웃
+          </UtilityButton>
         <Footer>© 2026 DIMIGOIN Backoffice</Footer>
       </UtilityArea>
     </Wrapper>

@@ -128,12 +128,16 @@ function LoginPage() {
           showToast("로그인에 성공하였습니다.", "info");
           setTimeout(() => {
             location.href = "/";
-          }, 3000);
-        })
+          }, 1500);
+        }).catch((e) => {
+          console.error("Permission check failed:", e);
+          showToast("권한 확인에 실패했습니다.", "danger");
+          logout();
+        });
       }).catch((e) => {
         console.error(e);
         showToast("로그인에 실패했습니다.", "danger");
-        showToast(e.response.data.error, "danger");
+        showToast(e.response?.data?.error || "알 수 없는 오류가 발생했습니다.", "danger");
       });
     }
   }, []);
