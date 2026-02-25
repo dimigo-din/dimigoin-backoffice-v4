@@ -547,7 +547,7 @@ function ApplyStayPage() {
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
-        setSelectedApplySeat(applyCopy.id === "new" ? true : currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
+        setSelectedApplySeat(applyCopy.id === "new" ? true : currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
       });
       return;
     }
@@ -625,7 +625,7 @@ function ApplyStayPage() {
     }
 
     const userTarget = `${selectedApply.user.grade}_${selectedApply.user.gender}`;
-    const validSeatRanges = currentStay?.stay_seat_preset.stay_seat.filter(
+    const validSeatRanges = currentStay?.stay_seat_preset.stay_seat_preset_range.filter(
       (target) => target.target === userTarget
     );
 
@@ -633,7 +633,7 @@ function ApplyStayPage() {
       isInRange(target.range.split(":"), selectedApply.stay_seat)
     ) ?? false;
 
-    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat.some((target) =>
+    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) =>
       isInRange(target.range.split(":"), selectedApply.stay_seat)
     ) ?? false;
 
@@ -645,7 +645,7 @@ function ApplyStayPage() {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    updateStayApply({...selectedApply, stay: currentStay.id!, user: selectedApply!.user.id}).then(() => {
+    updateStayApply({...selectedApply, stay: currentStay.id!, user: selectedApply!.user.id, stay_seat: selectedApply.stay_seat}).then(() => {
       showToast("성공했습니다.", "info");
       close(undefined, true);
       updateScreen();
@@ -941,7 +941,7 @@ function ApplyStayPage() {
                         {group.map((row, rowIdx) => (
                           <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
                             {row.map((seat, seatIdx) => {
-                              const isActive = currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
+                              const isActive = currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
                               const taken = stayApplies.find(
                                 (sapply) =>
                                   sapply.stay_seat === seat &&
@@ -975,7 +975,7 @@ function ApplyStayPage() {
                   type={"text"}
                   style={{ width: "100%", fontSize: "14px", height: "8dvh" }}
                   placeholder={"좌석 미선택 사유나 잔류 위치를 입력하세요."}
-                  value={currentStay?.stay_seat_preset.stay_seat.some((target) => isInRange(target.range.split(":"), selectedApply.stay_seat)) ? "" : selectedApply.stay_seat}
+                  value={currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), selectedApply.stay_seat)) ? "" : selectedApply.stay_seat}
                   onInput={(e) => {selectedApply.stay_seat = (e.target as HTMLInputElement).value; setSelectedApply({ ...selectedApply })}}
                 />
               )}

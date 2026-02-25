@@ -279,7 +279,7 @@ function LaundryTimelinePage() {
         return {
           time: time.time,
           grade: time.id === id ? grade : time.grade,
-          assigns: time.assigns.map((assign) => assign.id),
+          assigns: time.assigns.map((assign) => assign.laundry_machine.id),
         };
       })
     };
@@ -306,7 +306,7 @@ function LaundryTimelinePage() {
         return {
           time: time.id === id ? changed_time : time.time,
           grade: time.grade,
-          assigns: time.assigns.map((assign) => assign.id),
+          assigns: time.assigns.map((assign) => assign.laundry_machine.id),
         };
       })
     };
@@ -333,7 +333,7 @@ function LaundryTimelinePage() {
         return {
           time: time.time,
           grade: time.grade,
-          assigns: time.assigns.map((assign) => assign.id),
+          assigns: time.assigns.map((assign) => assign.laundry_machine.id),
         };
       }),
     };
@@ -385,7 +385,7 @@ function LaundryTimelinePage() {
         return {
           time: time.time,
           grade: time.grade,
-          assigns: time.assigns.map((assign) => assign.id),
+          assigns: time.assigns.map((assign) => assign.laundry_machine.id),
         };
       }).concat({ time: new_time, grade: [new_grade], assigns: [] }),
     };
@@ -413,12 +413,12 @@ function LaundryTimelinePage() {
           return {
             time: time.time,
             grade: time.grade,
-            assigns: time.assigns.map((assign) => assign.id).concat(machineid),
+            assigns: time.assigns.map((assign) => assign.laundry_machine.id).concat(machineid),
           };
         return {
           time: time.time,
           grade: time.grade,
-          assigns: time.assigns.map((assign) => assign.id),
+          assigns: time.assigns.map((assign) => assign.laundry_machine.id),
         };
       }),
     };
@@ -445,7 +445,7 @@ function LaundryTimelinePage() {
         return {
           time: time.time,
           grade: time.grade,
-          assigns: time.assigns.filter((assign) => time.id !== timeid || (time.id === timeid && assign.id !== machineid)).map((assign) => assign.id),
+          assigns: time.assigns.filter((assign) => time.id !== timeid || (time.id === timeid && assign.laundry_machine.id !== machineid)).map((assign) => assign.laundry_machine.id),
         };
       }),
     };
@@ -513,14 +513,14 @@ function LaundryTimelinePage() {
                   <LaundryTimeChildMachine>
                     <div/>
                     <Text>ㄴ</Text>
-                    <Select value={assign.id}>
+                    <Select value={assign.laundry_machine.id}>
                       {machineList && machineList.map((machine) => {
                         return (
                           <option value={machine.id}>({machine.gender === "male" ? "남" : "여"}) {machine.name} {machine.type === "washer" ? "세탁기" : "건조기"}</option>
                         );
                       })}
                     </Select>
-                    <UnassignMachineButton onClick={() => unassignMachine(time.id, assign.id)}>삭제</UnassignMachineButton>
+                    <UnassignMachineButton onClick={() => unassignMachine(time.id, assign.laundry_machine.id)}>삭제</UnassignMachineButton>
                   </LaundryTimeChildMachine>
                 );
               })}
