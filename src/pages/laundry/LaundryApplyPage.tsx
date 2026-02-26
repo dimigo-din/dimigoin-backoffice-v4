@@ -192,8 +192,8 @@ function LaundryApplyPage() {
           return a.type === "washer" ? -1 : 1;
         }
         
-        const aGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.id === a.id))?.grade || 0;
-        const bGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.id === b.id))?.grade || 0;
+        const aGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === a.id))?.grade || 0;
+        const bGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === b.id))?.grade || 0;
         if (aGrade !== bGrade) {
           return parseInt(aGrade.toString()) - parseInt(bGrade.toString());
         }
@@ -291,12 +291,12 @@ function LaundryApplyPage() {
             <LaundryListContainer>
               {isLoading ? <Loading/> : (
                 machines.filter(m => {
-                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.id === m.id))?.grade;
+                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
                 const gradeFilter = filterGrade === null || timelineGrade?.includes(filterGrade);
                 const genderFilter = filterGender === null || m.gender === filterGender;
                 return gradeFilter && genderFilter;
                 }).map((m) => {
-                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.id === m.id))?.grade;
+                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
 
                 return (
                   <LaundryApply key={m.id} selected={selectedMachine === machines.indexOf(m)} onClick={() => setSelectedMachine(machines.indexOf(m))}>
@@ -311,7 +311,7 @@ function LaundryApplyPage() {
             <LaundryListContainer>
               {isLoading ? <Loading/> : (
                 selectedMachine !== null && machines[selectedMachine] && (
-                  currentTimeline?.times.filter(t => t.assigns.find(a => a.id === machines[selectedMachine].id)).sort((a, b) => a.time.localeCompare(b.time)).map((time) => (
+                  currentTimeline?.times.filter(t => t.assigns.find(a => a.laundry_machine.id === machines[selectedMachine].id)).sort((a, b) => a.time.localeCompare(b.time)).map((time) => (
                     <LaundryApply key={time.id}>
                       <span>{time.time}</span>
                       {(() => {
@@ -378,7 +378,7 @@ function LaundryApplyPage() {
                 options={[
                   { value: "", label: "세탁/건조기 선택" },
                   ...(selectedMachine !== null ? machines.map((m) => {
-                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.id === m.id))?.grade;
+                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
                     return {
                       value: m.id,
                       label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`
@@ -401,7 +401,7 @@ function LaundryApplyPage() {
                   ...(
                     selectedMachine !== null && applyMachineId !== null
                       ? (currentTimeline?.times
-                        .filter(t => t.assigns.find(a => a.id === applyMachineId))
+                        .filter(t => t.assigns.find(a => a.laundry_machine.id === applyMachineId))
                         .filter(time => !applies.find(a => a.laundryMachine.id === applyMachineId && a.laundryTime.id === time.id))
                         .sort((a, b) => a.time.localeCompare(b.time))
                         .map((time) => ({ value: time.id, label: time.time })) || [])
@@ -428,7 +428,7 @@ function LaundryApplyPage() {
                 options={[
                   { value: "", label: "세탁/건조기 선택" },
                   ...(selectedMachine !== null ? machines.map((m) => {
-                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.id === m.id))?.grade;
+                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
                     return {
                       value: m.id,
                       label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`
@@ -451,7 +451,7 @@ function LaundryApplyPage() {
                   ...(
                     selectedMachine !== null && cancleMachineId !== null
                       ? (currentTimeline?.times
-                        .filter(t => t.assigns.find(a => a.id === cancleMachineId))
+                        .filter(t => t.assigns.find(a => a.laundry_machine.id === cancleMachineId))
                         .filter(time => applies.find(a => a.laundryMachine.id === cancleMachineId && a.laundryTime.id === time.id))
                         .sort((a, b) => a.time.localeCompare(b.time))
                         .map((time) => {

@@ -159,12 +159,17 @@ function flattenTimeline(data: MealTimelineData): FlatTimeOption[] {
 export default function DienenDelayTimePage() {
   const { showToast } = useNotification();
   const [timeline, setTimeline] = useState<MealTimelineData | null>(null);
-  const [source, setSource] = useState("");
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [delayMinutes, setDelayMinutes] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
 
   const timeOptions = useMemo(() => flattenTimeline(timeline || {}), [timeline]);
-  const dest = source ? addMinutes(source, delayMinutes) : "";
+
+  const toggleSource = (time: string) => {
+    setSelectedSources((prev) => 
+      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time]
+    );
+  };
 
   const updateMinutes = (delta: number) => {
     setDelayMinutes((prev) => Math.min(120, Math.max(1, prev + delta)));
@@ -176,9 +181,6 @@ export default function DienenDelayTimePage() {
       const today = new Date().toISOString().slice(0, 10);
       const data = await getMealTimeline(today);
       setTimeline(data);
-
-      const flat = flattenTimeline(data);
-      if (flat.length > 0) setSource(flat[0].time);
     } catch (e) {
       console.error(e);
       showToast(getErrorMessage(e), "danger");
@@ -192,7 +194,7 @@ export default function DienenDelayTimePage() {
   }, []);
 
   const submit = async () => {
-    if (!source) {
+    if (selectedSources.length === 0) {
       showToast("미룰 급식 시간을 선택해주세요.", "warning");
       return;
     }
@@ -204,12 +206,31 @@ export default function DienenDelayTimePage() {
 
     setIsLoading(true);
     try {
-      await delayMealTimeline({
-        source,
-        dest,
-        description: `급식 시간을 ${delayMinutes}분 미뤘습니다.`,
-      });
-      showToast("급식 시간이 미뤄졌습니다.", "info");
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const source of selectedSources) {
+        try {
+          const dest = addMinutes(source, delayMinutes);
+          await delayMealTimeline({
+            source,
+            dest,
+            description: `급식 시간을 ${delayMinutes}분 미뤘습니다.`,
+          });
+          successCount++;
+        } catch (e) {
+          console.error(`Failed to delay ${source}:`, e);
+          failCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        showToast(`${successCount}개 급식 시간이 미뤄졌습니다.${failCount > 0 ? ` (${failCount}개 실패)` : ""}`, failCount > 0 ? "warning" : "info");
+      } else {
+        showToast("급식 시간 미루기에 실패했습니다.", "danger");
+      }
+
+      setSelectedSources([]);
       await loadTodayTimeline();
     } catch (e) {
       console.error(e);
@@ -223,7 +244,7 @@ export default function DienenDelayTimePage() {
     <Wrapper>
       <Panel>
         <Title>급식 시간 미루기</Title>
-        <Sub>오늘 급식 시간표에서 시간을 선택하고, 몇 분 미룰지 지정합니다.</Sub>
+        <Sub>오늘 급식 시간표에서 시간을 선택하고, 몇 분 미룰지 지정합니다. 여러 시간대를 선택할 수 있습니다.</Sub>
 
         <FieldRow>
           <UIButton size="medium" variant="neutral" onClick={loadTodayTimeline} disabled={isLoading}>오늘 시간표 다시 불러오기</UIButton>
@@ -234,7 +255,7 @@ export default function DienenDelayTimePage() {
         ) : (
           <TimeList>
             {timeOptions.map((item) => (
-              <TimeCard key={item.time} $selected={source === item.time} onClick={() => setSource(item.time)}>
+              <TimeCard key={item.time} $selected={selectedSources.includes(item.time)} onClick={() => toggleSource(item.time)}>
                 <TimeTitle>{item.time}</TimeTitle>
                 <TimeMeta>{item.meta}</TimeMeta>
               </TimeCard>
@@ -250,9 +271,13 @@ export default function DienenDelayTimePage() {
           </CounterBox>
         </FieldRow>
 
-        <Sub>{source ? `${source} → ${dest} (${delayMinutes}분 미루기)` : "시간을 먼저 선택해주세요."}</Sub>
+        <Sub>
+          {selectedSources.length > 0 
+            ? selectedSources.map((s) => `${s} → ${addMinutes(s, delayMinutes)}`).join(", ") + ` (${selectedSources.length}개 시간대, ${delayMinutes}분 미루기)`
+            : "시간을 먼저 선택해주세요."}
+        </Sub>
 
-        <UIButton size="medium" onClick={submit} disabled={isLoading}>미루기 적용</UIButton>
+        <UIButton size="medium" onClick={submit} disabled={isLoading || selectedSources.length === 0}>미루기 적용</UIButton>
       </Panel>
     </Wrapper>
   );

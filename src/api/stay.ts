@@ -62,7 +62,7 @@ export type Stay = {
     id: string;
     name: string;
     only_readingRoom: boolean;
-    stay_seat: {
+    stay_seat_preset_range: {
       id: string;
       target: "1_male" | "1_female" | "2_male" | "2_female" | "3_male" | "3_female";
       range: string;

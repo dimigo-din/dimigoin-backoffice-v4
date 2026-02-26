@@ -17,6 +17,11 @@ export type WakeupApply = {
   }[]
 }
 
+type WakeupApplyResponse = Omit<WakeupApply, "wakeupSongVote"> & {
+  wakeup_song_vote?: WakeupApply["wakeupSongVote"];
+  wakeupSongVote?: WakeupApply["wakeupSongVote"];
+}
+
 export type WakeupHistory = {
   id: string;
   video_id: string;
@@ -27,7 +32,12 @@ export type WakeupHistory = {
 }
 
 export const getWakeupSongList = async (): Promise<WakeupApply[]> => {
-  return (await client.get("/manage/wakeup")).data;
+  const response = (await client.get("/manage/wakeup")).data as WakeupApplyResponse[];
+
+  return response.map((item) => ({
+    ...item,
+    wakeupSongVote: item.wakeupSongVote ?? item.wakeup_song_vote ?? [],
+  }));
 }
 
 export const selectWakeupSong = async (id: string): Promise<WakeupApply> => {
