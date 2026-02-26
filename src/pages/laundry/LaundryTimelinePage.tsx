@@ -39,13 +39,18 @@ const Wrapper = styled.div`
 
 const ControllerBox = styled.div`
   flex: 1;
-  min-width: 0;
+  min-width: 360px;
   height: 100%;
   
   display: flex;
   flex-direction: column;
   
   gap: 16px;
+
+  @media (max-width: 900px) {
+    min-width: 0;
+    height: auto;
+  }
 `;
 
 
@@ -77,10 +82,12 @@ const StretchController = styled.div`
   
   padding: 16px;
   gap: 8px;
+
+  overflow-y: auto;
 `;
 
 const TimelineListItemBlock = styled.div<{ selected: boolean }>`
-  height: 5dvh;
+  min-height: 48px;
   width: 100%;
 
   display: flex;
@@ -92,8 +99,9 @@ const TimelineListItemBlock = styled.div<{ selected: boolean }>`
   font-size: ${({theme}) => theme.Font.Headline.size};
   background-color: ${({theme, selected}) => selected ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Tertiary};
   color: ${({theme}) => theme.Colors.Content.Primary};
-  padding: 0 1dvw;
+  padding: 0 12px;
   box-shadow: ${({selected}) => selected ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 1px 4px rgba(0, 0, 0, 0.08)'};
+  cursor: pointer;
 `;
 
 const TimelineListItemEnableIndicator = styled.div<{ enabled?: boolean }>`
@@ -112,38 +120,45 @@ const TimelineDetail = styled.div`
   min-width: 0;
   
   display: flex;
+  flex-direction: column;
   padding: 16px;
-  gap: 8px;
+  gap: 10px;
   
   background-color: ${({theme}) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  
-  min-width: 0;
-  padding: 10px;
 
   overflow-y: auto;
-  gap: 8px;
-  @media (max-width: 900px) {
-  padding: 10px;
-    min-height: 360px;
-  overflow-y: auto;
+  overflow-x: hidden;
 
   @media (max-width: 900px) {
     width: 100%;
+    height: auto;
     min-height: 360px;
+    padding: 12px;
   }
+`;
+
+const TimeBlock = styled.div`
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
 `;
 
 const Time = styled.div`
   flex: 0 0 auto;
   
-  height: 5dvh;
+  min-height: 52px;
   width: 100%;
   
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
+  gap: 10px;
   
   color: ${({theme}) => theme.Colors.Content.Primary};
   
@@ -151,22 +166,37 @@ const Time = styled.div`
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-  padding: 1dvh 1dvw;
+  padding: 8px 12px;
   
   input {
-    padding: 0 1dvh;
+    padding: 0 10px;
     border-radius: 8px;
     border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
   }
 
-  div {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5dvw;
+`;
 
-    padding-left: 2dvh;
+const GradeCheckGroup = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding-left: 4px;
 
-    width: fit-content;
+  @media (max-width: 1200px) {
+    width: 100%;
+    padding-left: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 900px) {
+    width: 100%;
+    padding-left: 0;
+    flex-wrap: wrap;
   }
 `;
 
@@ -193,37 +223,42 @@ const Text = styled.p`
 
 const DeleteTime = styled.div`
   margin-left: auto;
+  flex: 0 0 auto;
   
   border-radius: 8px;
   
   background-color: ${({theme}) => theme.Colors.Core.Status.Negative};
   color: ${({theme}) => theme.Colors.Content.Primary};
   
-  padding: 1dvh 1dvw;
+  padding: 8px 12px;
+  cursor: pointer;
 `;
 
 const LaundryTimeChildMachine = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
   
-  gap: 0.5dvw;
+  gap: 8px;
   
-  margin-left: 2dvh;
-  padding: 0.8dvh 1dvw;
+  margin-left: 0;
+  padding: 8px 12px;
   background-color: ${({theme}) => theme.Colors.Background.Primary};
   border-radius: 8px;
 `;
 
 const UnassignMachineButton = styled.div`
-  margin-left: 0.2dvw;
+  margin-left: auto;
   
   border-radius: 6px;
 
   background-color: ${({theme}) => theme.Colors.Core.Status.Negative};
   color: ${({theme}) => theme.Colors.Content.Primary};
   
-  padding: 0.3dvh 0.5dvw;
+  padding: 6px 10px;
+  cursor: pointer;
 `;
 
 function LaundryTimelinePage() {
@@ -471,10 +506,10 @@ function LaundryTimelinePage() {
           return a.time.localeCompare(b.time);
         }).filter((time) => filterGrade === null || time.grade.indexOf(filterGrade) !== -1).map((time) => {
           return (
-            <>
+            <TimeBlock key={time.id}>
               <Time>
                 <Input type={"time"} value={time.time} onChange={(e) => updateTimeForTime(time.id, e.target.value)} />
-                <div>
+                <GradeCheckGroup>
                   <CheckBox text="1학년" canceled={time.grade.includes(1)} onClick={() => {
                     let new_grade: (1 | 2 | 3)[] = [];
                     if (time.grade.includes(1)) {
@@ -505,18 +540,18 @@ function LaundryTimelinePage() {
 
                     updateGradeForTime(time.id, new_grade.sort());
                   }} />
-                </div>
+                </GradeCheckGroup>
                 <DeleteTime onClick={() => deleteTime(time.id)}>삭제</DeleteTime>
               </Time>
               {time.assigns.map((assign) => {
                 return (
-                  <LaundryTimeChildMachine>
+                  <LaundryTimeChildMachine key={`${time.id}_${assign.laundry_machine.id}`}>
                     <div/>
                     <Text>ㄴ</Text>
                     <Select value={assign.laundry_machine.id}>
                       {machineList && machineList.map((machine) => {
                         return (
-                          <option value={machine.id}>({machine.gender === "male" ? "남" : "여"}) {machine.name} {machine.type === "washer" ? "세탁기" : "건조기"}</option>
+                          <option key={machine.id} value={machine.id}>({machine.gender === "male" ? "남" : "여"}) {machine.name} {machine.type === "washer" ? "세탁기" : "건조기"}</option>
                         );
                       })}
                     </Select>
@@ -531,12 +566,12 @@ function LaundryTimelinePage() {
                   <option value={"add"}>추가하기</option>
                   {machineList && machineList.map((machine) => {
                     return (
-                      <option value={machine.id}>({machine.gender === "male" ? "남" : "여"}) {machine.name} {machine.type === "washer" ? "세탁기" : "건조기"}</option>
+                      <option key={machine.id} value={machine.id}>({machine.gender === "male" ? "남" : "여"}) {machine.name} {machine.type === "washer" ? "세탁기" : "건조기"}</option>
                     );
                   })}
                 </Select>
               </LaundryTimeChildMachine>
-            </>
+            </TimeBlock>
           );
         })}
       </TimelineDetail>
@@ -548,7 +583,7 @@ function LaundryTimelinePage() {
           <Text>세탁 일정 목록</Text>
           {timelineList !== null ? timelineList.map((tli) => {
             return (
-              <TimelineListItemBlock selected={!!currentTimeline && (currentTimeline.id === tli.id)} onClick={() => getTimeline(tli.id)}>
+              <TimelineListItemBlock key={tli.id} selected={!!currentTimeline && (currentTimeline.id === tli.id)} onClick={() => getTimeline(tli.id)}>
                 {tli.name}
                 <TimelineListItemEnableIndicator enabled={tli.enabled}>
                   {tli.enabled ? "활성" : "비활성"}
@@ -563,10 +598,10 @@ function LaundryTimelinePage() {
               <Text>분류</Text>
               <UISegmentedControl
                 items={[
-                  { label: `1학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(1) !== -1).length}건)`, value: "1" },
-                  { label: `2학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(2) !== -1).length}건)`, value: "2" },
-                  { label: `3학년 (${currentTimeline.times.filter((time) => time.grade.indexOf(3) !== -1).length}건)`, value: "3" },
-                  { label: `모두 (${currentTimeline.times.length}건)`, value: "all" },
+                  { label: `1학년`, value: "1" },
+                  { label: `2학년`, value: "2" },
+                  { label: `3학년`, value: "3" },
+                  { label: `전체`, value: "all" },
                 ]}
                 value={gradeSegmentValue}
                 onChange={(value) => setFilterGrade(value === "all" ? null : parseInt(value) as 1 | 2 | 3)}
