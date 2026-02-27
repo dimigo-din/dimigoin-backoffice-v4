@@ -80,6 +80,26 @@ export async function getPersonalInformation(email: string[]): Promise<(Personal
   }
 }
 
+export async function getAllPersonalInformations(): Promise<PersonalInformation[]> {
+  try {
+    const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(PERSONAL_INFO_STORE)) {
+          db.createObjectStore(PERSONAL_INFO_STORE, { keyPath: "mail" });
+        }
+      },
+    });
+
+    const all = await db.getAll(PERSONAL_INFO_STORE);
+    return all.filter((item): item is PersonalInformation => {
+      return !!item && typeof item.mail === "string" && item.mail.length > 0;
+    });
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
 export async function setPersonalInformations(info: PersonalInformation[]): Promise<void> {
   try {
     const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {

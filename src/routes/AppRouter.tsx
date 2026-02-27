@@ -1,7 +1,7 @@
 import {Routes, Route} from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../components/Loading.tsx";
-import StudentInfo from "../pages/studentinfo/StudentInfo.tsx";
+import StudentInfoPage from "../pages/studentinfo/StudentInfo.tsx";
 
 const LoginPage = lazy(() => import("../pages/login/LoginPage.tsx"));
 const EmptyPage = lazy(() => import("../pages/EmptyPage.tsx"));
@@ -34,7 +34,7 @@ const AppRouter = () => {
         <Route path="/dienen_time" element={<DienenTimePage/>}/>
         <Route path="/dienen_edittime" element={<DienenManageTimePage/>}/>
         <Route path="/dienen_delaytime" element={<DienenDelayTimePage/>}/>
-        <Route path="/studentinfo" element={<StudentInfo/>}/>
+        <Route path="/studentinfo" element={<StudentInfoPage/>}/>
         <Route path="/uikit" element={<UiKitPage/>}/>
         <Route path="*" element={<EmptyPage/>}/>
       </Routes>
