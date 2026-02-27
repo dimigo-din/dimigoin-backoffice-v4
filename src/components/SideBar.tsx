@@ -167,7 +167,7 @@ const Footer = styled.p`
 `;
 
 function getSections(): MenuSection[] {
-  const sections_manage: MenuSection[] = [
+  const sections_teacher: MenuSection[] = [
     {
       title: "잔류",
       key: "stay-section",
@@ -213,11 +213,11 @@ function getSections(): MenuSection[] {
     },
   ];
 
-  const hasManagePermission = checkPermission("manage_permission");
+  const hasManagePermission = checkPermission("teacher");
   const hasDienenPermission = checkPermission("dienen");
 
   const sections: MenuSection[] = [];
-  if (hasManagePermission) sections.push(...sections_manage);
+  if (hasManagePermission) sections.push(...sections_teacher);
   if (hasDienenPermission) sections.push(...sections_dienen);
   return sections;
 }
@@ -239,7 +239,7 @@ export default function SideBar({
 
   const menuList = useMemo(() => getSections(), []);
   const name = window.localStorage.getItem("name");
-  const hasManagePermission = checkPermission("manage_permission");
+  const hasManagePermission = checkPermission("teacher");
   const hasDienenPermission = checkPermission("dienen");
 
   useEffect(() => {

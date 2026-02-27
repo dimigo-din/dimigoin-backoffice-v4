@@ -1,7 +1,12 @@
 import styled from "styled-components";
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {setPersonalInformations, type PersonalInformation} from "../../api/auth.ts";
+import {
+  deletePersonalInformationAll,
+  getAllPersonalInformations,
+  setPersonalInformations,
+  type PersonalInformation
+} from "../../api/auth.ts";
 import Papa from "papaparse";
 
 const Wrapper = styled.div`
@@ -17,261 +22,614 @@ const Wrapper = styled.div`
   }
 `;
 
-const TitleBar = styled.div`
-  min-height: 56px;
-  
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  
-  div {
-    width: 100%;
-    
-    font-size: ${({theme}) => theme.Font.Title.size};
-    color: ${({theme}) => theme.Colors.Content.Primary};
-    
-    text-align: center;
-    
-    align-content: center;
-  }
-`;
-
-const ContentWrapper = styled.div`
+const Card = styled.div`
   flex: 1;
-  width: 100%;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  gap: 12px;
-`;
-
-const ProcedureList = styled.div`
-  flex: 1;
-  height: 100%;
-  
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border-radius: 12px;
-  
-  padding: 10px;
-  overflow: auto;
-`;
-
-const ProcedureItem = styled.div`
-  flex: 0 0 auto;
-  
-  min-height: 10dvh;
-  max-height: fit-content;
-  width: 100%;
-  
+  min-height: 0;
   background-color: ${({theme}) => theme.Colors.Background.Primary};
   border-radius: 8px;
-
-  padding: 3dvh;
-
+  padding: 16px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  
+  flex-direction: column;
+  gap: 10px;
   overflow: hidden;
-  
-  font-size: ${({theme}) => theme.Font.Headline.size};
+`;
 
-  h1 {
-    font-size: ${({theme}) => theme.Font.Title.size};
-  }
+const CardHead = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 
-  .right {
-    width: 20%;
-    height: 100%;
-
-    display: flex;
-
-    button {
-      width: 100%;
-    }
-  }
-
-  button {
-    height: 5dvh;
-    width: 20%;
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
-    color: white;
-    border: none;
-    border-radius: 8px;
+  h3 {
+    margin: 0;
     font-size: ${({theme}) => theme.Font.Headline.size};
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: ${({theme}) => theme.Colors.Core.Brand.Primary}aa;
-    }
-
-    &:disabled {
-      background-color: ${({theme}) => theme.Colors.Line.Outline};
-      cursor: not-allowed;
-    }
+    color: ${({theme}) => theme.Colors.Content.Primary};
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1dvh;
-    text-align: left;
-
-    overflow-y: auto;
-    display: block;
-    height: 30dvh;
-
-    thead {
-      background-color: ${({theme}) => theme.Colors.Background.Secondary};
-    }
-
-    th, td {
-      border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-      padding: 0.5dvh 1dvh;
-    }
-
-    th {
-      font-size: ${({theme}) => theme.Font.Headline.size};
-    }
+  p {
+    margin: 2px 0 0;
+    color: ${({theme}) => theme.Colors.Content.Secondary};
+    font-size: ${({theme}) => theme.Font.Body.size};
   }
 `;
+
+const ActionButton = styled.button`
+  height: 40px;
+  min-width: 110px;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  color: white;
+  font-size: ${({theme}) => theme.Font.Body.size};
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary}cc;
+  }
+
+  &:disabled {
+    background-color: ${({theme}) => theme.Colors.Line.Outline};
+    cursor: not-allowed;
+  }
+`;
+
+const GhostButton = styled(ActionButton)`
+  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+
+  &:hover {
+    background-color: ${({theme}) => theme.Colors.Background.Tertiary}cc;
+  }
+`;
+
+const DangerButton = styled(ActionButton)`
+  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
+  color: ${({theme}) => theme.Colors.Solid.Red};
+
+  &:hover {
+    background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red}dd;
+  }
+`;
+
+const TableWrapper = styled.div`
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 80dvh;
+`;
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: ${({theme}) => theme.Colors.Background.Primary};
+
+  thead {
+    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  th, td {
+    border-bottom: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+    padding: 10px;
+    text-align: left;
+    font-size: ${({theme}) => theme.Font.Body.size};
+    color: ${({theme}) => theme.Colors.Content.Primary};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  tbody tr:hover {
+    background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  }
+`;
+
+const SortButton = styled.button`
+  border: none;
+  background: transparent;
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({theme}) => theme.Font.Body.size};
+  font-weight: ${({theme}) => theme.Font.Body.weight.regular};
+  cursor: pointer;
+  padding: 0;
+`;
+
+const EditableInput = styled.input<{ $changed?: boolean }>`
+  width: 100%;
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({$changed, theme}) => $changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  border-radius: 6px;
+  padding: 8px;
+  font-size: ${({theme}) => theme.Font.Body.size};
+
+  &:focus {
+    outline: none;
+    border-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  }
+`;
+
+const EditableSelect = styled.select<{ $changed?: boolean }>`
+  width: 100%;
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({$changed, theme}) => $changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  border-radius: 6px;
+  padding: 8px;
+  font-size: ${({theme}) => theme.Font.Body.size};
+
+  &:focus {
+    outline: none;
+    border-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  }
+`;
+
+const ActionRow = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+`;
+
+const EmptyText = styled.p`
+  margin: 0;
+  color: ${({theme}) => theme.Colors.Content.Secondary};
+  font-size: ${({theme}) => theme.Font.Body.size};
+`;
+
+const templateFallbackHeaders = ["이메일", "학번", "성별(남/여)", "이름"];
+
+type SortKey = "mail" | "grade" | "class" | "number" | "gender" | "name";
+type SortDirection = "asc" | "desc";
+type EditableField = keyof PersonalInformation;
+
+const parseStudentNumber = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length < 4) {
+    return {grade: 0, class: 0, number: 0};
+  }
+
+  return {
+    grade: Number.parseInt(digits.substring(0, 1), 10),
+    class: Number.parseInt(digits.substring(1, 2), 10),
+    number: Number.parseInt(digits.substring(2, 4), 10)
+  };
+};
+
+const formatStudentNumber = (info: PersonalInformation) => {
+  return `${info.grade}${info.class}${String(info.number).padStart(2, "0")}`;
+};
+
+const sanitizeInfo = (info: PersonalInformation): PersonalInformation => ({
+  ...info,
+  mail: info.mail.trim(),
+  name: info.name.trim(),
+  grade: Number.isFinite(info.grade) ? info.grade : 0,
+  class: Number.isFinite(info.class) ? info.class : 0,
+  number: Number.isFinite(info.number) ? info.number : 0,
+  gender: info.gender === "female" ? "female" : "male"
+});
+
+const rowValue = (row: Record<string, string>, keys: string[], fallbackIndex: number) => {
+  for (const key of keys) {
+    const value = row[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
+      return String(value).trim();
+    }
+  }
+
+  const values = Object.values(row).map((value) => String(value ?? "").trim());
+  return values[fallbackIndex] ?? "";
+};
 
 function StudentInfoPage() {
   const { showToast } = useNotification();
+  const [currentInformations, setCurrentInformations] = useState<PersonalInformation[]>([]);
+  const [draftInformations, setDraftInformations] = useState<PersonalInformation[]>([]);
+  const [templateHeaders, setTemplateHeaders] = useState<string[]>(templateFallbackHeaders);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("grade");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
-  const [personalInformations, setPersonalInformationsState] = useState<PersonalInformation[]>([]);
+  const loadCurrentInformations = async () => {
+    const data = await getAllPersonalInformations();
+    const sanitized = data.map(sanitizeInfo);
+    setCurrentInformations(sanitized);
+    if (!isEditMode) {
+      setDraftInformations(sanitized);
+    }
+  };
 
-  const uploadFile = (file: File) => {
-    Papa.parse(file, {
-      header: true,          // 첫 줄을 컬럼명으로 사용
+  useEffect(() => {
+    loadCurrentInformations();
+  }, []);
+
+  const loadTemplateHeaders = async () => {
+    try {
+      const response = await fetch("/디미고인_학생정보_양식.csv");
+      const text = await response.text();
+      const firstLine = text.split(/\r?\n/)[0]?.replace(/^\uFEFF/, "").trim();
+      if (firstLine) {
+        const parsed = Papa.parse<string[]>(firstLine, { delimiter: "," });
+        const headers = (parsed.data?.[0] ?? []).map((header) => String(header).trim()).filter(Boolean);
+        if (headers.length >= 4) {
+          setTemplateHeaders(headers);
+          return headers;
+        }
+      }
+    }
+    catch {
+      return templateFallbackHeaders;
+    }
+
+    return templateHeaders;
+  };
+
+  const uploadFileToDraft = (file: File) => {
+    Papa.parse<Record<string, string>>(file, {
+      header: true,
       skipEmptyLines: true,
-      complete: (results: { data: any; }) => {
-        console.log("파싱 결과:", results.data);
+      complete: (results) => {
+        const parsed = results.data
+          .map((row) => {
+            const email = rowValue(row, ["이메일", "email", "mail"], 0);
+            const studentNumber = rowValue(row, ["학번", "studentNumber", "student_number"], 1);
+            const genderText = rowValue(row, ["성별(남/여)", "성별", "gender"], 2);
+            const name = rowValue(row, ["이름", "name"], 3);
+            const student = parseStudentNumber(studentNumber);
 
-        setPersonalInformationsState(results.data.map((row: any) => ({
-          gender: row[Object.keys(row)[2]] == "남" ? "male" : "female",
-          mail: row[Object.keys(row)[0]],
-          name: row[Object.keys(row)[3]],
-          grade: parseInt(row[Object.keys(row)[1]].substring(0, 1)),
-          class: parseInt(row[Object.keys(row)[1]].substring(1, 2)),
-          number: parseInt(row[Object.keys(row)[1]].substring(2, 4))
-        })));
+                       return sanitizeInfo({
+              gender: genderText === "여" || genderText.toLowerCase() === "female" ? "female" : "male",
+              mail: email,
+              name,
+              grade: student.grade,
+              class: student.class,
+              number: student.number
+            });
+          })
+          .filter((row) => row.mail && row.name && row.grade > 0 && row.class > 0 && row.number > 0);
+
+        setDraftInformations(parsed);
+        showToast(`${parsed.length}명의 학생 정보를 불러왔습니다.`, "info");
       },
-      error: (err: any) => {
+      error: (err) => {
         console.error("파싱 실패:", err);
+        showToast("CSV 파일 파싱에 실패했습니다.", "danger");
       },
     });
   };
 
-  const handleSetPersonalInformations = async () => {
+  const updateDraftInformation = (index: number, key: keyof PersonalInformation, value: string) => {
+    setDraftInformations((prev) => prev.map((item, i) => {
+      if (i !== index) {
+        return item;
+      }
+
+      if (key === "grade" || key === "class" || key === "number") {
+        return {
+          ...item,
+          [key]: Number.parseInt(value.replace(/\D/g, "") || "0", 10)
+        };
+      }
+
+      if (key === "gender") {
+        return {
+          ...item,
+          gender: value === "female" ? "female" : "male"
+        };
+      }
+
+      return {
+        ...item,
+        [key]: value
+      };
+    }));
+  };
+
+  const addDraftRow = () => {
+    setDraftInformations((prev) => [...prev, {
+      mail: "",
+      name: "",
+      gender: "male",
+      grade: 0,
+      class: 0,
+      number: 0
+    }]);
+  };
+
+  const removeDraftRow = (index: number) => {
+    setDraftInformations((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const startEditMode = () => {
+    setDraftInformations(currentInformations.map(sanitizeInfo));
+    setIsEditMode(true);
+  };
+
+  const cancelEditMode = () => {
+    setDraftInformations(currentInformations.map(sanitizeInfo));
+    setIsEditMode(false);
+  };
+
+  const applyDraftInformations = async () => {
+    const hasInvalidNumberField = draftInformations.some((row) => {
+      return !Number.isInteger(row.grade) || !Number.isInteger(row.class) || !Number.isInteger(row.number)
+        || row.grade <= 0 || row.class <= 0 || row.number <= 0;
+    });
+
+    if (hasInvalidNumberField) {
+      showToast("학년, 반, 번호는 1 이상의 숫자로 입력해주세요.", "danger");
+      return;
+    }
+
+    const validRows = draftInformations
+      .map(sanitizeInfo)
+      .filter((row) => row.mail && row.name && row.grade > 0 && row.class > 0 && row.number > 0);
+
+    if (validRows.length === 0) {
+      showToast("적용할 유효한 학생 정보가 없습니다.", "danger");
+      return;
+    }
+
+    const shouldApply = window.confirm("현재 수정 내용을 학생정보에 적용할까요?");
+    if (!shouldApply) {
+      return;
+    }
+
     try {
-      await setPersonalInformations(personalInformations);
-      showToast("학생 정보가 성공적으로 등록되었습니다.", "info");
+      await deletePersonalInformationAll();
+      await setPersonalInformations(validRows);
+      setCurrentInformations(validRows);
+      setDraftInformations(validRows);
+      setIsEditMode(false);
+      showToast("학생 정보가 성공적으로 적용되었습니다.", "info");
     } catch (e) {
       console.error(e);
-      showToast("학생 정보 등록에 실패했습니다. 다시 시도해주세요.", "danger");
+      showToast("학생 정보 적용에 실패했습니다. 다시 시도해주세요.", "danger");
     }
+  };
+
+  const downloadCurrentCsv = async () => {
+    const headers = await loadTemplateHeaders();
+    const [emailHeader, studentNoHeader, genderHeader, nameHeader] = headers;
+    const csvRows = currentInformations.map((row) => ({
+      [emailHeader]: row.mail,
+      [studentNoHeader]: formatStudentNumber(row),
+      [genderHeader]: row.gender === "male" ? "남" : "여",
+      [nameHeader]: row.name
+    }));
+
+    const csvContent = Papa.unparse(csvRows, {
+      columns: [emailHeader, studentNoHeader, genderHeader, nameHeader]
+    });
+
+    const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "디미고인_학생정보.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const rows = isEditMode ? draftInformations : currentInformations;
+
+  const isCellChanged = (rowIndex: number, key: EditableField, row: PersonalInformation) => {
+    const baseline = currentInformations[rowIndex];
+    if (!baseline) {
+      return true;
+    }
+
+    return String(baseline[key]) !== String(row[key]);
+  };
+
+  const onSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDirection((prev) => prev === "asc" ? "desc" : "asc");
+      return;
+    }
+
+    setSortKey(key);
+    setSortDirection("asc");
+  };
+
+  const sortedRows = useMemo(() => {
+    const direction = sortDirection === "asc" ? 1 : -1;
+
+    return rows
+      .map((info, index) => ({info, index}))
+      .sort((a, b) => {
+        const left = a.info;
+        const right = b.info;
+
+        if (sortKey === "gender") {
+          const lv = left.gender === "male" ? 0 : 1;
+          const rv = right.gender === "male" ? 0 : 1;
+          return (lv - rv) * direction || (a.index - b.index);
+        }
+
+        if (sortKey === "grade" || sortKey === "class" || sortKey === "number") {
+          return ((left[sortKey] as number) - (right[sortKey] as number)) * direction || (a.index - b.index);
+        }
+
+        return String(left[sortKey]).localeCompare(String(right[sortKey]), "ko") * direction || (a.index - b.index);
+      });
+  }, [rows, sortDirection, sortKey]);
+
+  const sortLabel = (key: SortKey, label: string) => {
+    if (sortKey !== key) {
+      return label;
+    }
+
+    return `${label} ${sortDirection === "asc" ? "▲" : "▼"}`;
   };
 
   return (
     <Wrapper>
-      <TitleBar>
-        <div>학생정보 등록</div>
-      </TitleBar>
-      <ContentWrapper>
-        <ProcedureList>
-          <ProcedureItem>
-            <div>
-              <h1>1. 엑셀 양식 다운로드</h1>
-              <p>양식에 맞게 정보를 채워주세요.</p>
-            </div>
-            <button
-              onClick={() => {
-                const link = document.createElement("a");
-                link.href = "/디미고인_학생정보_양식.csv";
-                link.download = "디미고인_학생정보_양식.csv";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}
-            >
-              양식 다운로드
-            </button>
-          </ProcedureItem>
-          <ProcedureItem>
-            <div>
-              <h1>2. 양식 업로드</h1>
-              <p>입력한 양식을 저장 후, 업로드해주세요.</p>
-            </div>
-            <input
-              type="file"
-              id="file-upload"
-              style={{ display: "none" }}
-              accept=".csv"
-              onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                // Handle file upload logic here
-                uploadFile(file);
-              }
-              }}
-            />
-            <button
-              onClick={() => {
-              document.getElementById("file-upload")?.click();
-              }}
-            >
-              양식 업로드
-            </button>
-          </ProcedureItem>
-          <ProcedureItem>
-            <div>
-              <h1>3. 업로드 내용 확인</h1>
-              <p>업로드된 내용이 맞는지 확인후 맞으면 버튼을 눌러주세요.</p>
+      <Card>
+        <CardHead>
+          <div>
+            <h3>학생정보 등록</h3>
+            <p>{isEditMode ? "수정 모드입니다. 수정 후 적용해주세요." : "수정하기를 누르면 편집할 수 있습니다."}</p>
+          </div>
+        </CardHead>
 
-              <table>
-                <thead>
-                  <tr>
-                    <th>이메일</th>
-                    <th>학번</th>
-                    <th>성별</th>
-                    <th>이름</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {personalInformations.map((info, index) => (
-                    <tr key={index}>
-                      <td>{info.mail}</td>
-                      <td>{`${info.grade}${info.class}${info.number.toString().padStart(2, "0")}`}</td>
-                      <td>{info.gender === "male" ? "남" : "여"}</td>
-                      <td>{info.name}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="right">
-              <button
-                disabled={personalInformations.length === 0}
-                onClick={() => handleSetPersonalInformations()}
+        <ActionRow>
+          <GhostButton onClick={downloadCurrentCsv} disabled={currentInformations.length === 0}>
+            CSV 다운로드
+          </GhostButton>
+
+          {isEditMode ? (
+            <>
+              <input
+                type="file"
+                id="file-upload"
+                style={{ display: "none" }}
+                accept=".csv"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    uploadFileToDraft(file);
+                  }
+                }}
+              />
+              <GhostButton
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = "/디미고인_학생정보_양식.csv";
+                  link.download = "디미고인_학생정보_양식.csv";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
               >
+                양식 다운로드
+              </GhostButton>
+              <GhostButton
+                onClick={() => {
+                  document.getElementById("file-upload")?.click();
+                }}
+              >
+                양식 업로드
+              </GhostButton>
+              <GhostButton onClick={addDraftRow}>행 추가</GhostButton>
+              <DangerButton onClick={cancelEditMode}>취소</DangerButton>
+              <ActionButton onClick={applyDraftInformations} disabled={draftInformations.length === 0}>
                 적용
-              </button>
-            </div>
-          </ProcedureItem>
-        </ProcedureList>
-      </ContentWrapper>
+              </ActionButton>
+            </>
+          ) : (
+            <ActionButton onClick={startEditMode}>수정하기</ActionButton>
+          )}
+        </ActionRow>
+
+        {rows.length === 0 ? (
+          <EmptyText>등록된 학생정보가 없습니다.</EmptyText>
+        ) : (
+          <TableWrapper>
+            <StyledTable>
+              <colgroup>
+                <col style={{ width: "36%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "21%" }} />
+                {isEditMode && <col style={{ width: "12%" }} />}
+              </colgroup>
+              <thead>
+                <tr>
+                  <th><SortButton onClick={() => onSort("mail")}>{sortLabel("mail", "이메일")}</SortButton></th>
+                  <th><SortButton onClick={() => onSort("grade")}>{sortLabel("grade", "학년")}</SortButton></th>
+                  <th><SortButton onClick={() => onSort("class")}>{sortLabel("class", "반")}</SortButton></th>
+                  <th><SortButton onClick={() => onSort("number")}>{sortLabel("number", "번호")}</SortButton></th>
+                  <th><SortButton onClick={() => onSort("gender")}>{sortLabel("gender", "성별")}</SortButton></th>
+                  <th><SortButton onClick={() => onSort("name")}>{sortLabel("name", "이름")}</SortButton></th>
+                  {isEditMode && <th>삭제</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {sortedRows.map(({info, index}) => (
+                  <tr key={`${info.mail}-${index}`}>
+                    <td title={info.mail}>
+                      {isEditMode ? (
+                        <EditableInput
+                          $changed={isCellChanged(index, "mail", info)}
+                          value={info.mail}
+                          onChange={(e) => updateDraftInformation(index, "mail", e.target.value)}
+                        />
+                      ) : info.mail}
+                    </td>
+                    <td>
+                      {isEditMode ? (
+                        <EditableInput
+                          $changed={isCellChanged(index, "grade", info)}
+                          inputMode="numeric"
+                          value={info.grade || ""}
+                          onChange={(e) => updateDraftInformation(index, "grade", e.target.value)}
+                        />
+                      ) : info.grade}
+                    </td>
+                    <td>
+                      {isEditMode ? (
+                        <EditableInput
+                          $changed={isCellChanged(index, "class", info)}
+                          inputMode="numeric"
+                          value={info.class || ""}
+                          onChange={(e) => updateDraftInformation(index, "class", e.target.value)}
+                        />
+                      ) : info.class}
+                    </td>
+                    <td>
+                      {isEditMode ? (
+                        <EditableInput
+                          $changed={isCellChanged(index, "number", info)}
+                          inputMode="numeric"
+                          value={info.number || ""}
+                          onChange={(e) => updateDraftInformation(index, "number", e.target.value)}
+                        />
+                      ) : info.number}
+                    </td>
+                    <td>
+                      {isEditMode ? (
+                        <EditableSelect
+                          $changed={isCellChanged(index, "gender", info)}
+                          value={info.gender}
+                          onChange={(e) => updateDraftInformation(index, "gender", e.target.value)}
+                        >
+                          <option value="male">남</option>
+                          <option value="female">여</option>
+                        </EditableSelect>
+                      ) : info.gender === "male" ? "남" : "여"}
+                    </td>
+                    <td title={info.name}>
+                      {isEditMode ? (
+                        <EditableInput
+                          $changed={isCellChanged(index, "name", info)}
+                          value={info.name}
+                          onChange={(e) => updateDraftInformation(index, "name", e.target.value)}
+                        />
+                      ) : info.name}
+                    </td>
+                    {isEditMode && (
+                      <td>
+                        <GhostButton onClick={() => removeDraftRow(index)}>삭제</GhostButton>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </TableWrapper>
+        )}
+      </Card>
     </Wrapper>
   );
 }
