@@ -178,7 +178,7 @@ export default function DienenDelayTimePage() {
   const loadTodayTimeline = async () => {
     setIsLoading(true);
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = new Date().toLocaleDateString('en-CA');
       const data = await getMealTimeline(today);
       setTimeline(data);
     } catch (e) {
