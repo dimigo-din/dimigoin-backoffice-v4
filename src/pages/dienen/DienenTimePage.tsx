@@ -113,7 +113,7 @@ function getErrorMessage(e: unknown): string {
 
 export default function DienenTimePage() {
   const { showToast } = useNotification();
-  const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState<string>(new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }));
   const [isLoading, setIsLoading] = useState(false);
   const [timeline, setTimeline] = useState<MealTimelineData | null>(null);
 
