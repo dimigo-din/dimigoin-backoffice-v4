@@ -2,7 +2,8 @@ import styled from "styled-components";
 import {useEffect, useMemo, useState} from "react";
 import {delayMealTimeline, getMealTimeline, type MealTimelineData} from "../../api/dienen.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {UIButton} from "../../components/ui";
+import {UIButton, UIInputField} from "../../components/ui";
+import Divider from "../../components/Divider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -15,6 +16,7 @@ const Wrapper = styled.div`
 
   @media (max-width: 900px) {
     padding: 12px;
+    min-height: 100%;
   }
 `;
 
@@ -25,6 +27,10 @@ const Panel = styled.section`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  @media (max-width: 900px) {
+    flex: 1;
+  }
 `;
 
 const Title = styled.h2`
@@ -120,6 +126,13 @@ const EmptyText = styled.p`
   font-size: ${({theme}) => theme.Font.Body.size};
 `;
 
+const ActionSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+`;
+
 function getErrorMessage(e: unknown): string {
   const err = e as { response?: { data?: { error?: { message?: string } | string } } };
   if (typeof err?.response?.data?.error === "string") return err.response.data.error;
@@ -160,7 +173,8 @@ export default function DienenDelayTimePage() {
   const { showToast } = useNotification();
   const [timeline, setTimeline] = useState<MealTimelineData | null>(null);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [delayMinutes, setDelayMinutes] = useState(10);
+  const [delayMinutes, setDelayMinutes] = useState(5);
+  const [delayReason, setDelayReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const timeOptions = useMemo(() => flattenTimeline(timeline || {}), [timeline]);
@@ -178,7 +192,9 @@ export default function DienenDelayTimePage() {
   const loadTodayTimeline = async () => {
     setIsLoading(true);
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = new Date().toLocaleDateString("sv-SE", {
+        timeZone: "Asia/Seoul",
+      });
       const data = await getMealTimeline(today);
       setTimeline(data);
     } catch (e) {
@@ -215,7 +231,7 @@ export default function DienenDelayTimePage() {
           await delayMealTimeline({
             source,
             dest,
-            description: `급식 시간을 ${delayMinutes}분 미뤘습니다.`,
+            description: `급식 시간이 ${delayMinutes}분 미뤄졌습니다. (${source} → ${dest}) ${delayReason ? `사유: ${delayReason}` : ""}`,
           });
           successCount++;
         } catch (e) {
@@ -263,21 +279,34 @@ export default function DienenDelayTimePage() {
           </TimeList>
         )}
 
-        <FieldRow>
-          <CounterBox>
-            <CounterButton type="button" onClick={() => updateMinutes(-1)}>&lt;</CounterButton>
-            <CounterValue>{delayMinutes}분</CounterValue>
-            <CounterButton type="button" onClick={() => updateMinutes(1)}>&gt;</CounterButton>
-          </CounterBox>
-        </FieldRow>
 
-        <Sub>
-          {selectedSources.length > 0 
-            ? selectedSources.map((s) => `${s} → ${addMinutes(s, delayMinutes)}`).join(", ") + ` (${selectedSources.length}개 시간대, ${delayMinutes}분 미루기)`
-            : "시간을 먼저 선택해주세요."}
-        </Sub>
+        <ActionSection>
+          <Divider />
+          <FieldRow>
+            <CounterBox>
+              <CounterButton type="button" onClick={() => updateMinutes(-1)}>&lt;</CounterButton>
+              <CounterValue>{delayMinutes}분</CounterValue>
+              <CounterButton type="button" onClick={() => updateMinutes(1)}>&gt;</CounterButton>
+            </CounterBox>
+          </FieldRow>
 
-        <UIButton size="medium" onClick={submit} disabled={isLoading || selectedSources.length === 0}>미루기 적용</UIButton>
+          <FieldRow>
+            <UIInputField
+              placeholder="미루기 사유 (선택사항)"
+              value={delayReason}
+              onChange={(e) => setDelayReason(e.target.value)}
+              disabled={isLoading}
+            />
+          </FieldRow>
+
+          <Sub>
+            {selectedSources.length > 0
+              ? selectedSources.map((s) => `${s} → ${addMinutes(s, delayMinutes)}`).join(", ") + ` (${selectedSources.length}개 시간대, ${delayMinutes}분 미루기)`
+              : "시간을 먼저 선택해주세요."}
+          </Sub>
+
+          <UIButton size="medium" onClick={submit} disabled={isLoading || selectedSources.length === 0}>미루기 적용</UIButton>
+        </ActionSection>
       </Panel>
     </Wrapper>
   );
