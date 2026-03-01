@@ -231,7 +231,7 @@ export default function DienenDelayTimePage() {
           await delayMealTimeline({
             source,
             dest,
-            description: `급식 시간이 ${delayMinutes}분 미뤄졌습니다. (${source} → ${dest}) ${delayReason ? `사유: ${delayReason}` : ""}`,
+            description: delayReason || "급식 시간이 미뤄졌습니다.",
           });
           successCount++;
         } catch (e) {

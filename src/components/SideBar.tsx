@@ -207,7 +207,7 @@ function getSections(): MenuSection[] {
       key: "dienen-section",
       items: [
         { key: "dienen_time", label: "급식 시간 조회" },
-        { key: "dienen_edittime", label: "급식 시간 관리" },
+        // { key: "dienen_edittime", label: "급식 시간 관리" },
         { key: "dienen_delaytime", label: "급식 시간 미루기" },
       ],
     },
