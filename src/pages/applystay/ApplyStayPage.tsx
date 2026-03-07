@@ -883,17 +883,17 @@ function ApplyStayPage() {
                 }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
-              }else if(currentSelectedFileOutput === "out_pdf"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
-                  await updateScreen();
-                  stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }, `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
-                }
-                else
-                  showToast("내보낼 데이터가 없습니다.", "warning");
               }else if(currentSelectedFileOutput === "out"){
                 if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
                   await updateScreen();
                   stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: true});
+                }
+                else
+                  showToast("내보낼 데이터가 없습니다.", "warning");
+              }else if(currentSelectedFileOutput === "out_pdf"){
+                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
+                  await updateScreen();
+                  stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }, `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
                 }
                 else
                   showToast("내보낼 데이터가 없습니다.", "warning");
