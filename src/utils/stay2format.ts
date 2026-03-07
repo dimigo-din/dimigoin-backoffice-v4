@@ -165,7 +165,7 @@ export async function stay2excel(
   // masking이 true면 결재란 관련 헤더는 비워둠
 
   // 날짜 (제목과 같은 색)
-  aoa[1][0] = `${displayDateKorean(stay.stay_from)} ~ ${displayDateKorean(stay.stay_to)}`; // A2
+  aoa[1][0] = `${displayDateKorean(stay.stay_from)}`; // A2
 
   // 헤더
   aoa[3][0] = "학년"; // A4
@@ -193,6 +193,9 @@ export async function stay2excel(
         }
       }
     : (s: string) => s;
+
+  let allMaleSum = 0;
+  let allFemaleSum = 0;
 
   for (const { grade, startRow, subtotalRow } of blocks) {
     let maleSum = 0;
@@ -229,7 +232,13 @@ export async function stay2excel(
     aoa[r][1] = "소계"; // B
     aoa[r][3] = `${maleSum + femaleSum}명`; // D
     aoa[r][4] = `(남${maleSum} + 여${femaleSum})`; // E (E:H 병합영역 시작)
+
+    allMaleSum += maleSum;
+    allFemaleSum += femaleSum;
   }
+  aoa[43][0] = '총원';
+  aoa[43][3] = `${allMaleSum + allFemaleSum}명`;
+  aoa[43][4] = `(남${allMaleSum}명 + 여${allFemaleSum}명)`;
 
   // 시트 생성
   const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -249,8 +258,8 @@ export async function stay2excel(
   // 병합 - masking 여부에 따라 다르게 설정
   const baseMerges = [
     { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }, // A2:E2 (날짜)
-    // 본문 E:H 병합(각 줄 & 소계)
-    ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42]
+    // 본문 E:H 병합(각 줄 & 소계 & 총원)
+    ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42, 43]
       .map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
     // C, B 짝줄 병합(반)
     ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
@@ -267,6 +276,8 @@ export async function stay2excel(
     { s: { r: 16, c: 1 }, e: { r: 16, c: 2 } },
     { s: { r: 29, c: 1 }, e: { r: 29, c: 2 } },
     { s: { r: 42, c: 1 }, e: { r: 42, c: 2 } },
+    // 총원 병합
+    { s: { r: 43, c: 0 }, e: { r: 43, c: 2 } },
   ];
 
   if (opt.masking) {
