@@ -145,8 +145,8 @@ export async function stay2excel(
 ) {
   const wb = XLSX.utils.book_new();
 
-  // 43행 x 9열 (A..I)
-  const rows = 43, cols = 9;
+  // 44행 x 9열 (A..I)
+  const rows = 44, cols = 9;
   const aoa: (string | number)[][] = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => "")
   );
