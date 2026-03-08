@@ -242,7 +242,7 @@ export async function stay2excel(
 
   // 시트 생성
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws["!ref"] = "A1:I43";
+  ws["!ref"] = "A1:I44";
 
   // 열/행 크기
   ws["!cols"] = [
@@ -287,7 +287,7 @@ export async function stay2excel(
       { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } }, // A2:I2 (날짜)
       { s: { r: 3, c: 4 }, e: { r: 3, c: 8 } }, // E4:I4 (잔류자 목록 헤더)
       // 기존 baseMerges에서 A2:E2 제외하고 추가
-      ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42]
+      ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42, 43]
         .map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
       // C, B 짝줄 병합(반)
       ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
@@ -304,6 +304,8 @@ export async function stay2excel(
       { s: { r: 16, c: 1 }, e: { r: 16, c: 2 } },
       { s: { r: 29, c: 1 }, e: { r: 29, c: 2 } },
       { s: { r: 42, c: 1 }, e: { r: 42, c: 2 } },
+      // 총원 병합
+      { s: { r: 43, c: 0 }, e: { r: 43, c: 2 } },
     ];
   } else {
     // masking이 false일 때: 기존과 동일
@@ -317,7 +319,7 @@ export async function stay2excel(
 
   // ===== 스타일 일괄 적용 =====
   // 1) 전체 기본
-  rangeEach(ws, "A1:I43", (_, cell) => {
+  rangeEach(ws, `A1:I$44`, (_, cell) => {
     cell.s = { ...base };
   });
 
@@ -348,13 +350,13 @@ export async function stay2excel(
   });
 
   // 6) A열 전체 — 제목과 같은 스타일
-  for (let r = 1; r <= 43; r++) {
+  for (let r = 1; r <= 44; r++) {
     const addr = `A${r}`;
     if (ws[addr] && addr !== "A3") ws[addr].s = { ...title };
   }
 
   // 7) 소계 행 전체 — 제목과 같은 스타일
-  [17, 30, 43].forEach((row) => {
+  [17, 30, 43, 44].forEach((row) => {
     for (let c = 1; c <= 9; c++) {
       const addr = XLSX.utils.encode_cell({ r: row - 1, c: c - 1 });
       if (ws[addr]) ws[addr].s = { ...title };
