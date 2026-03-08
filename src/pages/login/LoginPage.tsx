@@ -4,8 +4,8 @@ import GoogleLogo from "../../assets/icons/google.svg?react";
 import Logo from "../../assets/icons/dimigoin.svg?react";
 import {getRedirectUri, googleLogin, getPermission, logout} from "../../api/auth.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {useEffect} from "react";
-import {useSearchParams} from "react-router-dom";
+import {useEffect, useRef} from "react";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {parseJwt} from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
@@ -102,6 +102,43 @@ const SceneryLayer = styled.div`
 function LoginPage() {
   const {showToast} = useNotification();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const longPressTimerRef = useRef<number | null>(null);
+  const didLongPressRef = useRef(false);
+
+  const clearLongPressTimer = () => {
+    if (longPressTimerRef.current !== null) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const startLongPress = () => {
+    didLongPressRef.current = false;
+    clearLongPressTimer();
+    longPressTimerRef.current = window.setTimeout(() => {
+      didLongPressRef.current = true;
+      navigate("/login/pw");
+    }, 700);
+  };
+
+  const cancelLongPress = () => {
+    clearLongPressTimer();
+  };
+
+  const handleLoginClick = () => {
+    if (didLongPressRef.current) {
+      didLongPressRef.current = false;
+      return;
+    }
+    getRedirectUri()
+      .then((url) => {
+        location.href = url;
+      })
+      .catch(() => {
+        showToast("서버에 연결할 수 없습니다", "danger");
+      });
+  };
 
   useEffect(() => {
     const code = searchParams.get("code") as string;
@@ -142,6 +179,12 @@ function LoginPage() {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      clearLongPressTimer();
+    };
+  }, []);
+
   return (
     <Wrapper>
       <Brand>
@@ -149,7 +192,13 @@ function LoginPage() {
           <Logo/>
           <p>디미고인</p>
         </Title>
-        <LoginButton onClick={() => getRedirectUri().then(url => location.href = url).catch(() => showToast("서버에 연결할 수 없습니다", "danger"))}>
+        <LoginButton
+          onPointerDown={startLongPress}
+          onPointerUp={cancelLongPress}
+          onPointerCancel={cancelLongPress}
+          onPointerLeave={cancelLongPress}
+          onClick={handleLoginClick}
+        >
           <GoogleLogo/>
           <p>디미고 구글 계정으로 로그인</p>
         </LoginButton>
