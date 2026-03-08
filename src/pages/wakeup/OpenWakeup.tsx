@@ -1,5 +1,5 @@
 import {getTodayWakeup} from "../../api/wakeup.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import styled from "styled-components";
 import {AxiosError} from "axios";
@@ -72,6 +72,28 @@ function OpenWakeup() {
   const { showToast } = useNotification();
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const manifest = document.head.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    const appTitle = document.head.querySelector<HTMLMetaElement>(
+      'meta[name="apple-mobile-web-app-title"]',
+    );
+
+    const previousManifest = manifest?.getAttribute("href") ?? null;
+    const previousAppTitle = appTitle?.getAttribute("content") ?? null;
+
+    if (manifest) manifest.setAttribute("href", "/manifest_wakeup.json");
+    if (appTitle) appTitle.setAttribute("content", "디미고인 기상곡");
+
+    return () => {
+      if (manifest && previousManifest !== null) {
+        manifest.setAttribute("href", previousManifest);
+      }
+      if (appTitle && previousAppTitle !== null) {
+        appTitle.setAttribute("content", previousAppTitle);
+      }
+    };
+  }, []);
+
   const run = async (gender: "male" | "female") => {
     if (isLoading) return;
     setIsLoading(true);
@@ -103,11 +125,6 @@ function OpenWakeup() {
           <ActionButton disabled={isLoading} onClick={() => run("female")}>우정학사 기상송</ActionButton>
         </ActionRow>
       </Card>
-      <link rel="manifest" href="/manifest_wakeup.json" />
-      <link rel="apple-touch-icon" href="/dimigoin.png"/>
-      <meta name="apple-mobile-web-app-capable" content="yes"/>
-      <meta name="apple-mobile-web-app-title" content="디미고인 기상곡"/>
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     </Wrapper>
   );
 }
