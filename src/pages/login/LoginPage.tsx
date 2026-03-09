@@ -4,8 +4,8 @@ import GoogleLogo from "../../assets/icons/google.svg?react";
 import Logo from "../../assets/icons/dimigoin.svg?react";
 import {getRedirectUri, googleLogin, getPermission, logout} from "../../api/auth.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {useEffect, useRef} from "react";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useEffect} from "react";
+import {Link, useSearchParams} from "react-router-dom";
 import {parseJwt} from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
@@ -86,6 +86,25 @@ const LoginButton = styled.button`
   }
 `;
 
+const PwLoginButton = styled(Link)`
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  border-radius: ${({theme}) => theme.Radius[400]};
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  text-decoration: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  line-height: ${({theme}) => theme.Font.Callout.lineHeight};
+  font-weight: ${({theme}) => theme.Font.Callout.weight.regular};
+`;
+
 const SceneryLayer = styled.div`
   position: absolute;
   left: 0;
@@ -102,35 +121,8 @@ const SceneryLayer = styled.div`
 function LoginPage() {
   const {showToast} = useNotification();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const longPressTimerRef = useRef<number | null>(null);
-  const didLongPressRef = useRef(false);
-
-  const clearLongPressTimer = () => {
-    if (longPressTimerRef.current !== null) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
-
-  const startLongPress = () => {
-    didLongPressRef.current = false;
-    clearLongPressTimer();
-    longPressTimerRef.current = window.setTimeout(() => {
-      didLongPressRef.current = true;
-      navigate("/login/pw");
-    }, 700);
-  };
-
-  const cancelLongPress = () => {
-    clearLongPressTimer();
-  };
 
   const handleLoginClick = () => {
-    if (didLongPressRef.current) {
-      didLongPressRef.current = false;
-      return;
-    }
     getRedirectUri()
       .then((url) => {
         location.href = url;
@@ -179,12 +171,6 @@ function LoginPage() {
     }
   }, []);
 
-  useEffect(() => {
-    return () => {
-      clearLongPressTimer();
-    };
-  }, []);
-
   return (
     <Wrapper>
       <Brand>
@@ -192,16 +178,11 @@ function LoginPage() {
           <Logo/>
           <p>디미고인</p>
         </Title>
-        <LoginButton
-          onPointerDown={startLongPress}
-          onPointerUp={cancelLongPress}
-          onPointerCancel={cancelLongPress}
-          onPointerLeave={cancelLongPress}
-          onClick={handleLoginClick}
-        >
+        <LoginButton onClick={handleLoginClick}>
           <GoogleLogo/>
           <p>디미고 구글 계정으로 로그인</p>
         </LoginButton>
+        <PwLoginButton to="/login/pw">비밀번호 로그인</PwLoginButton>
       </Brand>
       <SceneryLayer>
         <Scenery />
