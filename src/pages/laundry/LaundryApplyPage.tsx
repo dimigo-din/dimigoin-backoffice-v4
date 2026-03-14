@@ -3,8 +3,8 @@ import {useEffect, useState} from "react";
 import {
   getLaundryMachineList,
   getLaundryTimeline,
-  getLaundryTimelineList, 
-  getLaundryApplyList, 
+  getLaundryTimelineList,
+  getLaundryApplyList,
   createLaundryApply,
   deleteLaundryApply,
   type LaundryMachine,
@@ -187,17 +187,17 @@ function LaundryApplyPage() {
         if (a.gender !== b.gender) {
           return a.gender === "male" ? -1 : 1;
         }
-        
+
         if (a.type !== b.type) {
           return a.type === "washer" ? -1 : 1;
         }
-        
+
         const aGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === a.id))?.grade || 0;
         const bGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === b.id))?.grade || 0;
         if (aGrade !== bGrade) {
           return parseInt(aGrade.toString()) - parseInt(bGrade.toString());
         }
-        
+
         return a.name.localeCompare(b.name);
       }));
 
@@ -271,7 +271,7 @@ function LaundryApplyPage() {
       return;
     }
 
-    const apply = applies.find(a => a.laundryMachine.id === cancleMachineId && a.laundryTime.id === cancleTimeId);
+    const apply = applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === cancleTimeId);
     if(!apply) {
       showToast("해당 세탁 신청을 찾을 수 없습니다.", "warning");
       return;
@@ -315,7 +315,7 @@ function LaundryApplyPage() {
                     <LaundryApply key={time.id}>
                       <span>{time.time}</span>
                       {(() => {
-                        const user = applies.find(a => a.laundryMachine.id === machines[selectedMachine].id && a.laundryTime.id === time.id)?.user;
+                        const user = applies.find(a => a.laundry_machine.id === machines[selectedMachine].id && a.laundry_time.id === time.id)?.user;
                         return user && <span>{`${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name}`}</span>
                       })()}
                     </LaundryApply>
@@ -402,7 +402,7 @@ function LaundryApplyPage() {
                     selectedMachine !== null && applyMachineId !== null
                       ? (currentTimeline?.times
                         .filter(t => t.assigns.find(a => a.laundry_machine.id === applyMachineId))
-                        .filter(time => !applies.find(a => a.laundryMachine.id === applyMachineId && a.laundryTime.id === time.id))
+                        .filter(time => !applies.find(a => a.laundry_machine.id === applyMachineId && a.laundry_time.id === time.id))
                         .sort((a, b) => a.time.localeCompare(b.time))
                         .map((time) => ({ value: time.id, label: time.time })) || [])
                       : []
@@ -452,10 +452,10 @@ function LaundryApplyPage() {
                     selectedMachine !== null && cancleMachineId !== null
                       ? (currentTimeline?.times
                         .filter(t => t.assigns.find(a => a.laundry_machine.id === cancleMachineId))
-                        .filter(time => applies.find(a => a.laundryMachine.id === cancleMachineId && a.laundryTime.id === time.id))
+                        .filter(time => applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id))
                         .sort((a, b) => a.time.localeCompare(b.time))
                         .map((time) => {
-                          const user = applies.find(a => a.laundryMachine.id === cancleMachineId && a.laundryTime.id === time.id)?.user;
+                          const user = applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id)?.user;
                           return {
                             value: time.id,
                             label: `${time.time} ${user?.number ? ` (${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name})` : user?.name || ""}`

@@ -56,9 +56,9 @@ export type LaundryMachinePayload = {
 export type LaundryApply = {
   id: string;
   date: string;
-  laundryTimeline: LaundryTimeline;
-  laundryTime: LaundryTime;
-  laundryMachine: LaundryMachine;
+  laundry_timeline: LaundryTimeline;
+  laundry_time: LaundryTime;
+  laundry_machine: LaundryMachine;
   user: User & PersonalInformation;
   created_at: string;
 }
