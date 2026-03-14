@@ -20,7 +20,7 @@ export function getInstance(): AxiosInstance {
       return {...res, data: res.data.data, status: res.data.status};
     }, (err) => {
       console.error(err);
-      if (err.response && err.response.status === 401 && err.config.url !== "/auth/refresh") {
+      if (err.response && err.response.status === 401 && err.config.url.startsWith("/auth")) {
         if (!isRefreshing) {
           isRefreshing = true;
           return instance.post("/auth/refresh").then(() => {

@@ -5,7 +5,7 @@ import Logo from "../../assets/icons/dimigoin.svg?react";
 import {getRedirectUri, googleLogin, getPermission, logout} from "../../api/auth.ts";
 import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import {useEffect} from "react";
-import {useSearchParams} from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 import {parseJwt} from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
@@ -86,6 +86,25 @@ const LoginButton = styled.button`
   }
 `;
 
+const PwLoginButton = styled(Link)`
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  border-radius: ${({theme}) => theme.Radius[400]};
+  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  color: ${({theme}) => theme.Colors.Content.Primary};
+  text-decoration: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: ${({theme}) => theme.Font.Callout.size};
+  line-height: ${({theme}) => theme.Font.Callout.lineHeight};
+  font-weight: ${({theme}) => theme.Font.Callout.weight.regular};
+`;
+
 const SceneryLayer = styled.div`
   position: absolute;
   left: 0;
@@ -102,6 +121,16 @@ const SceneryLayer = styled.div`
 function LoginPage() {
   const {showToast} = useNotification();
   const [searchParams] = useSearchParams();
+
+  const handleLoginClick = () => {
+    getRedirectUri()
+      .then((url) => {
+        location.href = url;
+      })
+      .catch(() => {
+        showToast("서버에 연결할 수 없습니다", "danger");
+      });
+  };
 
   useEffect(() => {
     const code = searchParams.get("code") as string;
@@ -149,10 +178,11 @@ function LoginPage() {
           <Logo/>
           <p>디미고인</p>
         </Title>
-        <LoginButton onClick={() => getRedirectUri().then(url => location.href = url).catch(() => showToast("서버에 연결할 수 없습니다", "danger"))}>
+        <LoginButton onClick={handleLoginClick}>
           <GoogleLogo/>
           <p>디미고 구글 계정으로 로그인</p>
         </LoginButton>
+        <PwLoginButton to="/login/pw">비밀번호 로그인</PwLoginButton>
       </Brand>
       <SceneryLayer>
         <Scenery />

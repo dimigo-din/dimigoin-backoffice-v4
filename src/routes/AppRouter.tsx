@@ -4,6 +4,7 @@ import Loading from "../components/Loading.tsx";
 import StudentInfoPage from "../pages/studentinfo/StudentInfo.tsx";
 
 const LoginPage = lazy(() => import("../pages/login/LoginPage.tsx"));
+const LoginPwPage = lazy(() => import("../pages/login/LoginPw.tsx"));
 const EmptyPage = lazy(() => import("../pages/EmptyPage.tsx"));
 const ApplyStayPage = lazy(() => import("../pages/applystay/ApplyStayPage.tsx"));
 const ViewStaySeatPage = lazy(() => import("../pages/viewstayseat/ViewStaySeatPage.tsx"));
@@ -24,6 +25,7 @@ const AppRouter = () => {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/login" element={<LoginPage/>}/>
+        <Route path="/login/pw" element={<LoginPwPage/>}/>
         <Route path="/applystay" element={<ApplyStayPage/>}/>
         <Route path="/viewstayseat" element={<ViewStaySeatPage/>}/>
         <Route path="/wakeup" element={<WakeupPage/>}/>
