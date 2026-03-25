@@ -105,9 +105,6 @@ export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolea
     })
     .from(container)
     .save()
-    .finally(() => {
-      document.body.removeChild(container);
-    });
 }
 
 function generateHtml(apply: StayApply[], stay: Stay, opt: { masking?: boolean} = {}) {
