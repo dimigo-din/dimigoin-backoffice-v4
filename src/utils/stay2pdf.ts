@@ -80,35 +80,34 @@ export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolea
 
   const bodyContent = doc.body.innerHTML || html;
 
-const container = document.createElement("div");
-container.innerHTML = `
-  <style>${originalStyles + fallbackStyles}</style>
-  ${bodyContent}
-`;
+  const container = document.createElement("div");
+  container.innerHTML = `
+    <style>${originalStyles + fallbackStyles}</style>
+    ${bodyContent}
+  `;
 
-container.style.width = "210mm";
-container.style.background = "white";
-container.style.padding = "10mm 10mm 5mm 10mm";
-container.style.position = "fixed";
-container.style.left = "-99999px";
-container.style.top = "0";
+  container.style.width = "210mm";
+  container.style.background = "white";
+  container.style.padding = "10mm 10mm 5mm 10mm";
+  container.style.position = "fixed";
+  container.style.left = "-99999px";
+  container.style.top = "0";
 
-document.body.appendChild(container);
+  document.body.appendChild(container);
 
-html2pdf()
-  .set({
-    filename,
-    margin: 0,
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    pagebreak: { mode: ["css", "legacy"] },
-  })
-  .from(container)
-  .save()
-  .finally(() => {
-    document.body.removeChild(container);
-  });
+  html2pdf()
+    .set({
+      filename,
+      margin: 0,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    })
+    .from(container)
+    .save()
+    .finally(() => {
+      document.body.removeChild(container);
+    });
 }
 
 function generateHtml(apply: StayApply[], stay: Stay, opt: { masking?: boolean} = {}) {
