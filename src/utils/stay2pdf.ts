@@ -3,7 +3,7 @@ import type {Stay, StayApply} from "../api/stay.ts";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { maskName } from "./maskName.ts";
-import printJS from "print-js";
+import html2pdf from "html2pdf.js";
 
 export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolean} = {}, filename: string) {
   const html = generateHtml(apply, stay, opt);
@@ -80,14 +80,34 @@ export function stay2pdf(apply: StayApply[], stay: Stay, opt: { masking?: boolea
 
   const bodyContent = doc.body.innerHTML || html;
 
-  printJS({
-    printable: bodyContent,
-    type: 'raw-html',
-    style: originalStyles + fallbackStyles,
-    documentTitle: document.title,
-    scanStyles: false,
-    font: '함초롬바탕',
-    onError: (err) => console.error('PrintJS Error:', err),
+const container = document.createElement("div");
+container.innerHTML = `
+  <style>${originalStyles + fallbackStyles}</style>
+  ${bodyContent}
+`;
+
+container.style.width = "210mm";
+container.style.background = "white";
+container.style.padding = "10mm 10mm 5mm 10mm";
+container.style.position = "fixed";
+container.style.left = "-99999px";
+container.style.top = "0";
+
+document.body.appendChild(container);
+
+html2pdf()
+  .set({
+    filename,
+    margin: 0,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: ["css", "legacy"] },
+  })
+  .from(container)
+  .save()
+  .finally(() => {
+    document.body.removeChild(container);
   });
 }
 
