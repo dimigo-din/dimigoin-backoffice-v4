@@ -254,9 +254,19 @@ const SeatRow = styled.div<{seat: string | null}>`
     color: ${({theme}) => theme.Colors.Content.Secondary};
   }
 
-  > span.taken {
-    color: ${({theme}) => theme.Colors.Content.Secondary};
-    background-color: ${({theme}) => theme.Colors.Components.Fill.Tertiary};
+  > span.taken-1 {
+    color: rgb(59, 130, 246);
+    background-color: rgba(59, 130, 246, 0.15);
+  }
+
+  > span.taken-2 {
+    color: rgb(139, 92, 246);
+    background-color: rgba(139, 92, 246, 0.15);
+  }
+
+  > span.taken-3 {
+    color: rgb(236, 72, 153);
+    background-color: rgba(236, 72, 153, 0.15);
   }
 
   > span:active {
@@ -547,7 +557,7 @@ function ApplyStayPage() {
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
-        setSelectedApplySeat(applyCopy.id === "new" ? true : currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), applyCopy.stay_seat)) ? true : false);
+        setSelectedApplySeat(applyCopy.id === "new" ? true : isInRange(["A1", "L18"], applyCopy.stay_seat) || isInRange(["M1", "N7"], applyCopy.stay_seat));
       });
       return;
     }
@@ -940,7 +950,7 @@ function ApplyStayPage() {
                       <div key={idx} style={{ marginBottom: "16px" }}>
                         {group.map((row, rowIdx) => (
                           <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
-                            {row.map((seat, seatIdx) => {
+                            {row.map((seat: string, seatIdx) => {
                               const isActive = currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
                               const taken = stayApplies.find(
                                 (sapply) =>
@@ -951,7 +961,7 @@ function ApplyStayPage() {
                                 <span
                                   id={seat}
                                   ref={selectedApply.stay_seat === seat ? seatRef : null}
-                                  className={[isActive ? "active" : "inactive", taken ? "taken" : "notTaken"].join(" ")}
+                                  className={[isActive ? "active" : "inactive", taken ? `taken-${taken.user.grade}` : "notTaken"].join(" ")}
                                   onClick={() =>
                                     setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
                                   }
