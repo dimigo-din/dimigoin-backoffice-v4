@@ -123,9 +123,19 @@ const SeatRow = styled.div`
     color: ${({theme}) => theme.Colors.Content.Secondary};
   }
 
-  > div.taken {
-    color: ${({theme}) => theme.Colors.Content.Primary};
-    background-color: ${({theme}) => theme.Colors.Background.Primary};
+  > div.taken-1 {
+    color: rgb(59, 130, 246);
+    background-color: rgba(59, 130, 246, 0.15);
+  }
+
+  > div.taken-2 {
+    color: rgb(139, 92, 246);
+    background-color: rgba(139, 92, 246, 0.15);
+  }
+
+  > div.taken-3 {
+    color: rgb(236, 72, 153);
+    background-color: rgba(236, 72, 153, 0.15);
   }
 `;
 
@@ -275,7 +285,7 @@ function ViewStaySeatPage() {
                                         return (
                                         <div
                                             id={seat}
-                                            className={[taken ? "taken" : "notTaken"].join(" ")}
+                                            className={taken ? `taken-${taken.user.grade}` : "notTaken"}
                                             key={seat}
                                             style={{
                                             marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
