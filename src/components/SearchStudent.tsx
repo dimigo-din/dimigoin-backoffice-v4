@@ -1,9 +1,8 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getPersonalInformation, type PersonalInformation } from "../api/auth.ts";
+import { searchUser, type User } from "../api/user.ts";
 import { Input } from "../styles/components/input.ts";
-import {useState, useEffect} from "react";
-import {searchUser, type User} from "../api/user.ts";
-import {getPersonalInformation, type PersonalInformation} from "../api/auth.ts";
-
 
 const InputWrapper = styled.div`
   position: relative;
@@ -18,8 +17,8 @@ const SuggestBox = styled.div`
   right: 0;
   max-height: 30dvh;
   overflow-y: auto;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.18);
   z-index: 20;
@@ -29,18 +28,18 @@ const SuggestBox = styled.div`
 const SuggestItem = styled.div`
   width: 100%;
   padding: 10px 12px;
-  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   transition: background-color 120ms ease;
 
-  &:hover { background-color: ${({theme}) => theme.Colors.Components.Interaction.Hover}; }
-  &:active { background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed}; }
+  &:hover { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Hover}; }
+  &:active { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Pressed}; }
 
-  .meta { color: ${({theme}) => theme.Colors.Content.Tertiary}; font-size: ${({theme}) => theme.Font.Footnote.size}; }
+  .meta { color: ${({ theme }) => theme.Colors.Content.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
 `;
 
 interface SearchStudentProps {
@@ -53,7 +52,15 @@ interface SearchStudentProps {
   setNameSearch?: (name: string) => void;
 }
 
-function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, setNameLoading, nameSearch, setNameSearch }: SearchStudentProps) {
+function SearchStudent({
+  setNewUser,
+  nameResults,
+  setNameResults,
+  nameLoading,
+  setNameLoading,
+  nameSearch,
+  setNameSearch,
+}: SearchStudentProps) {
   const [isSuggestOpen, setIsSuggestOpen] = useState(false);
 
   useEffect(() => {
@@ -61,7 +68,10 @@ function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, s
   }, [nameSearch]);
 
   useEffect(() => {
-    if (!nameSearch) { setNameResults([]); return; }
+    if (!nameSearch) {
+      setNameResults([]);
+      return;
+    }
     let alive = true;
     const t = setTimeout(async () => {
       try {
@@ -70,9 +80,13 @@ function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, s
         if (!alive) return;
         if (res) {
           getPersonalInformation(res.map((r) => r.email)).then((u) => {
-            setNameResults(res.map((r, i) => { return u[i] ? { ...r, ...u[i] } : null; }) as (User & PersonalInformation)[]);
+            setNameResults(
+              res.map((r, i) => {
+                return u[i] ? { ...r, ...u[i] } : null;
+              }) as (User & PersonalInformation)[],
+            );
           });
-        }else {
+        } else {
           setNameResults([]);
         }
       } catch (e) {
@@ -82,7 +96,10 @@ function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, s
         setNameLoading(false);
       }
     }, 180);
-    return () => { alive = false; clearTimeout(t); };
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
   }, [nameSearch]);
 
   return (
@@ -94,7 +111,7 @@ function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, s
         onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
         onInput={(e) => setNameSearch?.((e.target as HTMLInputElement).value)}
         value={nameSearch}
-        style={{height: "5dvh", width: "100%"}}
+        style={{ height: "5dvh", width: "100%" }}
       />
       {isSuggestOpen && (
         <SuggestBox>
@@ -104,19 +121,27 @@ function SearchStudent({ setNewUser, nameResults, setNameResults, nameLoading, s
               <span className="meta">잠시만요</span>
             </SuggestItem>
           )}
-          {!nameLoading && nameResults.slice(0, 12).filter(Boolean).map((u) => (
-            <SuggestItem
-              key={u.id}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                setNewUser(u);
-                setNameSearch?.(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
-                setIsSuggestOpen(false);
-              }}
-            >
-              <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
-            </SuggestItem>
-          ))}
+          {!nameLoading &&
+            nameResults
+              .slice(0, 12)
+              .filter(Boolean)
+              .map((u) => (
+                <SuggestItem
+                  key={u.id}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setNewUser(u);
+                    setNameSearch?.(`${u.grade}${u.class}${("0" + u.number).slice(-2)} ${u.name}`);
+                    setIsSuggestOpen(false);
+                  }}
+                >
+                  <span>
+                    {u.grade}
+                    {u.class}
+                    {("0" + u.number).slice(-2)} {u.name}
+                  </span>
+                </SuggestItem>
+              ))}
           {!nameLoading && nameResults.length === 0 && nameSearch && (
             <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
               <span>검색 결과가 없습니다</span>

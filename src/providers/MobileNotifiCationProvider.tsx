@@ -1,9 +1,8 @@
-import React, {createContext, useContext, useState} from "react";
-import styled, {css, keyframes} from "styled-components";
-
+import React, { createContext, useContext, useState } from "react";
+import styled, { css, keyframes } from "styled-components";
+import ErrorIcon from "../assets/icons/error.svg?react";
 import InfoIcon from "../assets/icons/info.svg?react";
 import WarningIcon from "../assets/icons/warning.svg?react";
-import ErrorIcon from "../assets/icons/error.svg?react";
 
 interface NotificationContextType {
   showToast: (msg: string, type: "info" | "warning" | "danger") => void;
@@ -69,23 +68,23 @@ const Notification = styled.div<{ leaving?: boolean }>`
 
   width: fit-content;
   margin: 0 auto;
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
 
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 32px;
   padding: 12px 16px;
   overflow: hidden;
   max-height: 200px; /* enough to fit one‑line or multi‑line toast */
   transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
-  font-size: ${({theme}) => theme.Font.Callout.size};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
   white-space: pre-line;
   text-align: center;
 
   animation: ${slideDown} 0.3s ease;
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
-  ${({leaving}) =>
+  ${({ leaving }) =>
     leaving &&
     css`
       animation: ${slideUpFadeOut} 0.3s ease forwards;
@@ -95,31 +94,29 @@ const Notification = styled.div<{ leaving?: boolean }>`
     `}
 `;
 
-export function MobileNotificationProvider({children}: { children: React.ReactNode }) {
+export function MobileNotificationProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<NotificationItem[]>([]);
 
   const showToast = (msg: string, type: "info" | "warning" | "danger" = "info") => {
     const id = Date.now() + Math.random();
-    setMessages(prev => [...prev, {id, text: msg, type, isLeaving: false}]);
+    setMessages((prev) => [...prev, { id, text: msg, type, isLeaving: false }]);
 
     setTimeout(() => {
-      setMessages(prev =>
-        prev.map(m => m.id === id ? {...m, isLeaving: true} : m)
-      );
+      setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, isLeaving: true } : m)));
       setTimeout(() => {
-        setMessages(prev => prev.filter(m => m.id !== id));
+        setMessages((prev) => prev.filter((m) => m.id !== id));
       }, 300);
     }, 2000);
   };
 
   return (
-    <NotificationContext.Provider value={{showToast}}>
+    <NotificationContext.Provider value={{ showToast }}>
       <NotificationArea id="NOTIFICATION">
         {messages.map((m) => (
           <Notification key={m.id} leaving={m.isLeaving}>
-            {m.type === "info" ? (<InfoIcon/>) : null}
-            {m.type === "warning" ? (<WarningIcon/>) : null}
-            {m.type === "danger" ? (<ErrorIcon/>) : null}
+            {m.type === "info" ? <InfoIcon /> : null}
+            {m.type === "warning" ? <WarningIcon /> : null}
+            {m.type === "danger" ? <ErrorIcon /> : null}
             {m.text}
           </Notification>
         ))}

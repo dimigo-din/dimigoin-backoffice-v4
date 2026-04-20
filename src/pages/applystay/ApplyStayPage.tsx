@@ -1,37 +1,37 @@
-import {
-  createStayApply, deleteStayApply,
-  getStayApply,
-  getStayList,
-  getStay,
-  type Outing,
-  type StayApply,
-  type StayListItem,
-  type Stay,
-  updateStayApply,
-  changeStaySeat
-} from "../../api/stay.ts";
-import {type User} from "../../api/user.ts";
-import {type PersonalInformation} from "../../api/auth.ts";
-import styled from "styled-components";
-import {useEffect, useRef, useState} from "react";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import Loading from "../../components/Loading.tsx";
-import {ExportStayAppliesToExcel} from "../../utils/stay2excel.ts";
-import { stay2pdf } from "../../utils/stay2pdf.ts";
-import {sha256} from "../../utils/sha256.ts";
-import {genTable, isInRange} from "../../utils/staySeatUtil.ts";
-import {Input} from "../../styles/components/input.ts";
-import CheckBox from "../../components/CheckBox.tsx";
-import {Button, LightButton} from "../../styles/components/button.ts";
-import {makeid} from "../../utils/makeid.ts";
 import { TZDate } from "@date-fns/tz";
 import { format } from "date-fns";
-
-import {stay2excel} from "../../utils/stay2format.ts";
+import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import SelectionDialog from "../../components/SelectionDialog.tsx";
+import styled from "styled-components";
+import { type PersonalInformation } from "../../api/auth.ts";
+import {
+  changeStaySeat,
+  createStayApply,
+  deleteStayApply,
+  getStay,
+  getStayApply,
+  getStayList,
+  type Outing,
+  type Stay,
+  type StayApply,
+  type StayListItem,
+  updateStayApply,
+} from "../../api/stay.ts";
+import { type User } from "../../api/user.ts";
+import CheckBox from "../../components/CheckBox.tsx";
+import Loading from "../../components/Loading.tsx";
 import SearchStudent from "../../components/SearchStudent.tsx";
-import {UIButton, UIInputField, UISelectField, UISegmentedControl} from "../../components/ui";
+import SelectionDialog from "../../components/SelectionDialog.tsx";
+import { UIButton, UIInputField, UISegmentedControl, UISelectField } from "../../components/ui";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { Button, LightButton } from "../../styles/components/button.ts";
+import { Input } from "../../styles/components/input.ts";
+import { makeid } from "../../utils/makeid.ts";
+import { sha256 } from "../../utils/sha256.ts";
+import { ExportStayAppliesToExcel } from "../../utils/stay2excel.ts";
+import { stay2excel } from "../../utils/stay2format.ts";
+import { stay2pdf } from "../../utils/stay2pdf.ts";
+import { genTable, isInRange } from "../../utils/staySeatUtil.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -69,7 +69,7 @@ const StayApplyContainer = styled.div`
   gap: 8px;
   padding: 10px;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 12px;
 
   overflow-y: auto;
@@ -92,7 +92,7 @@ const ControllerContainer = styled.div`
 
   gap: 16px;
 
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   @media (max-width: 900px) {
     height: auto;
@@ -120,7 +120,7 @@ const FitContainer = styled.div`
 
   border-radius: 12px;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   padding: 16px;
 
   display: flex;
@@ -135,19 +135,19 @@ const NoApply = styled.div`
   text-align: center;
   align-content: center;
 
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Title.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
-const StayApplyCard = styled.div<{outingCount: number}>`
+const StayApplyCard = styled.div<{ outingCount: number }>`
   height: auto;
   width: 100%;
 
   height: 6dvh;
   flex: 0 0 auto;
 
-  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   border-radius: 6px;
 
@@ -172,7 +172,7 @@ const StayApplyCardSummary = styled.div`
   > .left {
     align-content: center;
 
-    font-size: ${({theme}) => theme.Font.Title.size};
+    font-size: ${({ theme }) => theme.Font.Title.size};
   }
 
   > .right {
@@ -180,7 +180,7 @@ const StayApplyCardSummary = styled.div`
 
     text-align: right;
     align-content: center;
-    color: ${({theme}) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Secondary};
   }
 `;
 
@@ -202,7 +202,7 @@ const StayApplyDetail = styled.div`
     margin-top: 2dvh;
   }
 
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 `;
 
 const StayApplyHeader = styled.div`
@@ -212,8 +212,8 @@ const StayApplyHeader = styled.div`
   align-items: center;
 
   > p {
-    font-size: ${({theme}) => theme.Font.Title.size};
-    font-weight: ${({theme}) => theme.Font.Title.weight};
+    font-size: ${({ theme }) => theme.Font.Title.size};
+    font-weight: ${({ theme }) => theme.Font.Title.weight};
     margin-bottom: 2dvh;
   }
 `;
@@ -224,13 +224,13 @@ const SeatBox = styled.div`
   height: 35dvh;
   width: 100%;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 8px;
 
   overflow: scroll;
 `;
 
-const SeatRow = styled.div<{seat: string | null}>`
+const SeatRow = styled.div<{ seat: string | null }>`
   width: fit-content;
 
   white-space: nowrap;
@@ -243,7 +243,7 @@ const SeatRow = styled.div<{seat: string | null}>`
     padding: 12px 0;
     margin: 4px;
 
-    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
     border-radius: 8px;
 
     text-align: center;
@@ -251,7 +251,7 @@ const SeatRow = styled.div<{seat: string | null}>`
 
   > span.inactive {
     filter: brightness(0.9);
-    color: ${({theme}) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Secondary};
   }
 
   > span.taken-1 {
@@ -270,20 +270,20 @@ const SeatRow = styled.div<{seat: string | null}>`
   }
 
   > span:active {
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+    background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   }
 
-  > span#${({seat}) => seat} {
+  > span#${({ seat }) => seat} {
     color: white;
 
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+    background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   }
 `;
 
 const OutingBox = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 8px;
   margin-top: 2dvh;
 
@@ -300,14 +300,14 @@ const OutingBox = styled.div`
     justify-content: space-evenly;
     align-items: center;
 
-    font-size: ${({theme}) => theme.Font.Body.size};
+    font-size: ${({ theme }) => theme.Font.Body.size};
 
     input {
       height: 4dvh;
       padding: 0;
 
       //border: none;
-      font-size: ${({theme}) => theme.Font.Callout.size};
+      font-size: ${({ theme }) => theme.Font.Callout.size};
       text-align: center;
       background-color: inherit;
     }
@@ -342,10 +342,10 @@ const ButtonBox = styled.div`
     padding: 0;
   }
 
-`
+`;
 
-const InputRow = styled.div<{width?: string}>`
-  width: ${({width}) => width || "100%"};
+const InputRow = styled.div<{ width?: string }>`
+  width: ${({ width }) => width || "100%"};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -372,10 +372,10 @@ const DeleteBtn = styled.div`
   text-align: center;
   align-content: center;
 
-  font-size: ${({theme}) => theme.Font.Callout.size};
-  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
+  background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
 
-  border: 1px solid ${({theme}) => theme.Colors.Solid.Red};
+  border: 1px solid ${({ theme }) => theme.Colors.Solid.Red};
   border-radius: 12px;
 
   margin-left: 1%;
@@ -388,10 +388,10 @@ const PresetBtn = styled.div`
   text-align: center;
   align-content: center;
 
-  font-size: ${({theme}) => theme.Font.Callout.size};
-  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Blue};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
+  background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Blue};
 
-  border: 1px solid ${({theme}) => theme.Colors.Solid.Blue};
+  border: 1px solid ${({ theme }) => theme.Colors.Solid.Blue};
   border-radius: 12px;
 
   margin-left: 3%;
@@ -407,7 +407,7 @@ const NoOuting = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   margin-bottom: 2px;
 `;
 
@@ -453,59 +453,72 @@ function ApplyStayPage() {
   const [currentSeatChangeLocation, setCurrentSeatChangeLocation] = useState<string>("");
 
   const gradeSegmentValue =
-    filterGrade === true ? "1" :
-      filterGrade === null ? "2" :
-        filterGrade === false ? "3" : "all";
+    filterGrade === true ? "1" : filterGrade === null ? "2" : filterGrade === false ? "3" : "all";
 
   const genderSegmentValue =
-    filterGender === true ? "male" :
-      filterGender === false ? "female" : "all";
+    filterGender === true ? "male" : filterGender === false ? "female" : "all";
 
   const stateSegmentValue =
-    filterState === true ? "approved" :
-      filterState === null ? "review" :
-        filterState === false ? "rejected" : "all";
+    filterState === true
+      ? "approved"
+      : filterState === null
+        ? "review"
+        : filterState === false
+          ? "rejected"
+          : "all";
 
   const [newUser, setNewUser] = useState<User | null>(null);
 
   const updateScreen = async () => {
-    getStayList().then((res1) => {
-      const now = new Date();
-      setStayList(res1.sort((a, b) => {
-        const dateA = new Date(a.stay_from);
-        const dateB = new Date(b.stay_from);
+    getStayList()
+      .then((res1) => {
+        const now = new Date();
+        setStayList(
+          res1.sort((a, b) => {
+            const dateA = new Date(a.stay_from);
+            const dateB = new Date(b.stay_from);
 
-        const isAfterA = dateA >= now;
-        const isAfterB = dateB >= now;
+            const isAfterA = dateA >= now;
+            const isAfterB = dateB >= now;
 
-        if (isAfterA && !isAfterB) return -1;
-        if (!isAfterA && isAfterB) return 1;
+            if (isAfterA && !isAfterB) return -1;
+            if (!isAfterA && isAfterB) return 1;
 
-        return dateA.getTime() - dateB.getTime();
-      }));
+            return dateA.getTime() - dateB.getTime();
+          }),
+        );
 
-      if (res1.length > 0) {
-        getStay(res1[currentStayIndex].id).then((res3) => {
-          setCurrentStay(res3);
-        }).catch((e) => {
-          showToast(e.response.data.error.message || e.response.data.error, "danger");
-        });
+        if (res1.length > 0) {
+          getStay(res1[currentStayIndex].id)
+            .then((res3) => {
+              setCurrentStay(res3);
+            })
+            .catch((e) => {
+              showToast(e.response.data.error.message || e.response.data.error, "danger");
+            });
 
-        getStayApply(res1[currentStayIndex].id).then((res2) => {
-          setStayApplies(res2.sort((a, b) => {
-            return a.user.grade - b.user.grade ||
-                   a.user.class - b.user.class ||
-                   a.user.number - b.user.number;
-          }));
-        }).catch((e) => {
-          showToast(e.response.data.error.message || e.response.data.error, "danger");
-        });
-      }
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+          getStayApply(res1[currentStayIndex].id)
+            .then((res2) => {
+              setStayApplies(
+                res2.sort((a, b) => {
+                  return (
+                    a.user.grade - b.user.grade ||
+                    a.user.class - b.user.class ||
+                    a.user.number - b.user.number
+                  );
+                }),
+              );
+            })
+            .catch((e) => {
+              showToast(e.response.data.error.message || e.response.data.error, "danger");
+            });
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const close = (callback?: () => void, bypass?: boolean) => {
     const closeAction = () => {
@@ -523,20 +536,31 @@ function ApplyStayPage() {
           setTimeout(() => callback(), 100);
         }
       }, 300);
-    }
+    };
 
-    if(!selectedApply) return;
+    if (!selectedApply) return;
 
     if (bypass) {
       closeAction();
       return;
     }
 
-    const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k as keyof typeof a])).join("")).join("");
+    const merged =
+      selectedApply.stay_seat +
+      selectedApply.outing
+        .map((a) =>
+          Object.keys(a)
+            .map((k) => String(a[k as keyof typeof a]))
+            .join(""),
+        )
+        .join("");
     sha256(merged).then((data) => {
-      if (data !== selectedApplyChecksum && !confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?"))
+      if (
+        data !== selectedApplyChecksum &&
+        !confirm("수정사항이 존재합니다. 정말로 닫으시겠습니까?")
+      )
         return;
-      else{
+      else {
         closeAction();
       }
     });
@@ -549,15 +573,26 @@ function ApplyStayPage() {
       const applyCopy = JSON.parse(JSON.stringify(apply));
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const merged = applyCopy.stay_seat + applyCopy.outing.map(a =>
-        Object.keys(a).map((k) => String(a[k])).join("")
-      ).join("");
+      // @ts-expect-error
+      const merged =
+        applyCopy.stay_seat +
+        applyCopy.outing
+          .map((a) =>
+            Object.keys(a)
+              .map((k) => String(a[k]))
+              .join(""),
+          )
+          .join("");
 
       sha256(merged).then((data) => {
         setSelectedApplyChecksum(data);
         setSelectedApply(applyCopy);
-        setSelectedApplySeat(applyCopy.id === "new" ? true : isInRange(["A1", "L18"], applyCopy.stay_seat) || isInRange(["M1", "N7"], applyCopy.stay_seat));
+        setSelectedApplySeat(
+          applyCopy.id === "new"
+            ? true
+            : isInRange(["A1", "L18"], applyCopy.stay_seat) ||
+                isInRange(["M1", "N7"], applyCopy.stay_seat),
+        );
       });
       return;
     }
@@ -569,16 +604,32 @@ function ApplyStayPage() {
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const merged = selectedApply.stay_seat + selectedApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+    // @ts-expect-error
+    const merged =
+      selectedApply.stay_seat +
+      selectedApply.outing
+        .map((a) =>
+          Object.keys(a)
+            .map((k) => String(a[k]))
+            .join(""),
+        )
+        .join("");
     sha256(merged).then((data) => {
       if (data !== selectedApplyChecksum) {
         if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
           // 무한 반복 방지를 위해 새로운 함수로 에디터 열기
           const openNewEditor = (targetApply: StayApply) => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            const newMerged = targetApply.stay_seat + targetApply.outing.map(a => Object.keys(a).map((k) => String(a[k])).join("")).join("");
+            // @ts-expect-error
+            const newMerged =
+              targetApply.stay_seat +
+              targetApply.outing
+                .map((a) =>
+                  Object.keys(a)
+                    .map((k) => String(a[k]))
+                    .join(""),
+                )
+                .join("");
             sha256(newMerged).then((newData) => {
               setSelectedApplyChecksum(newData);
               setSelectedApply(targetApply);
@@ -603,9 +654,9 @@ function ApplyStayPage() {
         showToast("현재 잔류 정보가 없습니다.", "danger");
         return;
       }
-      showToast(currentStay.id, 'info');
+      showToast(currentStay.id, "info");
 
-      if(selectedApply.stay_seat === "null") {
+      if (selectedApply.stay_seat === "null") {
         showToast("좌석을 선택해주세요.", "danger");
         return;
       }
@@ -615,17 +666,19 @@ function ApplyStayPage() {
         user: selectedApply.user.id,
         outing: selectedApply.outing,
         stay_seat: selectedApply.stay_seat,
-      }).then(() => {
-        showToast("성공했습니다.", "info");
-        setNameLoading(false);
-        setNameResults([]);
-        setSelectedApply(null);
-        setSelectedApplyChecksum(null);
-        updateScreen();
-      }).catch((e) => {
-        console.error(e);
-        showToast(e.response.data.error.message || e.response.data.error, "danger");
-      });
+      })
+        .then(() => {
+          showToast("성공했습니다.", "info");
+          setNameLoading(false);
+          setNameResults([]);
+          setSelectedApply(null);
+          setSelectedApplyChecksum(null);
+          updateScreen();
+        })
+        .catch((e) => {
+          console.error(e);
+          showToast(e.response.data.error.message || e.response.data.error, "danger");
+        });
       return;
     }
 
@@ -636,16 +689,18 @@ function ApplyStayPage() {
 
     const userTarget = `${selectedApply.user.grade}_${selectedApply.user.gender}`;
     const validSeatRanges = currentStay?.stay_seat_preset.stay_seat_preset_range.filter(
-      (target) => target.target === userTarget
+      (target) => target.target === userTarget,
     );
 
-    const isSeatInValidRange = validSeatRanges?.some((target) =>
-      isInRange(target.range.split(":"), selectedApply.stay_seat)
-    ) ?? false;
+    const isSeatInValidRange =
+      validSeatRanges?.some((target) =>
+        isInRange(target.range.split(":"), selectedApply.stay_seat),
+      ) ?? false;
 
-    const isSeatInAnyRange = currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) =>
-      isInRange(target.range.split(":"), selectedApply.stay_seat)
-    ) ?? false;
+    const isSeatInAnyRange =
+      currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) =>
+        isInRange(target.range.split(":"), selectedApply.stay_seat),
+      ) ?? false;
 
     if (isSeatInAnyRange && !isSeatInValidRange) {
       if (!window.confirm("해당 학년의 좌석이 아닙니다. 정말로 저장하시겠습니까?")) {
@@ -654,40 +709,48 @@ function ApplyStayPage() {
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    updateStayApply({...selectedApply, stay: currentStay.id!, user: selectedApply!.user.id, stay_seat: selectedApply.stay_seat}).then(() => {
-      showToast("성공했습니다.", "info");
-      close(undefined, true);
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    // @ts-expect-error
+    updateStayApply({
+      ...selectedApply,
+      stay: currentStay.id!,
+      user: selectedApply!.user.id,
+      stay_seat: selectedApply.stay_seat,
+    })
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        close(undefined, true);
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const deleteApply = (id: string) => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
-    if (id === 'new') {
+    if (id === "new") {
       close(undefined, true);
       updateScreen();
       return;
     }
 
-    deleteStayApply(id).then(() => {
-      showToast("성공했습니다.", "info");
-      close(undefined, true);
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    deleteStayApply(id)
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        close(undefined, true);
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   useEffect(() => {
     updateScreen();
   }, [currentStayIndex]);
-
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -698,7 +761,7 @@ function ApplyStayPage() {
         box.scrollTo({
           top: seat.offsetTop - box.clientHeight / 2 + seat.clientHeight / 2 - box.offsetTop,
           left: seat.offsetLeft - box.clientWidth / 2 + seat.clientWidth / 2 - box.offsetLeft,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     }, 100);
@@ -706,46 +769,69 @@ function ApplyStayPage() {
     return () => clearTimeout(timeout);
   }, [selectedApply]);
 
-
   return (
     <Wrapper>
       <StayApplyContainer>
-        {stayApplies ? stayApplies.length > 0 ? stayApplies.filter((a) =>
-          `${a.user.grade}${a.user.class}${("0"+a.user.number).slice(-2)} ${a.user.name}`.indexOf(filterText) !== -1 &&
-          (filterState === undefined || a.outing.some((o) => o.approved === filterState)) &&
-          (filterGrade === undefined ||
-            (filterGrade === true && a.user.grade === 1) ||
-            (filterGrade === null && a.user.grade === 2) ||
-            (filterGrade === false && a.user.grade === 3)
-          ) &&
-          (filterGender === undefined ||
-            (filterGender === true && a.user.gender === "male") ||
-            (filterGender === false && a.user.gender === "female")
+        {stayApplies ? (
+          stayApplies.length > 0 ? (
+            stayApplies
+              .filter(
+                (a) =>
+                  `${a.user.grade}${a.user.class}${("0" + a.user.number).slice(-2)} ${a.user.name}`.indexOf(
+                    filterText,
+                  ) !== -1 &&
+                  (filterState === undefined || a.outing.some((o) => o.approved === filterState)) &&
+                  (filterGrade === undefined ||
+                    (filterGrade === true && a.user.grade === 1) ||
+                    (filterGrade === null && a.user.grade === 2) ||
+                    (filterGrade === false && a.user.grade === 3)) &&
+                  (filterGender === undefined ||
+                    (filterGender === true && a.user.gender === "male") ||
+                    (filterGender === false && a.user.gender === "female")),
+              )
+              .map((apply) => {
+                return (
+                  <StayApplyCard
+                    key={apply.id}
+                    outingCount={
+                      (selectedApply ? selectedApply.outing.length : null) || apply.outing.length
+                    }
+                  >
+                    <StayApplyCardSummary>
+                      <div
+                        className="left"
+                        onClick={(e) => {
+                          if (e.currentTarget === e.target) {
+                            openEditor(apply);
+                          }
+                        }}
+                      >
+                        <>
+                          {apply.user.grade}
+                          {apply.user.class}
+                          {("0" + apply.user.number).slice(-2)} {apply.user.name}
+                        </>
+                      </div>
+                      <div
+                        className="right"
+                        onClick={(e) => {
+                          if (e.currentTarget === e.target) {
+                            openEditor(apply);
+                          }
+                        }}
+                      >
+                        {apply.stay_seat} | 외출 {apply.outing.length}건
+                      </div>
+                    </StayApplyCardSummary>
+                  </StayApplyCard>
+                );
+              })
+          ) : (
+            <NoApply>신청자가 없습니다.</NoApply>
           )
-        ).map((apply) => {
-          return (
-            <StayApplyCard
-              key={apply.id}
-              outingCount={(selectedApply ? selectedApply.outing.length : null) || apply.outing.length}>
-              <StayApplyCardSummary>
-                <div className="left" onClick={(e) => {
-                  if (e.currentTarget === e.target) {
-                    openEditor(apply);
-                  }
-                }}>
-                  <>{apply.user.grade}{apply.user.class}{("0"+apply.user.number).slice(-2)} {apply.user.name}</>
-                </div>
-                <div className="right" onClick={(e) => {
-                  if (e.currentTarget === e.target) {
-                    openEditor(apply);
-                  }
-                }}>
-                  {apply.stay_seat} | 외출 {apply.outing.length}건
-                </div>
-              </StayApplyCardSummary>
-            </StayApplyCard>
-          );
-        }) : <NoApply>신청자가 없습니다.</NoApply> : Loading()}
+        ) : (
+          Loading()
+        )}
       </StayApplyContainer>
       <ControllerContainer>
         <FitContainer>
@@ -756,24 +842,45 @@ function ApplyStayPage() {
               close();
               setCurrentStayIndex(parseInt(e.target.value));
             }}
-            options={stayList !== null
-              ? stayList.map((apply, index) => ({
-                  value: String(index),
-                  label: `${apply.name} (${apply.stay_from} ~ ${apply.stay_to})`
-                }))
-              : [{ value: "0", label: "불러오는 중..." }]
+            options={
+              stayList !== null
+                ? stayList.map((apply, index) => ({
+                    value: String(index),
+                    label: `${apply.name} (${apply.stay_from} ~ ${apply.stay_to})`,
+                  }))
+                : [{ value: "0", label: "불러오는 중..." }]
             }
           />
         </FitContainer>
         <FitContainer>
           <Text>잔류 신청 추가</Text>
-          <SearchStudent setNewUser={setNewUser} nameResults={nameResults} setNameResults={setNameResults} nameLoading={nameLoading} setNameLoading={setNameLoading} nameSearch={nameSearch} setNameSearch={setNameSearch} />
-          <UIButton disabled={newUser === null} size="medium" fullWidth onClick={() => {
-            const newApply = { id: "new", stay_seat: "null", outing: [], user: newUser } as unknown as StayApply;
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            setSelectedApply(newApply);
-          }}>잔류 신청 추가하기</UIButton>
+          <SearchStudent
+            setNewUser={setNewUser}
+            nameResults={nameResults}
+            setNameResults={setNameResults}
+            nameLoading={nameLoading}
+            setNameLoading={setNameLoading}
+            nameSearch={nameSearch}
+            setNameSearch={setNameSearch}
+          />
+          <UIButton
+            disabled={newUser === null}
+            size="medium"
+            fullWidth
+            onClick={() => {
+              const newApply = {
+                id: "new",
+                stay_seat: "null",
+                outing: [],
+                user: newUser,
+              } as unknown as StayApply;
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              setSelectedApply(newApply);
+            }}
+          >
+            잔류 신청 추가하기
+          </UIButton>
         </FitContainer>
         <FitContainer>
           <Text>잔류자 검색</Text>
@@ -784,20 +891,37 @@ function ApplyStayPage() {
           />
           <UISegmentedControl
             items={[
-              { label: `1학년 (${stayApplies?.filter(apply => apply.user.grade === 1).length || 0}건)`, value: "1" },
-              { label: `2학년 (${stayApplies?.filter(apply => apply.user.grade === 2).length || 0}건)`, value: "2" },
-              { label: `3학년 (${stayApplies?.filter(apply => apply.user.grade === 3).length || 0}건)`, value: "3" },
+              {
+                label: `1학년 (${stayApplies?.filter((apply) => apply.user.grade === 1).length || 0}건)`,
+                value: "1",
+              },
+              {
+                label: `2학년 (${stayApplies?.filter((apply) => apply.user.grade === 2).length || 0}건)`,
+                value: "2",
+              },
+              {
+                label: `3학년 (${stayApplies?.filter((apply) => apply.user.grade === 3).length || 0}건)`,
+                value: "3",
+              },
               { label: `모두 (${stayApplies?.length || 0}건)`, value: "all" },
             ]}
             value={gradeSegmentValue}
             onChange={(value) => {
-              setFilterGrade(value === "1" ? true : value === "2" ? null : value === "3" ? false : undefined);
+              setFilterGrade(
+                value === "1" ? true : value === "2" ? null : value === "3" ? false : undefined,
+              );
             }}
           />
           <UISegmentedControl
             items={[
-              { label: `남자 (${stayApplies?.filter(apply => apply.user.gender === "male").length || 0}건)`, value: "male" },
-              { label: `여자 (${stayApplies?.filter(apply => apply.user.gender === "female").length || 0}건)`, value: "female" },
+              {
+                label: `남자 (${stayApplies?.filter((apply) => apply.user.gender === "male").length || 0}건)`,
+                value: "male",
+              },
+              {
+                label: `여자 (${stayApplies?.filter((apply) => apply.user.gender === "female").length || 0}건)`,
+                value: "female",
+              },
               { label: `모두 (${stayApplies?.length || 0}건)`, value: "all" },
             ]}
             value={genderSegmentValue}
@@ -810,26 +934,48 @@ function ApplyStayPage() {
           <Text>외출 검색</Text>
           <UISegmentedControl
             items={[
-              { label: `허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === true).length, 0) || 0}건)`, value: "approved" },
-              { label: `검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === null).length, 0) || 0}건)`, value: "review" },
-              { label: `불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter(outing => outing.approved === false).length, 0) || 0}건)`, value: "rejected" },
-              { label: `모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`, value: "all" },
+              {
+                label: `허가 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter((outing) => outing.approved === true).length, 0) || 0}건)`,
+                value: "approved",
+              },
+              {
+                label: `검토 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter((outing) => outing.approved === null).length, 0) || 0}건)`,
+                value: "review",
+              },
+              {
+                label: `불허 (${stayApplies?.reduce((count, apply) => count + apply.outing.filter((outing) => outing.approved === false).length, 0) || 0}건)`,
+                value: "rejected",
+              },
+              {
+                label: `모두 (${stayApplies?.reduce((count, apply) => count + apply.outing.length, 0) || 0}건)`,
+                value: "all",
+              },
             ]}
             value={stateSegmentValue}
             onChange={(value) => {
-              setFilterState(value === "approved" ? true : value === "review" ? null : value === "rejected" ? false : undefined);
+              setFilterState(
+                value === "approved"
+                  ? true
+                  : value === "review"
+                    ? null
+                    : value === "rejected"
+                      ? false
+                      : undefined,
+              );
             }}
           />
         </FitContainer>
         <FitContainer>
           <Text>잔류장소 일괄 이동</Text>
           <SpaceBetweenWrapper>
-            <div style={{width: "40%"}}>
+            <div style={{ width: "40%" }}>
               <UISelectField
                 value={currentSeatChangeGrade ? String(currentSeatChangeGrade) : ""}
                 onChange={(e) => {
                   close();
-                  setCurrentSeatChangeGrade(e.target.value === "" ? undefined : parseInt(e.target.value));
+                  setCurrentSeatChangeGrade(
+                    e.target.value === "" ? undefined : parseInt(e.target.value),
+                  );
                 }}
                 options={[
                   { value: "", label: "학년 선택" },
@@ -839,38 +985,55 @@ function ApplyStayPage() {
                 ]}
               />
             </div>
-            <div style={{width: "57%"}}>
+            <div style={{ width: "57%" }}>
               <UIInputField
                 onChange={(e) => setCurrentSeatChangeLocation(e.target.value)}
                 value={currentSeatChangeLocation}
                 placeholder="장소 입력..."
               />
             </div>
-         </SpaceBetweenWrapper>
-         <Button disabled={currentSeatChangeGrade === undefined || currentSeatChangeLocation == ""} style={{height: "5dvh", padding: 0}} onClick={() => {
-            const targets = stayApplies?.filter(apply => apply.user.grade === currentSeatChangeGrade);
-            if(!targets || targets.length === 0) {
-              showToast("해당 학년의 잔류자가 없습니다.", "warning");
-              return;
-            }
+          </SpaceBetweenWrapper>
+          <Button
+            disabled={currentSeatChangeGrade === undefined || currentSeatChangeLocation == ""}
+            style={{ height: "5dvh", padding: 0 }}
+            onClick={() => {
+              const targets = stayApplies?.filter(
+                (apply) => apply.user.grade === currentSeatChangeGrade,
+              );
+              if (!targets || targets.length === 0) {
+                showToast("해당 학년의 잔류자가 없습니다.", "warning");
+                return;
+              }
 
-            if(!confirm(`정말로 ${currentSeatChangeGrade}학년 ${targets.length}명의 잔류장소를 '${currentSeatChangeLocation}'(으)로 일괄 변경하시겠습니까?`))
-              return;
+              if (
+                !confirm(
+                  `정말로 ${currentSeatChangeGrade}학년 ${targets.length}명의 잔류장소를 '${currentSeatChangeLocation}'(으)로 일괄 변경하시겠습니까?`,
+                )
+              )
+                return;
 
-            const to = currentSeatChangeLocation;
-            changeStaySeat(targets.map(apply => apply.id), to).then(() => {
-              showToast("잔류장소 일괄 이동이 완료되었습니다.", "info");
-              setCurrentSeatChangeGrade(undefined);
-              setCurrentSeatChangeLocation("");
-            }).catch((e) => {
-              showToast(e, "danger");
-            });
-          }}>잔류장소 일괄 이동</Button>
+              const to = currentSeatChangeLocation;
+              changeStaySeat(
+                targets.map((apply) => apply.id),
+                to,
+              )
+                .then(() => {
+                  showToast("잔류장소 일괄 이동이 완료되었습니다.", "info");
+                  setCurrentSeatChangeGrade(undefined);
+                  setCurrentSeatChangeLocation("");
+                })
+                .catch((e) => {
+                  showToast(e, "danger");
+                });
+            }}
+          >
+            잔류장소 일괄 이동
+          </Button>
         </FitContainer>
         <FitContainer>
           <Text>파일 내보내기</Text>
           <SpaceBetweenWrapper>
-            <div style={{width: "70%"}}>
+            <div style={{ width: "70%" }}>
               <UISelectField
                 value={currentSelectedFileOutput}
                 onChange={(e) => setCurrentSelectedFileOutput(e.target.value)}
@@ -883,51 +1046,71 @@ function ApplyStayPage() {
                 ]}
               />
             </div>
-            <Button style={{width: "27%", height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={async () => {
-              if(currentSelectedFileOutput === "") {
-                showToast("내보내기 형식을 선택하세요.", "danger");
-              }else if(currentSelectedFileOutput === "in"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
-                  await updateScreen();
-                  ExportStayAppliesToExcel(currentStay, stayApplies?.filter(apply => apply.id != 'new'));
+            <Button
+              style={{ width: "27%", height: "100%", fontSize: "14px", padding: "0 8px" }}
+              onClick={async () => {
+                if (currentSelectedFileOutput === "") {
+                  showToast("내보내기 형식을 선택하세요.", "danger");
+                } else if (currentSelectedFileOutput === "in") {
+                  if (stayApplies?.filter((apply) => apply.id != "new") && currentStay) {
+                    await updateScreen();
+                    ExportStayAppliesToExcel(
+                      currentStay,
+                      stayApplies?.filter((apply) => apply.id != "new"),
+                    );
+                  } else showToast("내보낼 데이터가 없습니다.", "warning");
+                } else if (currentSelectedFileOutput === "out") {
+                  if (stayApplies?.filter((apply) => apply.id != "new") && currentStay) {
+                    await updateScreen();
+                    stay2excel(
+                      stayApplies?.filter((apply) => apply.id != "new"),
+                      currentStay,
+                      { masking: true },
+                    );
+                  } else showToast("내보낼 데이터가 없습니다.", "warning");
+                } else if (currentSelectedFileOutput === "out_pdf") {
+                  if (stayApplies?.filter((apply) => apply.id != "new") && currentStay) {
+                    await updateScreen();
+                    stay2pdf(
+                      stayApplies?.filter((apply) => apply.id != "new"),
+                      currentStay,
+                      { masking: true },
+                      `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`,
+                    );
+                  } else showToast("내보낼 데이터가 없습니다.", "warning");
+                } else if (currentSelectedFileOutput === "dorm") {
+                  if (stayApplies?.filter((apply) => apply.id != "new") && currentStay) {
+                    await updateScreen();
+                    stay2excel(
+                      stayApplies?.filter((apply) => apply.id != "new"),
+                      currentStay,
+                      { masking: false },
+                    );
+                  } else showToast("내보낼 데이터가 없습니다.", "warning");
                 }
-                else
-                  showToast("내보낼 데이터가 없습니다.", "warning");
-              }else if(currentSelectedFileOutput === "out"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
-                  await updateScreen();
-                  stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: true});
-                }
-                else
-                  showToast("내보낼 데이터가 없습니다.", "warning");
-              }else if(currentSelectedFileOutput === "out_pdf"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
-                  await updateScreen();
-                  stay2pdf(stayApplies?.filter(apply => apply.id != 'new'), currentStay, { masking: true }, `외부용 잔류 현황 (${currentStay.stay_from} ~ ${currentStay.stay_to}).pdf`)
-                }
-                else
-                  showToast("내보낼 데이터가 없습니다.", "warning");
-              }else if(currentSelectedFileOutput === "dorm"){
-                if(stayApplies?.filter(apply => apply.id != 'new') && currentStay){
-                  await updateScreen();
-                  stay2excel(stayApplies?.filter(apply => apply.id != 'new'), currentStay, {masking: false});
-                }
-                else
-                  showToast("내보낼 데이터가 없습니다.", "warning");
-              }
-            }}>내보내기</Button>
+              }}
+            >
+              내보내기
+            </Button>
           </SpaceBetweenWrapper>
         </FitContainer>
       </ControllerContainer>
 
-
-      <SelectionDialog isOpen={!!selectedApply && !isClosing} closeAction={() => close()} onOpen={() => { } }>
+      <SelectionDialog
+        isOpen={!!selectedApply && !isClosing}
+        closeAction={() => close()}
+        onOpen={() => {}}
+      >
         {selectedApply && stayApplies ? (
           <>
             <StayApplyDetail>
               <StayApplyHeader>
-                <p>{selectedApply.user.grade}{selectedApply.user.class}{("0"+selectedApply.user.number).slice(-2)} {selectedApply?.user.name}</p>
-                <div style={{width: "25%", marginBottom: "2dvh"}}>
+                <p>
+                  {selectedApply.user.grade}
+                  {selectedApply.user.class}
+                  {("0" + selectedApply.user.number).slice(-2)} {selectedApply?.user.name}
+                </p>
+                <div style={{ width: "25%", marginBottom: "2dvh" }}>
                   <UISegmentedControl
                     items={[
                       { label: "열람실", value: "seat" },
@@ -938,7 +1121,7 @@ function ApplyStayPage() {
                   />
                 </div>
               </StayApplyHeader>
-              { selectedApplySeat ? (
+              {selectedApplySeat ? (
                 <SeatBox ref={seatBoxRef}>
                   {(() => {
                     const table = genTable();
@@ -951,27 +1134,39 @@ function ApplyStayPage() {
                         {group.map((row, rowIdx) => (
                           <SeatRow seat={selectedApply.stay_seat} key={rowIdx}>
                             {row.map((seat: string, seatIdx) => {
-                              const isActive = currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), seat) && target.target === `${selectedApply.user.grade}_${selectedApply.user.gender}`);
+                              const isActive =
+                                currentStay?.stay_seat_preset.stay_seat_preset_range.some(
+                                  (target) =>
+                                    isInRange(target.range.split(":"), seat) &&
+                                    target.target ===
+                                      `${selectedApply.user.grade}_${selectedApply.user.gender}`,
+                                );
                               const taken = stayApplies.find(
                                 (sapply) =>
                                   sapply.stay_seat === seat &&
-                                  sapply.stay_seat !== selectedApply.stay_seat
+                                  sapply.stay_seat !== selectedApply.stay_seat,
                               );
                               return (
                                 <span
                                   id={seat}
                                   ref={selectedApply.stay_seat === seat ? seatRef : null}
-                                  className={[isActive ? "active" : "inactive", taken ? `taken-${taken.user.grade}` : "notTaken"].join(" ")}
+                                  className={[
+                                    isActive ? "active" : "inactive",
+                                    taken ? `taken-${taken.user.grade}` : "notTaken",
+                                  ].join(" ")}
                                   onClick={() =>
                                     setSelectedApply((p) => ({ ...p!, stay_seat: seat }))
                                   }
                                   key={seat}
                                   style={{
-                                    marginRight: (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1 ? "20px" : undefined
+                                    marginRight:
+                                      (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1
+                                        ? "20px"
+                                        : undefined,
                                   }}
                                 >
-                              {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
-                            </span>
+                                  {taken ? taken.user.name.replace(/[0-9]/g, "") : seat}
+                                </span>
                               );
                             })}
                           </SeatRow>
@@ -985,132 +1180,217 @@ function ApplyStayPage() {
                   type={"text"}
                   style={{ width: "100%", fontSize: "14px", height: "8dvh" }}
                   placeholder={"좌석 미선택 사유나 잔류 위치를 입력하세요."}
-                  value={currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) => isInRange(target.range.split(":"), selectedApply.stay_seat)) ? "" : selectedApply.stay_seat}
-                  onInput={(e) => {selectedApply.stay_seat = (e.target as HTMLInputElement).value; setSelectedApply({ ...selectedApply })}}
+                  value={
+                    currentStay?.stay_seat_preset.stay_seat_preset_range.some((target) =>
+                      isInRange(target.range.split(":"), selectedApply.stay_seat),
+                    )
+                      ? ""
+                      : selectedApply.stay_seat
+                  }
+                  onInput={(e) => {
+                    selectedApply.stay_seat = (e.target as HTMLInputElement).value;
+                    setSelectedApply({ ...selectedApply });
+                  }}
                 />
               )}
-              <OutingBox style={{height: selectedApplySeat === true ? "45dvh" : "72dvh"}}>
+              <OutingBox style={{ height: selectedApplySeat === true ? "45dvh" : "72dvh" }}>
                 {selectedApply.outing.map((outing) => {
                   const modify = (deleteTarget?: Outing) => {
                     setSelectedApply((p) => {
                       if (deleteTarget)
-                        return { ...p!, outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id) };
+                        return {
+                          ...p!,
+                          outing: p!.outing.filter((p2) => p2.id !== deleteTarget.id),
+                        };
                       else
-                        return { ...p!, outing: p!.outing.map((o) => {
-                            return o.id === outing.id ? {
-                              ...outing
-                            } : o;
-                          }) };
+                        return {
+                          ...p!,
+                          outing: p!.outing.map((o) => {
+                            return o.id === outing.id
+                              ? {
+                                  ...outing,
+                                }
+                              : o;
+                          }),
+                        };
                     });
-                  }
+                  };
 
                   return (
                     <div key={outing.id}>
                       <InputRow>
-                        <Input type={"text"}
-                               style={{width: "62%"}}
-                               onInput={(e) => {outing.reason = (e.target as HTMLInputElement).value; modify()}}
-                               value={outing.reason}
-                               placeholder={"외출 사유를 입력하세요.."}/>
-                        <div style={{width: "18%"}}>
+                        <Input
+                          type={"text"}
+                          style={{ width: "62%" }}
+                          onInput={(e) => {
+                            outing.reason = (e.target as HTMLInputElement).value;
+                            modify();
+                          }}
+                          value={outing.reason}
+                          placeholder={"외출 사유를 입력하세요.."}
+                        />
+                        <div style={{ width: "18%" }}>
                           <UISegmentedControl
                             items={[
                               { label: "허가", value: "approved" },
                               { label: "검토", value: "review" },
                               { label: "불허", value: "rejected" },
                             ]}
-                            value={outing.approved === true ? "approved" : outing.approved === null ? "review" : "rejected"}
+                            value={
+                              outing.approved === true
+                                ? "approved"
+                                : outing.approved === null
+                                  ? "review"
+                                  : "rejected"
+                            }
                             onChange={(value) => {
-                              outing.approved = value === "approved" ? true : value === "review" ? null : false;
+                              outing.approved =
+                                value === "approved" ? true : value === "review" ? null : false;
                               modify();
                             }}
                           />
                         </div>
                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                         {/* @ts-ignore */}
-                        <DeleteBtn onClick={() => {modify(outing)}}>
+                        <DeleteBtn
+                          onClick={() => {
+                            modify(outing);
+                          }}
+                        >
                           삭제
                         </DeleteBtn>
                       </InputRow>
                       <InputRow>
-                        <Input type={"datetime-local"}
-                               onInput={(e) => { outing.from = fromLocalInput((e.target as HTMLInputElement).value); modify(); }}
-                               onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                               value={toLocalInput(outing.from)}
-                               step={600}
-                               min="2025-01-01T00:00"/>
+                        <Input
+                          type={"datetime-local"}
+                          onInput={(e) => {
+                            outing.from = fromLocalInput((e.target as HTMLInputElement).value);
+                            modify();
+                          }}
+                          onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                          value={toLocalInput(outing.from)}
+                          step={600}
+                          min="2025-01-01T00:00"
+                        />
                         <p>부터&nbsp;&nbsp;</p>
-                        <Input type={"datetime-local"}
-                               onInput={(e) => { outing.to = fromLocalInput((e.target as HTMLInputElement).value); modify(); }}
-                               onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                               value={toLocalInput(outing.to)}
-                               step={600}
-                               min="2025-01-01T00:00"/>
+                        <Input
+                          type={"datetime-local"}
+                          onInput={(e) => {
+                            outing.to = fromLocalInput((e.target as HTMLInputElement).value);
+                            modify();
+                          }}
+                          onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                          value={toLocalInput(outing.to)}
+                          step={600}
+                          min="2025-01-01T00:00"
+                        />
                         <p>까지</p>
 
-                        <PresetBtn onClick={() => {
-                          if (!currentStay) return;
-                          const stayFromDate = new Date(currentStay.stay_from);
-                          const stayToDate = new Date(currentStay.stay_to);
+                        <PresetBtn
+                          onClick={() => {
+                            if (!currentStay) return;
+                            const stayFromDate = new Date(currentStay.stay_from);
+                            const stayToDate = new Date(currentStay.stay_to);
 
-                          // Find the Sunday during the stay period
-                          let sunday = new Date(stayFromDate);
-                          while (sunday.getDay() !== 0) { // 0 = Sunday
-                            sunday.setDate(sunday.getDate() + 1);
-                          }
-
-                          // If Sunday is after the stay period, use the first Sunday before
-                          if (sunday > stayToDate) {
-                            sunday = new Date(stayFromDate);
+                            // Find the Sunday during the stay period
+                            let sunday = new Date(stayFromDate);
                             while (sunday.getDay() !== 0) {
-                              sunday.setDate(sunday.getDate() - 1);
+                              // 0 = Sunday
+                              sunday.setDate(sunday.getDate() + 1);
                             }
-                          }
 
-                          // Set from time to Sunday 10:20
-                          const fromTime = new Date(sunday);
-                          fromTime.setHours(10, 20, 0, 0);
+                            // If Sunday is after the stay period, use the first Sunday before
+                            if (sunday > stayToDate) {
+                              sunday = new Date(stayFromDate);
+                              while (sunday.getDay() !== 0) {
+                                sunday.setDate(sunday.getDate() - 1);
+                              }
+                            }
 
-                          // Set to time to Sunday 14:00
-                          const toTime = new Date(sunday);
-                          toTime.setHours(14, 0, 0, 0);
+                            // Set from time to Sunday 10:20
+                            const fromTime = new Date(sunday);
+                            fromTime.setHours(10, 20, 0, 0);
 
-                          outing.reason = "자기계발외출";
-                          outing.from = fromTime.toISOString();
-                          outing.to = toTime.toISOString();
-                          modify();
-                        }}>자기계발외출 입력</PresetBtn>
+                            // Set to time to Sunday 14:00
+                            const toTime = new Date(sunday);
+                            toTime.setHours(14, 0, 0, 0);
+
+                            outing.reason = "자기계발외출";
+                            outing.from = fromTime.toISOString();
+                            outing.to = toTime.toISOString();
+                            modify();
+                          }}
+                        >
+                          자기계발외출 입력
+                        </PresetBtn>
                       </InputRow>
                       <InputRow>
-                        <CheckBox text="아침 취소" canceled={outing.breakfast_cancel}
-                                  onClick={() => {outing.breakfast_cancel = !outing.breakfast_cancel; modify()}}>
-                        </CheckBox>
+                        <CheckBox
+                          text="아침 취소"
+                          canceled={outing.breakfast_cancel}
+                          onClick={() => {
+                            outing.breakfast_cancel = !outing.breakfast_cancel;
+                            modify();
+                          }}
+                        ></CheckBox>
                         &nbsp;&nbsp;
-                        <CheckBox text="점심 취소" canceled={outing.lunch_cancel}
-                                  onClick={() => {outing.lunch_cancel = !outing.lunch_cancel; modify()}}>
-                        </CheckBox>
+                        <CheckBox
+                          text="점심 취소"
+                          canceled={outing.lunch_cancel}
+                          onClick={() => {
+                            outing.lunch_cancel = !outing.lunch_cancel;
+                            modify();
+                          }}
+                        ></CheckBox>
                         &nbsp;&nbsp;
-                        <CheckBox text="저녁 취소" canceled={outing.dinner_cancel}
-                                  onClick={() => {outing.dinner_cancel = !outing.dinner_cancel; modify()}}>
-                        </CheckBox>
+                        <CheckBox
+                          text="저녁 취소"
+                          canceled={outing.dinner_cancel}
+                          onClick={() => {
+                            outing.dinner_cancel = !outing.dinner_cancel;
+                            modify();
+                          }}
+                        ></CheckBox>
                       </InputRow>
                     </div>
-                  )
+                  );
                 })}
-                {selectedApply.outing.length === 0 && (
-                  <NoOuting>외출 신청이 없습니다.</NoOuting>
-                )}
+                {selectedApply.outing.length === 0 && <NoOuting>외출 신청이 없습니다.</NoOuting>}
               </OutingBox>
               <ButtonBox>
-                <LightButton type={"yellow"} onClick={() => {
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  setSelectedApply((p) => {
-                    return { ...p!, outing: [...p!.outing, {id: makeid(10), reason: "", breakfast_cancel: false, lunch_cancel: false, dinner_cancel: false, from: "", to: "", approved: true}] }
-                  });
-                }}>외출추가</LightButton>
-                <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>삭제하기</LightButton>
-                <Button onClick={() => edit()}>{selectedApply?.id == "new" ? "생성하기" : "수정하기"}</Button>
+                <LightButton
+                  type={"yellow"}
+                  onClick={() => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    setSelectedApply((p) => {
+                      return {
+                        ...p!,
+                        outing: [
+                          ...p!.outing,
+                          {
+                            id: makeid(10),
+                            reason: "",
+                            breakfast_cancel: false,
+                            lunch_cancel: false,
+                            dinner_cancel: false,
+                            from: "",
+                            to: "",
+                            approved: true,
+                          },
+                        ],
+                      };
+                    });
+                  }}
+                >
+                  외출추가
+                </LightButton>
+                <LightButton type={"danger"} onClick={() => deleteApply(selectedApply!.id)}>
+                  삭제하기
+                </LightButton>
+                <Button onClick={() => edit()}>
+                  {selectedApply?.id == "new" ? "생성하기" : "수정하기"}
+                </Button>
               </ButtonBox>
             </StayApplyDetail>
           </>

@@ -116,7 +116,8 @@ declare module "styled-components" {
       };
     };
     Font: {
-      [key in | "Display"
+      [key in
+        | "Display"
         | "Title"
         | "Headline"
         | "Body"

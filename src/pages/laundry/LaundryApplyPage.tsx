@@ -1,24 +1,24 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {useEffect, useState} from "react";
+import { type PersonalInformation } from "../../api/auth.ts";
 import {
+  type CreateLaundryApplyPayload,
+  createLaundryApply,
+  deleteLaundryApply,
+  getLaundryApplyList,
   getLaundryMachineList,
   getLaundryTimeline,
   getLaundryTimelineList,
-  getLaundryApplyList,
-  createLaundryApply,
-  deleteLaundryApply,
+  type LaundryApply,
   type LaundryMachine,
   type LaundryTimeline,
-  type CreateLaundryApplyPayload,
-  type LaundryApply
 } from "../../api/laundry.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
+import { type User } from "../../api/user.ts";
 import Loading from "../../components/Loading.tsx";
-import { Button } from "../../styles/components/button.ts";
 import SearchStudent from "../../components/SearchStudent.tsx";
-import {type User} from "../../api/user.ts";
-import {type PersonalInformation} from "../../api/auth.ts";
-import {UISelectField, UISegmentedControl} from "../../components/ui";
+import { UISegmentedControl, UISelectField } from "../../components/ui";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { Button } from "../../styles/components/button.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -63,7 +63,7 @@ const BodyBox = styled.div`
   flex-direction: row;
   align-items: center;
   
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
@@ -75,7 +75,7 @@ const BodyBox = styled.div`
   > hr {
     width: 0.7px;
     height: 85%; 
-    border: 1px solid ${({theme}) => theme.Colors.Background.Quaternary};
+    border: 1px solid ${({ theme }) => theme.Colors.Background.Quaternary};
   }
 `;
 
@@ -99,7 +99,7 @@ const FitController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -114,7 +114,7 @@ const StretchController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -122,8 +122,8 @@ const StretchController = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Callout.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
   font-weight: 600;
 `;
 
@@ -138,20 +138,18 @@ const LaundryApply = styled.div<{ selected?: boolean }>`
   justify-content: space-between;
   align-items: center;
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
-  font-size: ${({theme}) => theme.Font.Headline.size};
+  font-size: ${({ theme }) => theme.Font.Headline.size};
   
-  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
   padding: 1dvh 1dvw;
 
-  ${({ selected, theme }) => selected &&
-  `background-color: ${theme.Colors.Core.Brand.Primary};`}
+  ${({ selected, theme }) => selected && `background-color: ${theme.Colors.Core.Brand.Primary};`}
 `;
-
 
 function LaundryApplyPage() {
   const { showToast } = useNotification();
@@ -182,59 +180,75 @@ function LaundryApplyPage() {
   const updateScreen = () => {
     setIsLoading(true);
 
-    getLaundryMachineList().then((res) => {
-      setMachines(res.sort((a, b) => {
-        if (a.gender !== b.gender) {
-          return a.gender === "male" ? -1 : 1;
+    getLaundryMachineList()
+      .then((res) => {
+        setMachines(
+          res.sort((a, b) => {
+            if (a.gender !== b.gender) {
+              return a.gender === "male" ? -1 : 1;
+            }
+
+            if (a.type !== b.type) {
+              return a.type === "washer" ? -1 : 1;
+            }
+
+            const aGrade =
+              currentTimeline?.times.find((t) =>
+                t.assigns.find((assign) => assign.laundry_machine.id === a.id),
+              )?.grade || 0;
+            const bGrade =
+              currentTimeline?.times.find((t) =>
+                t.assigns.find((assign) => assign.laundry_machine.id === b.id),
+              )?.grade || 0;
+            if (aGrade !== bGrade) {
+              return parseInt(aGrade.toString()) - parseInt(bGrade.toString());
+            }
+
+            return a.name.localeCompare(b.name);
+          }),
+        );
+
+        if (res.length > 0) setSelectedMachine(0);
+      })
+      .catch((err) => {
+        console.error(err);
+        showToast("세탁기 목록을 불러오는데 실패했습니다.", "warning");
+      });
+
+    getLaundryTimelineList()
+      .then((res) => {
+        const currentTimelineId = res.find((timeline) => timeline.enabled);
+        if (currentTimelineId) {
+          getLaundryTimeline(currentTimelineId.id)
+            .then((timeline) => {
+              setCurrentTimeline(timeline);
+            })
+            .catch((err) => {
+              console.error(err);
+              showToast("세탁 타임라인을 불러오는데 실패했습니다.", "warning");
+            });
         }
+      })
+      .catch((err) => {
+        console.error(err);
+        showToast("세탁 타임라인을 불러오는데 실패했습니다.", "warning");
+      });
 
-        if (a.type !== b.type) {
-          return a.type === "washer" ? -1 : 1;
-        }
+    getLaundryApplyList()
+      .then((res) => {
+        setApplies(res);
 
-        const aGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === a.id))?.grade || 0;
-        const bGrade = currentTimeline?.times.find(t => t.assigns.find(assign => assign.laundry_machine.id === b.id))?.grade || 0;
-        if (aGrade !== bGrade) {
-          return parseInt(aGrade.toString()) - parseInt(bGrade.toString());
-        }
+        console.log(res);
+      })
+      .catch((err) => {
+        console.error(err);
+        showToast("세탁 신청 목록을 불러오는데 실패했습니다.", "warning");
+      })
+      .finally(() => {
+        setIsLoading(false);
 
-        return a.name.localeCompare(b.name);
-      }));
-
-      if(res.length > 0) setSelectedMachine(0);
-    }).catch((err) => {
-      console.error(err);
-      showToast("세탁기 목록을 불러오는데 실패했습니다.", "warning");
-    });
-
-    getLaundryTimelineList().then((res) => {
-      const currentTimelineId = res.find(timeline => timeline.enabled);
-      if (currentTimelineId) {
-        getLaundryTimeline(currentTimelineId.id).then((timeline) => {
-          setCurrentTimeline(timeline);
-        }).catch((err) => {
-          console.error(err);
-          showToast("세탁 타임라인을 불러오는데 실패했습니다.", "warning");
-        });
-      }
-    }).catch((err) => {
-      console.error(err);
-      showToast("세탁 타임라인을 불러오는데 실패했습니다.", "warning");
-    });
-
-    getLaundryApplyList().then((res) => {
-      setApplies(res);
-
-
-      console.log(res);
-    }).catch((err) => {
-      console.error(err);
-      showToast("세탁 신청 목록을 불러오는데 실패했습니다.", "warning");
-    }).finally(() => {
-      setIsLoading(false);
-
-      console.log(applies);
-    });
+        console.log(applies);
+      });
   };
 
   useEffect(() => {
@@ -242,7 +256,7 @@ function LaundryApplyPage() {
   }, []);
 
   const applyLaundry = () => {
-    if(newUser === null || applyMachineId === null || applyTimeId === null) {
+    if (newUser === null || applyMachineId === null || applyTimeId === null) {
       showToast("학생, 세탁기, 시간을 모두 선택해주세요.", "warning");
       return;
     }
@@ -250,227 +264,301 @@ function LaundryApplyPage() {
     const dto: CreateLaundryApplyPayload = {
       user: newUser.id,
       machine: applyMachineId,
-      laundryTime: applyTimeId
+      laundryTime: applyTimeId,
     };
 
-    createLaundryApply(dto).then(() => {
-      showToast("세탁 신청이 완료되었습니다.", "info");
-      setNewUser(null);
-      setNameSearch("");
-      setApplyMachineId(null);
-      setApplyTimeId(null);
-      updateScreen();
-    }).catch((e: any) => {
-      showToast(e.response.data.error.message || e.response.data.error || "세탁 신청에 실패했습니다.", "danger");
-    });
-  }
+    createLaundryApply(dto)
+      .then(() => {
+        showToast("세탁 신청이 완료되었습니다.", "info");
+        setNewUser(null);
+        setNameSearch("");
+        setApplyMachineId(null);
+        setApplyTimeId(null);
+        updateScreen();
+      })
+      .catch((e: any) => {
+        showToast(
+          e.response.data.error.message || e.response.data.error || "세탁 신청에 실패했습니다.",
+          "danger",
+        );
+      });
+  };
 
   const deleteLaundry = () => {
-    if(cancleMachineId === null || cancleTimeId === null) {
+    if (cancleMachineId === null || cancleTimeId === null) {
       showToast("세탁기, 시간을 모두 선택해주세요.", "warning");
       return;
     }
 
-    const apply = applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === cancleTimeId);
-    if(!apply) {
+    const apply = applies.find(
+      (a) => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === cancleTimeId,
+    );
+    if (!apply) {
       showToast("해당 세탁 신청을 찾을 수 없습니다.", "warning");
       return;
     }
 
-    deleteLaundryApply(apply.id).then(() => {
-      showToast("세탁 신청이 취소되었습니다.", "info");
-      updateScreen();
-    }).catch((e: any) => {
-      showToast(e.response.data.error.message || e.response.data.error || "세탁 신청 취소에 실패했습니다.", "danger");
-    });
-  }
+    deleteLaundryApply(apply.id)
+      .then(() => {
+        showToast("세탁 신청이 취소되었습니다.", "info");
+        updateScreen();
+      })
+      .catch((e: any) => {
+        showToast(
+          e.response.data.error.message ||
+            e.response.data.error ||
+            "세탁 신청 취소에 실패했습니다.",
+          "danger",
+        );
+      });
+  };
 
   return (
-      <Wrapper>
-          <BodyBox>
-            <LaundryListContainer>
-              {isLoading ? <Loading/> : (
-                machines.filter(m => {
-                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
+    <Wrapper>
+      <BodyBox>
+        <LaundryListContainer>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            machines
+              .filter((m) => {
+                const timelineGrade = currentTimeline?.times.find((t) =>
+                  t.assigns.find((a) => a.laundry_machine.id === m.id),
+                )?.grade;
                 const gradeFilter = filterGrade === null || timelineGrade?.includes(filterGrade);
                 const genderFilter = filterGender === null || m.gender === filterGender;
                 return gradeFilter && genderFilter;
-                }).map((m) => {
-                const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
+              })
+              .map((m) => {
+                const timelineGrade = currentTimeline?.times.find((t) =>
+                  t.assigns.find((a) => a.laundry_machine.id === m.id),
+                )?.grade;
 
                 return (
-                  <LaundryApply key={m.id} selected={selectedMachine === machines.indexOf(m)} onClick={() => setSelectedMachine(machines.indexOf(m))}>
-                  <span>{`[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name}`}</span>
-                  <span>{`(${timelineGrade}학년 ${m.gender === "male" ? "남자" : "여자"})`}</span>
+                  <LaundryApply
+                    key={m.id}
+                    selected={selectedMachine === machines.indexOf(m)}
+                    onClick={() => setSelectedMachine(machines.indexOf(m))}
+                  >
+                    <span>{`[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name}`}</span>
+                    <span>{`(${timelineGrade}학년 ${m.gender === "male" ? "남자" : "여자"})`}</span>
                   </LaundryApply>
                 );
-                })
-              )}
-            </LaundryListContainer>
-            <hr/>
-            <LaundryListContainer>
-              {isLoading ? <Loading/> : (
-                selectedMachine !== null && machines[selectedMachine] && (
-                  currentTimeline?.times.filter(t => t.assigns.find(a => a.laundry_machine.id === machines[selectedMachine].id)).sort((a, b) => a.time.localeCompare(b.time)).map((time) => (
-                    <LaundryApply key={time.id}>
-                      <span>{time.time}</span>
-                      {(() => {
-                        const user = applies.find(a => a.laundry_machine.id === machines[selectedMachine].id && a.laundry_time.id === time.id)?.user;
-                        return user && <span>{`${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name}`}</span>
-                      })()}
-                    </LaundryApply>
-                  ))
-              ))}
-            </LaundryListContainer>
-          </BodyBox>
-          <ControllerBox>
-            <FitController>
-              <Text>분류</Text>
-              <UISegmentedControl
-                items={[
-                  { label: "1학년", value: "1" },
-                  { label: "2학년", value: "2" },
-                  { label: "3학년", value: "3" },
-                  { label: "모두", value: "all" },
-                ]}
-                value={gradeSegmentValue}
-                onChange={(value) => {
-                  setFilterGrade(value === "all" ? null : parseInt(value) as 1 | 2 | 3);
-                  setSelectedMachine(null);
-                }}
-              />
-              <UISegmentedControl
-                items={[
-                  { label: "남자", value: "male" },
-                  { label: "여자", value: "female" },
-                  { label: "모두", value: "all" },
-                ]}
-                value={genderSegmentValue}
-                onChange={(value) => {
-                  setFilterGender(value === "all" ? null : value as "male" | "female");
-                  setSelectedMachine(null);
-                }}
-              />
-            </FitController>
-            <FitController>
-              <Text>세탁/건조 신청</Text>
-              <SearchStudent
-                setNewUser={setNewUser}
-                nameResults={nameResults}
-                setNameResults={setNameResults}
-                nameLoading={nameLoading}
-                setNameLoading={setNameLoading}
-                nameSearch={nameSearch}
-                setNameSearch={setNameSearch}
-              />
-              <UISelectField
-                value={applyMachineId || ""}
-                onChange={(e) => {
-                  if(e.target.value === "") {
-                    setApplyMachineId(null);
-                    setApplyTimeId(null);
-                    return;
-                  }
+              })
+          )}
+        </LaundryListContainer>
+        <hr />
+        <LaundryListContainer>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            selectedMachine !== null &&
+            machines[selectedMachine] &&
+            currentTimeline?.times
+              .filter((t) =>
+                t.assigns.find((a) => a.laundry_machine.id === machines[selectedMachine].id),
+              )
+              .sort((a, b) => a.time.localeCompare(b.time))
+              .map((time) => (
+                <LaundryApply key={time.id}>
+                  <span>{time.time}</span>
+                  {(() => {
+                    const user = applies.find(
+                      (a) =>
+                        a.laundry_machine.id === machines[selectedMachine].id &&
+                        a.laundry_time.id === time.id,
+                    )?.user;
+                    return (
+                      user && (
+                        <span>{`${user.grade}${user.class}${("0" + user.number).slice(-2)} ${user.name}`}</span>
+                      )
+                    );
+                  })()}
+                </LaundryApply>
+              ))
+          )}
+        </LaundryListContainer>
+      </BodyBox>
+      <ControllerBox>
+        <FitController>
+          <Text>분류</Text>
+          <UISegmentedControl
+            items={[
+              { label: "1학년", value: "1" },
+              { label: "2학년", value: "2" },
+              { label: "3학년", value: "3" },
+              { label: "모두", value: "all" },
+            ]}
+            value={gradeSegmentValue}
+            onChange={(value) => {
+              setFilterGrade(value === "all" ? null : (parseInt(value) as 1 | 2 | 3));
+              setSelectedMachine(null);
+            }}
+          />
+          <UISegmentedControl
+            items={[
+              { label: "남자", value: "male" },
+              { label: "여자", value: "female" },
+              { label: "모두", value: "all" },
+            ]}
+            value={genderSegmentValue}
+            onChange={(value) => {
+              setFilterGender(value === "all" ? null : (value as "male" | "female"));
+              setSelectedMachine(null);
+            }}
+          />
+        </FitController>
+        <FitController>
+          <Text>세탁/건조 신청</Text>
+          <SearchStudent
+            setNewUser={setNewUser}
+            nameResults={nameResults}
+            setNameResults={setNameResults}
+            nameLoading={nameLoading}
+            setNameLoading={setNameLoading}
+            nameSearch={nameSearch}
+            setNameSearch={setNameSearch}
+          />
+          <UISelectField
+            value={applyMachineId || ""}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setApplyMachineId(null);
+                setApplyTimeId(null);
+                return;
+              }
 
-                  setApplyMachineId(e.target.value);
-                  setApplyTimeId(null);
-                }}
-                options={[
-                  { value: "", label: "세탁/건조기 선택" },
-                  ...(selectedMachine !== null ? machines.map((m) => {
-                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
+              setApplyMachineId(e.target.value);
+              setApplyTimeId(null);
+            }}
+            options={[
+              { value: "", label: "세탁/건조기 선택" },
+              ...(selectedMachine !== null
+                ? machines.map((m) => {
+                    const timelineGrade = currentTimeline?.times.find((t) =>
+                      t.assigns.find((a) => a.laundry_machine.id === m.id),
+                    )?.grade;
                     return {
                       value: m.id,
-                      label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`
+                      label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`,
                     };
-                  }) : [])
-                ]}
-              />
-              <UISelectField
-                value={applyTimeId || ""}
-                onChange={(e) => {
-                  if(e.target.value === "") {
-                    setApplyTimeId(null);
-                    return;
-                  }
+                  })
+                : []),
+            ]}
+          />
+          <UISelectField
+            value={applyTimeId || ""}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setApplyTimeId(null);
+                return;
+              }
 
-                  setApplyTimeId(e.target.value);
-                }}
-                options={[
-                  { value: "", label: "세탁/건조 시간 선택" },
-                  ...(
-                    selectedMachine !== null && applyMachineId !== null
-                      ? (currentTimeline?.times
-                        .filter(t => t.assigns.find(a => a.laundry_machine.id === applyMachineId))
-                        .filter(time => !applies.find(a => a.laundry_machine.id === applyMachineId && a.laundry_time.id === time.id))
-                        .sort((a, b) => a.time.localeCompare(b.time))
-                        .map((time) => ({ value: time.id, label: time.time })) || [])
-                      : []
-                  )
-                ]}
-              />
-              <Button type={"primary"} style={{height: "5dvh", padding: 0}} disabled={newUser === null || applyMachineId === null || applyTimeId === null} onClick={applyLaundry}>세탁/건조 신청</Button>
-            </FitController>
-            <StretchController>
-              <Text>세탁/건조 신청 취소</Text>
-              <UISelectField
-                value={cancleMachineId || ""}
-                onChange={(e) => {
-                  if(e.target.value === "") {
-                    setCancleMachineId(null);
-                    setCancleTimeId(null);
-                    return;
-                  }
+              setApplyTimeId(e.target.value);
+            }}
+            options={[
+              { value: "", label: "세탁/건조 시간 선택" },
+              ...(selectedMachine !== null && applyMachineId !== null
+                ? currentTimeline?.times
+                    .filter((t) => t.assigns.find((a) => a.laundry_machine.id === applyMachineId))
+                    .filter(
+                      (time) =>
+                        !applies.find(
+                          (a) =>
+                            a.laundry_machine.id === applyMachineId &&
+                            a.laundry_time.id === time.id,
+                        ),
+                    )
+                    .sort((a, b) => a.time.localeCompare(b.time))
+                    .map((time) => ({ value: time.id, label: time.time })) || []
+                : []),
+            ]}
+          />
+          <Button
+            type={"primary"}
+            style={{ height: "5dvh", padding: 0 }}
+            disabled={newUser === null || applyMachineId === null || applyTimeId === null}
+            onClick={applyLaundry}
+          >
+            세탁/건조 신청
+          </Button>
+        </FitController>
+        <StretchController>
+          <Text>세탁/건조 신청 취소</Text>
+          <UISelectField
+            value={cancleMachineId || ""}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setCancleMachineId(null);
+                setCancleTimeId(null);
+                return;
+              }
 
-                  setCancleMachineId(e.target.value);
-                  setCancleTimeId(null);
-                }}
-                options={[
-                  { value: "", label: "세탁/건조기 선택" },
-                  ...(selectedMachine !== null ? machines.map((m) => {
-                    const timelineGrade = currentTimeline?.times.find(t => t.assigns.find(a => a.laundry_machine.id === m.id))?.grade;
+              setCancleMachineId(e.target.value);
+              setCancleTimeId(null);
+            }}
+            options={[
+              { value: "", label: "세탁/건조기 선택" },
+              ...(selectedMachine !== null
+                ? machines.map((m) => {
+                    const timelineGrade = currentTimeline?.times.find((t) =>
+                      t.assigns.find((a) => a.laundry_machine.id === m.id),
+                    )?.grade;
                     return {
                       value: m.id,
-                      label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`
+                      label: `[${m.type === "washer" ? "세탁기" : "건조기"}] ${m.name} (${timelineGrade}학년)`,
                     };
-                  }) : [])
-                ]}
-              />
-              <UISelectField
-                value={cancleTimeId || ""}
-                onChange={(e) => {
-                  if(e.target.value === "") {
-                    setCancleTimeId(null);
-                    return;
-                  }
+                  })
+                : []),
+            ]}
+          />
+          <UISelectField
+            value={cancleTimeId || ""}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setCancleTimeId(null);
+                return;
+              }
 
-                  setCancleTimeId(e.target.value);
-                }}
-                options={[
-                  { value: "", label: "세탁/건조 시간 선택" },
-                  ...(
-                    selectedMachine !== null && cancleMachineId !== null
-                      ? (currentTimeline?.times
-                        .filter(t => t.assigns.find(a => a.laundry_machine.id === cancleMachineId))
-                        .filter(time => applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id))
-                        .sort((a, b) => a.time.localeCompare(b.time))
-                        .map((time) => {
-                          const user = applies.find(a => a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id)?.user;
-                          return {
-                            value: time.id,
-                            label: `${time.time} ${user?.number ? ` (${user.grade}${user.class}${("0"+user.number).slice(-2)} ${user.name})` : user?.name || ""}`
-                          };
-                        }) || [])
-                      : []
-                  )
-                ]}
-              />
-              <Button type={"primary"} style={{height: "5dvh", padding: 0}} disabled={cancleMachineId === null || cancleTimeId === null} onClick={deleteLaundry}>세탁/건조 신청 취소</Button>
-            </StretchController>
-          </ControllerBox>
-      </Wrapper>
+              setCancleTimeId(e.target.value);
+            }}
+            options={[
+              { value: "", label: "세탁/건조 시간 선택" },
+              ...(selectedMachine !== null && cancleMachineId !== null
+                ? currentTimeline?.times
+                    .filter((t) => t.assigns.find((a) => a.laundry_machine.id === cancleMachineId))
+                    .filter((time) =>
+                      applies.find(
+                        (a) =>
+                          a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id,
+                      ),
+                    )
+                    .sort((a, b) => a.time.localeCompare(b.time))
+                    .map((time) => {
+                      const user = applies.find(
+                        (a) =>
+                          a.laundry_machine.id === cancleMachineId && a.laundry_time.id === time.id,
+                      )?.user;
+                      return {
+                        value: time.id,
+                        label: `${time.time} ${user?.number ? ` (${user.grade}${user.class}${("0" + user.number).slice(-2)} ${user.name})` : user?.name || ""}`,
+                      };
+                    }) || []
+                : []),
+            ]}
+          />
+          <Button
+            type={"primary"}
+            style={{ height: "5dvh", padding: 0 }}
+            disabled={cancleMachineId === null || cancleTimeId === null}
+            onClick={deleteLaundry}
+          >
+            세탁/건조 신청 취소
+          </Button>
+        </StretchController>
+      </ControllerBox>
+    </Wrapper>
   );
-
 }
 
 export default LaundryApplyPage;

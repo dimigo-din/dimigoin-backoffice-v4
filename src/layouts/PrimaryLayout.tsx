@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useState } from "react";
+import styled from "styled-components";
 import SideBar from "../components/SideBar.tsx";
-import {MobileNotificationProvider} from "../providers/MobileNotifiCationProvider.tsx";
+import { MobileNotificationProvider } from "../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   gap: 32px;
   padding: 58px;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
 
   @media (max-width: 768px) {
     padding: 0;
@@ -29,7 +29,7 @@ const ContentWrapper = styled.div`
   flex: 1;
   min-width: 0;
 
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
   border-radius: 12px;
 
   overflow: hidden;
@@ -57,8 +57,8 @@ const TopBar = styled.div`
     align-items: center;
     height: 56px;
     padding: 0 16px;
-    border-bottom: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-    background: ${({theme}) => theme.Colors.Background.Primary};
+    border-bottom: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
+    background: ${({ theme }) => theme.Colors.Background.Primary};
   }
 `;
 
@@ -71,8 +71,8 @@ const HamburgerButton = styled.button`
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    background: ${({theme}) => theme.Colors.Background.Secondary};
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    background: ${({ theme }) => theme.Colors.Background.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Primary};
     z-index: 1;
   }
 `;
@@ -85,7 +85,7 @@ const TopBarTitle = styled.span`
     left: 50%;
     transform: translateX(-50%);
     font-weight: 600;
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    color: ${({ theme }) => theme.Colors.Content.Primary};
     pointer-events: none;
   }
 `;
@@ -115,8 +115,8 @@ const Backdrop = styled.div<{ $visible: boolean }>`
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.35);
-  opacity: ${({$visible}) => ($visible ? 1 : 0)};
-  pointer-events: ${({$visible}) => ($visible ? "auto" : "none")};
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
   transition: opacity 200ms ease;
   z-index: 8; /* below sidebar */
 
@@ -125,14 +125,18 @@ const Backdrop = styled.div<{ $visible: boolean }>`
   }
 `;
 
-function PrimaryLayout({ children } : { children: ReactNode }) {
+function PrimaryLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <Wrapper>
       <MobileNotificationProvider>
         <SideBarHost>
-          <SideBar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} onNavigate={() => setMobileOpen(false)} />
+          <SideBar
+            mobileOpen={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            onNavigate={() => setMobileOpen(false)}
+          />
         </SideBarHost>
 
         <Backdrop $visible={mobileOpen} onClick={() => setMobileOpen(false)} />
@@ -145,9 +149,7 @@ function PrimaryLayout({ children } : { children: ReactNode }) {
             <TopBarTitle>디미고인</TopBarTitle>
             <RightSpacer aria-hidden="true" />
           </TopBar>
-          <MainContent>
-            {children}
-          </MainContent>
+          <MainContent>{children}</MainContent>
         </ContentWrapper>
       </MobileNotificationProvider>
     </Wrapper>

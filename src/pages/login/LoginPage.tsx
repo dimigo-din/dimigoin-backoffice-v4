@@ -1,12 +1,12 @@
-import Scenery from "../../assets/imgs/schoolscenery.svg?react"
+import { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import GoogleLogo from "../../assets/icons/google.svg?react";
+import { getPermission, getRedirectUri, googleLogin, logout } from "../../api/auth.ts";
 import Logo from "../../assets/icons/dimigoin.svg?react";
-import {getRedirectUri, googleLogin, getPermission, logout} from "../../api/auth.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {useEffect} from "react";
-import {Link, useSearchParams} from "react-router-dom";
-import {parseJwt} from "../../utils/jwt.ts";
+import GoogleLogo from "../../assets/icons/google.svg?react";
+import Scenery from "../../assets/imgs/schoolscenery.svg?react";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { parseJwt } from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: ${({theme}) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Primary};
 `;
 
 const Brand = styled.div`
@@ -37,10 +37,10 @@ const Title = styled.div`
   gap: 10px;
   margin-bottom: 16px;
 
-  font-size: ${({theme}) => theme.Font.Title.size};
-  font-weight: ${({theme}) => theme.Font.Title.weight.strong};
+  font-size: ${({ theme }) => theme.Font.Title.size};
+  font-weight: ${({ theme }) => theme.Font.Title.weight.strong};
 
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   > svg {
     width: 28px;
@@ -51,8 +51,8 @@ const Title = styled.div`
 const LoginButton = styled.button`
   width: 100%;
   min-height: 56px;
-  border-radius: ${({theme}) => theme.Radius[400]};
-  background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  border-radius: ${({ theme }) => theme.Radius[400]};
+  background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
 
   display: inline-flex;
   flex-direction: row;
@@ -60,14 +60,14 @@ const LoginButton = styled.button`
   justify-content: center;
   gap: 8px;
   padding: 0 20px;
-  color: ${({theme}) => theme.Colors.Solid.White};
+  color: ${({ theme }) => theme.Colors.Solid.White};
 
   p {
     margin: 0;
     color: inherit;
-    font-size: ${({theme}) => theme.Font.Body.size};
-    line-height: ${({theme}) => theme.Font.Body.lineHeight};
-    font-weight: ${({theme}) => theme.Font.Body.weight.regular};
+    font-size: ${({ theme }) => theme.Font.Body.size};
+    line-height: ${({ theme }) => theme.Font.Body.lineHeight};
+    font-weight: ${({ theme }) => theme.Font.Body.weight.regular};
   }
 
   > svg {
@@ -76,12 +76,12 @@ const LoginButton = styled.button`
   }
 
   &:active {
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Secondary};
+    background-color: ${({ theme }) => theme.Colors.Core.Brand.Secondary};
   }
 
   &:disabled {
-    background-color: ${({theme}) => theme.Colors.Components.Fill.Tertiary};
-    color: ${({theme}) => theme.Colors.Content.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Components.Fill.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Tertiary};
     cursor: not-allowed;
   }
 `;
@@ -90,19 +90,19 @@ const PwLoginButton = styled(Link)`
   width: 100%;
   min-height: 44px;
   margin-top: 10px;
-  border-radius: ${({theme}) => theme.Radius[400]};
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  border-radius: ${({ theme }) => theme.Radius[400]};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   text-decoration: none;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  font-size: ${({theme}) => theme.Font.Callout.size};
-  line-height: ${({theme}) => theme.Font.Callout.lineHeight};
-  font-weight: ${({theme}) => theme.Font.Callout.weight.regular};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
+  line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
+  font-weight: ${({ theme }) => theme.Font.Callout.weight.regular};
 `;
 
 const SceneryLayer = styled.div`
@@ -119,7 +119,7 @@ const SceneryLayer = styled.div`
 `;
 
 function LoginPage() {
-  const {showToast} = useNotification();
+  const { showToast } = useNotification();
   const [searchParams] = useSearchParams();
 
   const handleLoginClick = () => {
@@ -136,38 +136,42 @@ function LoginPage() {
     const code = searchParams.get("code") as string;
     if (code) {
       showToast("로그인중입니다...", "info");
-      googleLogin(code).then(({accessToken}) => {
-        const payload = parseJwt(accessToken);
+      googleLogin(code)
+        .then(({ accessToken }) => {
+          const payload = parseJwt(accessToken);
 
-        getPermission().then((res) => {
-          const permissions = res;
+          getPermission()
+            .then((res) => {
+              const permissions = res;
 
-          // 권한 체크
-          if(permissions.length === 0) {
-            showToast("권한이 없습니다.", "danger");
-            logout();
-            return;
-          }
+              // 권한 체크
+              if (permissions.length === 0) {
+                showToast("권한이 없습니다.", "danger");
+                logout();
+                return;
+              }
 
-          localStorage.setItem("id", payload.id);
-          localStorage.setItem("name", payload.name);
-          localStorage.setItem("picture", payload.picture);
-          localStorage.setItem("permissions", JSON.stringify(permissions));
+              localStorage.setItem("id", payload.id);
+              localStorage.setItem("name", payload.name);
+              localStorage.setItem("picture", payload.picture);
+              localStorage.setItem("permissions", JSON.stringify(permissions));
 
-          showToast("로그인에 성공하였습니다.", "info");
-          setTimeout(() => {
-            location.href = "/";
-          }, 1500);
-        }).catch((e) => {
-          console.error("Permission check failed:", e);
-          showToast("권한 확인에 실패했습니다.", "danger");
-          logout();
+              showToast("로그인에 성공하였습니다.", "info");
+              setTimeout(() => {
+                location.href = "/";
+              }, 1500);
+            })
+            .catch((e) => {
+              console.error("Permission check failed:", e);
+              showToast("권한 확인에 실패했습니다.", "danger");
+              logout();
+            });
+        })
+        .catch((e) => {
+          console.error(e);
+          showToast("로그인에 실패했습니다.", "danger");
+          showToast(e.response?.data?.error || "알 수 없는 오류가 발생했습니다.", "danger");
         });
-      }).catch((e) => {
-        console.error(e);
-        showToast("로그인에 실패했습니다.", "danger");
-        showToast(e.response?.data?.error || "알 수 없는 오류가 발생했습니다.", "danger");
-      });
     }
   }, []);
 
@@ -175,11 +179,11 @@ function LoginPage() {
     <Wrapper>
       <Brand>
         <Title>
-          <Logo/>
+          <Logo />
           <p>디미고인</p>
         </Title>
         <LoginButton onClick={handleLoginClick}>
-          <GoogleLogo/>
+          <GoogleLogo />
           <p>디미고 구글 계정으로 로그인</p>
         </LoginButton>
         <PwLoginButton to="/login/pw">비밀번호 로그인</PwLoginButton>

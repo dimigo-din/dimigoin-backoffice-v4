@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import styled from "styled-components";
 import { UIControl } from "./Control";
 
 type InputFieldType = "single" | "double";

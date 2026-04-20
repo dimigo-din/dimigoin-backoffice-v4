@@ -2,17 +2,17 @@ import { useState } from "react";
 import styled from "styled-components";
 import {
   Text,
-  UIButton,
   UIBadge,
+  UIButton,
   UIControl,
   UIDivider,
   UIInputField,
+  UINavBar,
+  UIOptionPicker,
+  UISegmentedControl,
   UISelectField,
   UITextAreaField,
   UIToggleRow,
-  UISegmentedControl,
-  UIOptionPicker,
-  UINavBar,
 } from "../../components/ui";
 
 const Wrapper = styled.div`
@@ -72,11 +72,17 @@ export default function UiKitPage() {
     <Wrapper>
       <Grid>
         <Section>
-          <Text as="h1" variant="title" weight="strong">Factory UI Components</Text>
-          <Text variant="paragraphSmall" color="secondary">Figma Atom/Molecule 기준으로 정리한 공통 컴포넌트입니다.</Text>
+          <Text as="h1" variant="title" weight="strong">
+            Factory UI Components
+          </Text>
+          <Text variant="paragraphSmall" color="secondary">
+            Figma Atom/Molecule 기준으로 정리한 공통 컴포넌트입니다.
+          </Text>
           <UIDivider size="small" />
 
-          <Text variant="callout" weight="strong">Buttons</Text>
+          <Text variant="callout" weight="strong">
+            Buttons
+          </Text>
           <Row>
             <UIButton>Primary</UIButton>
             <UIButton variant="neutral">Neutral</UIButton>
@@ -84,7 +90,9 @@ export default function UiKitPage() {
             <UIButton variant="ghost">Ghost</UIButton>
           </Row>
 
-          <Text variant="callout" weight="strong">Badges & Controls</Text>
+          <Text variant="callout" weight="strong">
+            Badges & Controls
+          </Text>
           <Row>
             <UIBadge tone="grayscale" label="공지" />
             <UIBadge tone="accent" label="신규" />
@@ -97,8 +105,14 @@ export default function UiKitPage() {
             <UIControl controlType="radio" checked />
           </Row>
 
-          <Text variant="callout" weight="strong">Inputs</Text>
-          <UIInputField title="외출 사유" placeholder="외출 사유를 입력해주세요" subLabel="최대 100자" />
+          <Text variant="callout" weight="strong">
+            Inputs
+          </Text>
+          <UIInputField
+            title="외출 사유"
+            placeholder="외출 사유를 입력해주세요"
+            subLabel="최대 100자"
+          />
           <UIInputField
             title="태그 입력"
             fieldType="double"
@@ -114,11 +128,17 @@ export default function UiKitPage() {
             ]}
           />
           <UITextAreaField title="비고" placeholder="추가 설명을 입력해주세요" />
-          <UIToggleRow label="이용 약관 동의" checked={agree} onChange={() => setAgree((prev) => !prev)} />
+          <UIToggleRow
+            label="이용 약관 동의"
+            checked={agree}
+            onChange={() => setAgree((prev) => !prev)}
+          />
         </Section>
 
         <Section>
-          <Text as="h2" variant="callout" weight="strong">Mobile Composition</Text>
+          <Text as="h2" variant="callout" weight="strong">
+            Mobile Composition
+          </Text>
           <PhoneFrame>
             <UINavBar title="잔류 신청" left="‹" right="⋯" />
             <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>

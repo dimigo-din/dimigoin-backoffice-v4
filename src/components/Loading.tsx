@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import DimigoinLoading from "../assets/icons/dimigoin_loading.svg?react"
+import DimigoinLoading from "../assets/icons/dimigoin_loading.svg?react";
 
 const Page = styled.div`
   height: 100%;
@@ -16,7 +16,7 @@ function Loading() {
     <Page>
       <DimigoinLoading />
     </Page>
-  )
+  );
 }
 
 export default Loading;

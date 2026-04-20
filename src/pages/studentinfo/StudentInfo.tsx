@@ -1,13 +1,13 @@
+import Papa from "papaparse";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import {useEffect, useMemo, useState} from "react";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
 import {
   deletePersonalInformationAll,
   getAllPersonalInformations,
+  type PersonalInformation,
   setPersonalInformations,
-  type PersonalInformation
 } from "../../api/auth.ts";
-import Papa from "papaparse";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 const Card = styled.div`
   flex: 1;
   min-height: 0;
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -42,14 +42,14 @@ const CardHead = styled.div`
 
   h3 {
     margin: 0;
-    font-size: ${({theme}) => theme.Font.Headline.size};
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    font-size: ${({ theme }) => theme.Font.Headline.size};
+    color: ${({ theme }) => theme.Colors.Content.Primary};
   }
 
   p {
     margin: 2px 0 0;
-    color: ${({theme}) => theme.Colors.Content.Secondary};
-    font-size: ${({theme}) => theme.Font.Body.size};
+    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    font-size: ${({ theme }) => theme.Font.Body.size};
   }
 `;
 
@@ -59,42 +59,42 @@ const ActionButton = styled.button`
   border: none;
   border-radius: 8px;
   padding: 0 14px;
-  background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   color: white;
-  font-size: ${({theme}) => theme.Font.Body.size};
+  font-size: ${({ theme }) => theme.Font.Body.size};
   cursor: pointer;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Primary}cc;
+    background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary}cc;
   }
 
   &:disabled {
-    background-color: ${({theme}) => theme.Colors.Line.Outline};
+    background-color: ${({ theme }) => theme.Colors.Line.Outline};
     cursor: not-allowed;
   }
 `;
 
 const GhostButton = styled(ActionButton)`
-  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   &:hover {
-    background-color: ${({theme}) => theme.Colors.Background.Tertiary}cc;
+    background-color: ${({ theme }) => theme.Colors.Background.Tertiary}cc;
   }
 `;
 
 const DangerButton = styled(ActionButton)`
-  background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red};
-  color: ${({theme}) => theme.Colors.Solid.Red};
+  background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
+  color: ${({ theme }) => theme.Colors.Solid.Red};
 
   &:hover {
-    background-color: ${({theme}) => theme.Colors.Solid.Translucent.Red}dd;
+    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red}dd;
   }
 `;
 
 const TableWrapper = styled.div`
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
   overflow: auto;
   max-height: 80dvh;
@@ -104,68 +104,68 @@ const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
 
   thead {
-    background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
     position: sticky;
     top: 0;
     z-index: 1;
   }
 
   th, td {
-    border-bottom: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+    border-bottom: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
     padding: 10px;
     text-align: left;
-    font-size: ${({theme}) => theme.Font.Body.size};
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    font-size: ${({ theme }) => theme.Font.Body.size};
+    color: ${({ theme }) => theme.Colors.Content.Primary};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   tbody tr:hover {
-    background-color: ${({theme}) => theme.Colors.Background.Secondary};
+    background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   }
 `;
 
 const SortButton = styled.button`
   border: none;
   background: transparent;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Body.size};
-  font-weight: ${({theme}) => theme.Font.Body.weight.regular};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Body.size};
+  font-weight: ${({ theme }) => theme.Font.Body.weight.regular};
   cursor: pointer;
   padding: 0;
 `;
 
 const EditableInput = styled.input<{ $changed?: boolean }>`
   width: 100%;
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  background-color: ${({$changed, theme}) => $changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
+  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary)};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   border-radius: 6px;
   padding: 8px;
-  font-size: ${({theme}) => theme.Font.Body.size};
+  font-size: ${({ theme }) => theme.Font.Body.size};
 
   &:focus {
     outline: none;
-    border-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+    border-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   }
 `;
 
 const EditableSelect = styled.select<{ $changed?: boolean }>`
   width: 100%;
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-  background-color: ${({$changed, theme}) => $changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
+  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary)};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   border-radius: 6px;
   padding: 8px;
-  font-size: ${({theme}) => theme.Font.Body.size};
+  font-size: ${({ theme }) => theme.Font.Body.size};
 
   &:focus {
     outline: none;
-    border-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+    border-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   }
 `;
 
@@ -178,8 +178,8 @@ const ActionRow = styled.div`
 
 const EmptyText = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Secondary};
-  font-size: ${({theme}) => theme.Font.Body.size};
+  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
 const templateFallbackHeaders = ["이메일", "학번", "성별(남/여)", "이름"];
@@ -191,13 +191,13 @@ type EditableField = keyof PersonalInformation;
 const parseStudentNumber = (value: string) => {
   const digits = value.replace(/\D/g, "");
   if (digits.length < 4) {
-    return {grade: 0, class: 0, number: 0};
+    return { grade: 0, class: 0, number: 0 };
   }
 
   return {
     grade: Number.parseInt(digits.substring(0, 1), 10),
     class: Number.parseInt(digits.substring(1, 2), 10),
-    number: Number.parseInt(digits.substring(2, 4), 10)
+    number: Number.parseInt(digits.substring(2, 4), 10),
   };
 };
 
@@ -212,7 +212,7 @@ const sanitizeInfo = (info: PersonalInformation): PersonalInformation => ({
   grade: Number.isFinite(info.grade) ? info.grade : 0,
   class: Number.isFinite(info.class) ? info.class : 0,
   number: Number.isFinite(info.number) ? info.number : 0,
-  gender: info.gender === "female" ? "female" : "male"
+  gender: info.gender === "female" ? "female" : "male",
 });
 
 const rowValue = (row: Record<string, string>, keys: string[], fallbackIndex: number) => {
@@ -253,17 +253,21 @@ function StudentInfoPage() {
     try {
       const response = await fetch("/디미고인_학생정보_양식.csv");
       const text = await response.text();
-      const firstLine = text.split(/\r?\n/)[0]?.replace(/^\uFEFF/, "").trim();
+      const firstLine = text
+        .split(/\r?\n/)[0]
+        ?.replace(/^\uFEFF/, "")
+        .trim();
       if (firstLine) {
         const parsed = Papa.parse<string[]>(firstLine, { delimiter: "," });
-        const headers = (parsed.data?.[0] ?? []).map((header) => String(header).trim()).filter(Boolean);
+        const headers = (parsed.data?.[0] ?? [])
+          .map((header) => String(header).trim())
+          .filter(Boolean);
         if (headers.length >= 4) {
           setTemplateHeaders(headers);
           return headers;
         }
       }
-    }
-    catch {
+    } catch {
       return templateFallbackHeaders;
     }
 
@@ -283,16 +287,19 @@ function StudentInfoPage() {
             const name = rowValue(row, ["이름", "name"], 3);
             const student = parseStudentNumber(studentNumber);
 
-                       return sanitizeInfo({
-              gender: genderText === "여" || genderText.toLowerCase() === "female" ? "female" : "male",
+            return sanitizeInfo({
+              gender:
+                genderText === "여" || genderText.toLowerCase() === "female" ? "female" : "male",
               mail: email,
               name,
               grade: student.grade,
               class: student.class,
-              number: student.number
+              number: student.number,
             });
           })
-          .filter((row) => row.mail && row.name && row.grade > 0 && row.class > 0 && row.number > 0);
+          .filter(
+            (row) => row.mail && row.name && row.grade > 0 && row.class > 0 && row.number > 0,
+          );
 
         setDraftInformations(parsed);
         showToast(`${parsed.length}명의 학생 정보를 불러왔습니다.`, "info");
@@ -305,41 +312,46 @@ function StudentInfoPage() {
   };
 
   const updateDraftInformation = (index: number, key: keyof PersonalInformation, value: string) => {
-    setDraftInformations((prev) => prev.map((item, i) => {
-      if (i !== index) {
-        return item;
-      }
+    setDraftInformations((prev) =>
+      prev.map((item, i) => {
+        if (i !== index) {
+          return item;
+        }
 
-      if (key === "grade" || key === "class" || key === "number") {
+        if (key === "grade" || key === "class" || key === "number") {
+          return {
+            ...item,
+            [key]: Number.parseInt(value.replace(/\D/g, "") || "0", 10),
+          };
+        }
+
+        if (key === "gender") {
+          return {
+            ...item,
+            gender: value === "female" ? "female" : "male",
+          };
+        }
+
         return {
           ...item,
-          [key]: Number.parseInt(value.replace(/\D/g, "") || "0", 10)
+          [key]: value,
         };
-      }
-
-      if (key === "gender") {
-        return {
-          ...item,
-          gender: value === "female" ? "female" : "male"
-        };
-      }
-
-      return {
-        ...item,
-        [key]: value
-      };
-    }));
+      }),
+    );
   };
 
   const addDraftRow = () => {
-    setDraftInformations((prev) => [...prev, {
-      mail: "",
-      name: "",
-      gender: "male",
-      grade: 0,
-      class: 0,
-      number: 0
-    }]);
+    setDraftInformations((prev) => [
+      ...prev,
+      {
+        mail: "",
+        name: "",
+        gender: "male",
+        grade: 0,
+        class: 0,
+        number: 0,
+      },
+    ]);
   };
 
   const removeDraftRow = (index: number) => {
@@ -358,8 +370,14 @@ function StudentInfoPage() {
 
   const applyDraftInformations = async () => {
     const hasInvalidNumberField = draftInformations.some((row) => {
-      return !Number.isInteger(row.grade) || !Number.isInteger(row.class) || !Number.isInteger(row.number)
-        || row.grade <= 0 || row.class <= 0 || row.number <= 0;
+      return (
+        !Number.isInteger(row.grade) ||
+        !Number.isInteger(row.class) ||
+        !Number.isInteger(row.number) ||
+        row.grade <= 0 ||
+        row.class <= 0 ||
+        row.number <= 0
+      );
     });
 
     if (hasInvalidNumberField) {
@@ -401,11 +419,11 @@ function StudentInfoPage() {
       [emailHeader]: row.mail,
       [studentNoHeader]: formatStudentNumber(row),
       [genderHeader]: row.gender === "male" ? "남" : "여",
-      [nameHeader]: row.name
+      [nameHeader]: row.name,
     }));
 
     const csvContent = Papa.unparse(csvRows, {
-      columns: [emailHeader, studentNoHeader, genderHeader, nameHeader]
+      columns: [emailHeader, studentNoHeader, genderHeader, nameHeader],
     });
 
     const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
@@ -432,7 +450,7 @@ function StudentInfoPage() {
 
   const onSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDirection((prev) => prev === "asc" ? "desc" : "asc");
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
       return;
     }
 
@@ -444,7 +462,7 @@ function StudentInfoPage() {
     const direction = sortDirection === "asc" ? 1 : -1;
 
     return rows
-      .map((info, index) => ({info, index}))
+      .map((info, index) => ({ info, index }))
       .sort((a, b) => {
         const left = a.info;
         const right = b.info;
@@ -452,14 +470,20 @@ function StudentInfoPage() {
         if (sortKey === "gender") {
           const lv = left.gender === "male" ? 0 : 1;
           const rv = right.gender === "male" ? 0 : 1;
-          return (lv - rv) * direction || (a.index - b.index);
+          return (lv - rv) * direction || a.index - b.index;
         }
 
         if (sortKey === "grade" || sortKey === "class" || sortKey === "number") {
-          return ((left[sortKey] as number) - (right[sortKey] as number)) * direction || (a.index - b.index);
+          return (
+            ((left[sortKey] as number) - (right[sortKey] as number)) * direction ||
+            a.index - b.index
+          );
         }
 
-        return String(left[sortKey]).localeCompare(String(right[sortKey]), "ko") * direction || (a.index - b.index);
+        return (
+          String(left[sortKey]).localeCompare(String(right[sortKey]), "ko") * direction ||
+          a.index - b.index
+        );
       });
   }, [rows, sortDirection, sortKey]);
 
@@ -477,7 +501,11 @@ function StudentInfoPage() {
         <CardHead>
           <div>
             <h3>학생정보 등록</h3>
-            <p>{isEditMode ? "수정 모드입니다. 수정 후 적용해주세요." : "수정하기를 누르면 편집할 수 있습니다."}</p>
+            <p>
+              {isEditMode
+                ? "수정 모드입니다. 수정 후 적용해주세요."
+                : "수정하기를 누르면 편집할 수 있습니다."}
+            </p>
           </div>
         </CardHead>
 
@@ -521,7 +549,10 @@ function StudentInfoPage() {
               </GhostButton>
               <GhostButton onClick={addDraftRow}>행 추가</GhostButton>
               <DangerButton onClick={cancelEditMode}>취소</DangerButton>
-              <ActionButton onClick={applyDraftInformations} disabled={draftInformations.length === 0}>
+              <ActionButton
+                onClick={applyDraftInformations}
+                disabled={draftInformations.length === 0}
+              >
                 적용
               </ActionButton>
             </>
@@ -546,17 +577,41 @@ function StudentInfoPage() {
               </colgroup>
               <thead>
                 <tr>
-                  <th><SortButton onClick={() => onSort("mail")}>{sortLabel("mail", "이메일")}</SortButton></th>
-                  <th><SortButton onClick={() => onSort("grade")}>{sortLabel("grade", "학년")}</SortButton></th>
-                  <th><SortButton onClick={() => onSort("class")}>{sortLabel("class", "반")}</SortButton></th>
-                  <th><SortButton onClick={() => onSort("number")}>{sortLabel("number", "번호")}</SortButton></th>
-                  <th><SortButton onClick={() => onSort("gender")}>{sortLabel("gender", "성별")}</SortButton></th>
-                  <th><SortButton onClick={() => onSort("name")}>{sortLabel("name", "이름")}</SortButton></th>
+                  <th>
+                    <SortButton onClick={() => onSort("mail")}>
+                      {sortLabel("mail", "이메일")}
+                    </SortButton>
+                  </th>
+                  <th>
+                    <SortButton onClick={() => onSort("grade")}>
+                      {sortLabel("grade", "학년")}
+                    </SortButton>
+                  </th>
+                  <th>
+                    <SortButton onClick={() => onSort("class")}>
+                      {sortLabel("class", "반")}
+                    </SortButton>
+                  </th>
+                  <th>
+                    <SortButton onClick={() => onSort("number")}>
+                      {sortLabel("number", "번호")}
+                    </SortButton>
+                  </th>
+                  <th>
+                    <SortButton onClick={() => onSort("gender")}>
+                      {sortLabel("gender", "성별")}
+                    </SortButton>
+                  </th>
+                  <th>
+                    <SortButton onClick={() => onSort("name")}>
+                      {sortLabel("name", "이름")}
+                    </SortButton>
+                  </th>
                   {isEditMode && <th>삭제</th>}
                 </tr>
               </thead>
               <tbody>
-                {sortedRows.map(({info, index}) => (
+                {sortedRows.map(({ info, index }) => (
                   <tr key={`${info.mail}-${index}`}>
                     <td title={info.mail}>
                       {isEditMode ? (
@@ -565,7 +620,9 @@ function StudentInfoPage() {
                           value={info.mail}
                           onChange={(e) => updateDraftInformation(index, "mail", e.target.value)}
                         />
-                      ) : info.mail}
+                      ) : (
+                        info.mail
+                      )}
                     </td>
                     <td>
                       {isEditMode ? (
@@ -575,7 +632,9 @@ function StudentInfoPage() {
                           value={info.grade || ""}
                           onChange={(e) => updateDraftInformation(index, "grade", e.target.value)}
                         />
-                      ) : info.grade}
+                      ) : (
+                        info.grade
+                      )}
                     </td>
                     <td>
                       {isEditMode ? (
@@ -585,7 +644,9 @@ function StudentInfoPage() {
                           value={info.class || ""}
                           onChange={(e) => updateDraftInformation(index, "class", e.target.value)}
                         />
-                      ) : info.class}
+                      ) : (
+                        info.class
+                      )}
                     </td>
                     <td>
                       {isEditMode ? (
@@ -595,7 +656,9 @@ function StudentInfoPage() {
                           value={info.number || ""}
                           onChange={(e) => updateDraftInformation(index, "number", e.target.value)}
                         />
-                      ) : info.number}
+                      ) : (
+                        info.number
+                      )}
                     </td>
                     <td>
                       {isEditMode ? (
@@ -607,7 +670,11 @@ function StudentInfoPage() {
                           <option value="male">남</option>
                           <option value="female">여</option>
                         </EditableSelect>
-                      ) : info.gender === "male" ? "남" : "여"}
+                      ) : info.gender === "male" ? (
+                        "남"
+                      ) : (
+                        "여"
+                      )}
                     </td>
                     <td title={info.name}>
                       {isEditMode ? (
@@ -616,7 +683,9 @@ function StudentInfoPage() {
                           value={info.name}
                           onChange={(e) => updateDraftInformation(index, "name", e.target.value)}
                         />
-                      ) : info.name}
+                      ) : (
+                        info.name
+                      )}
                     </td>
                     {isEditMode && (
                       <td>

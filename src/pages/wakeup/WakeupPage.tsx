@@ -1,8 +1,13 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {useEffect, useState} from "react";
-import {deleteWakeupSong, getWakeupSongList, selectWakeupSong, type WakeupApply} from "../../api/wakeup.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {UIButton} from "../../components/ui";
+import {
+  deleteWakeupSong,
+  getWakeupSongList,
+  selectWakeupSong,
+  type WakeupApply,
+} from "../../api/wakeup.ts";
+import { UIButton } from "../../components/ui";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -45,14 +50,14 @@ const Section = styled.div`
 const SectionTitle = styled.div`
   min-height: 32px;
 
-  font-size: ${({theme}) => theme.Font.Title.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Title.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   text-align: center;
   align-content: center;
 
   @media (max-width: 900px) {
     min-height: 0;
-    font-size: ${({theme}) => theme.Font.Headline.size};
+    font-size: ${({ theme }) => theme.Font.Headline.size};
     text-align: left;
     padding-left: 4px;
   }
@@ -66,7 +71,7 @@ const WakeupList = styled.div`
   flex-direction: column;
   gap: 8px;
   
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   overflow-y: auto;
   
@@ -79,14 +84,14 @@ const WakeupItem = styled.div`
   min-height: 110px;
   width: 100%;
   
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Primary};
   border-radius: 8px;
   
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   
   overflow: hidden;
 
@@ -119,11 +124,11 @@ const WakeupItem = styled.div`
       min-width: 0;
 
       .title {
-        font-size: ${({theme}) => theme.Font.Headline.size};
+        font-size: ${({ theme }) => theme.Font.Headline.size};
         word-break: break-word;
       }
       .votes {
-        color: ${({theme}) => theme.Colors.Content.Secondary};
+        color: ${({ theme }) => theme.Colors.Content.Secondary};
       }
     }
 
@@ -140,12 +145,12 @@ const WakeupItem = styled.div`
 
       .info {
         .title {
-          font-size: ${({theme}) => theme.Font.Body.size};
+          font-size: ${({ theme }) => theme.Font.Body.size};
           line-height: 1.25;
         }
 
         .votes {
-          font-size: ${({theme}) => theme.Font.Caption.size};
+          font-size: ${({ theme }) => theme.Font.Caption.size};
           line-height: 1.25;
         }
       }
@@ -181,40 +186,51 @@ function WakeupPage() {
   const [applies, setApplies] = useState<WakeupApply[] | null>();
 
   const updateScreen = () => {
-    getWakeupSongList().then((data) => {
-      setApplies(data.sort((a, b) =>
-        (b.wakeupSongVote.filter((v) => v.upvote).length)
-          -
-        (a.wakeupSongVote.filter((v) => v.upvote).length)
-      ));
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    getWakeupSongList()
+      .then((data) => {
+        setApplies(
+          data.sort(
+            (a, b) =>
+              b.wakeupSongVote.filter((v) => v.upvote).length -
+              a.wakeupSongVote.filter((v) => v.upvote).length,
+          ),
+        );
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const selectSong = (id: string) => {
     if (!confirm("확정하시겠습니까?")) return;
-    selectWakeupSong(id).then(() => {
-      showToast("성공했습니다.", "info");
-      window.open(`https://www.youtube.com/watch?v=${applies?.find((a) => a.id === id)!.video_id}`, "_blank")
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    selectWakeupSong(id)
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        window.open(
+          `https://www.youtube.com/watch?v=${applies?.find((a) => a.id === id)!.video_id}`,
+          "_blank",
+        );
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const deleteSong = (id: string) => {
     if (!confirm("삭제하시겠습니까?")) return;
-    deleteWakeupSong(id).then(() => {
-      showToast("성공했습니다.", "info");
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    deleteWakeupSong(id)
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   useEffect(() => {
     updateScreen();
@@ -226,49 +242,99 @@ function WakeupPage() {
         <Section>
           <SectionTitle>남학생 기상송 신청목록</SectionTitle>
           <WakeupList>
-            {applies && applies.filter((a) => a.gender === "male").map((apply) => {
-              return (
-                <WakeupItem key={apply.id}>
-                  <div className="left">
-                    <img src={apply.video_thumbnail} alt={apply.video_title} onClick={() => {window.open(`https://www.youtube.com/watch?v=${apply.video_id}`, "_blank")}}/>
-                    <div className="info">
-                      <div className="title">{apply.video_title.substring(0, 20)}{apply.video_title.length > 20 ? "..." : ""}</div>
-                      <div className="votes">
-                        좋아요 {apply.wakeupSongVote.filter((v) => v.upvote).length}개 · 싫어요 {apply.wakeupSongVote.filter((v) => !v.upvote).length}개
+            {applies &&
+              applies
+                .filter((a) => a.gender === "male")
+                .map((apply) => {
+                  return (
+                    <WakeupItem key={apply.id}>
+                      <div className="left">
+                        <img
+                          src={apply.video_thumbnail}
+                          alt={apply.video_title}
+                          onClick={() => {
+                            window.open(
+                              `https://www.youtube.com/watch?v=${apply.video_id}`,
+                              "_blank",
+                            );
+                          }}
+                        />
+                        <div className="info">
+                          <div className="title">
+                            {apply.video_title.substring(0, 20)}
+                            {apply.video_title.length > 20 ? "..." : ""}
+                          </div>
+                          <div className="votes">
+                            좋아요 {apply.wakeupSongVote.filter((v) => v.upvote).length}개 · 싫어요{" "}
+                            {apply.wakeupSongVote.filter((v) => !v.upvote).length}개
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <ActionButton variant="danger" size="small" fullWidth onClick={() => deleteSong(apply.id)}>삭제</ActionButton>
-                    <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>확정</ActionButton>
-                  </div>
-                </WakeupItem>
-              );
-            })}
+                      <div className="right">
+                        <ActionButton
+                          variant="danger"
+                          size="small"
+                          fullWidth
+                          onClick={() => deleteSong(apply.id)}
+                        >
+                          삭제
+                        </ActionButton>
+                        <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>
+                          확정
+                        </ActionButton>
+                      </div>
+                    </WakeupItem>
+                  );
+                })}
           </WakeupList>
         </Section>
         <Section>
           <SectionTitle>여학생 기상송 신청목록</SectionTitle>
           <WakeupList>
-            {applies && applies.filter((a) => a.gender === "female").map((apply) => {
-              return (
-                <WakeupItem key={apply.id}>
-                  <div className="left">
-                    <img src={apply.video_thumbnail} alt={apply.video_title} onClick={() => {window.open(`https://www.youtube.com/watch?v=${apply.video_id}`, "_blank")}}/>
-                    <div className="info">
-                      <div className="title">{apply.video_title.substring(0, 20)}{apply.video_title.length > 20 ? "..." : ""}</div>
-                      <div className="votes">
-                        좋아요 {apply.wakeupSongVote.filter((v) => v.upvote).length}개 · 싫어요 {apply.wakeupSongVote.filter((v) => !v.upvote).length}개
+            {applies &&
+              applies
+                .filter((a) => a.gender === "female")
+                .map((apply) => {
+                  return (
+                    <WakeupItem key={apply.id}>
+                      <div className="left">
+                        <img
+                          src={apply.video_thumbnail}
+                          alt={apply.video_title}
+                          onClick={() => {
+                            window.open(
+                              `https://www.youtube.com/watch?v=${apply.video_id}`,
+                              "_blank",
+                            );
+                          }}
+                        />
+                        <div className="info">
+                          <div className="title">
+                            {apply.video_title.substring(0, 20)}
+                            {apply.video_title.length > 20 ? "..." : ""}
+                          </div>
+                          <div className="votes">
+                            좋아요 {apply.wakeupSongVote.filter((v) => v.upvote).length}개 · 싫어요{" "}
+                            {apply.wakeupSongVote.filter((v) => !v.upvote).length}개
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <ActionButton variant="danger" size="small" fullWidth onClick={() => deleteSong(apply.id)}>삭제</ActionButton>
-                    <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>확정</ActionButton>
-                  </div>
-                </WakeupItem>
-              );
-            })}
+                      <div className="right">
+                        <ActionButton
+                          variant="danger"
+                          size="small"
+                          fullWidth
+                          onClick={() => deleteSong(apply.id)}
+                        >
+                          삭제
+                        </ActionButton>
+                        <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>
+                          확정
+                        </ActionButton>
+                      </div>
+                    </WakeupItem>
+                  );
+                })}
           </WakeupList>
         </Section>
       </ContentWrapper>

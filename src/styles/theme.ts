@@ -1,4 +1,4 @@
-import type {DefaultTheme} from "styled-components";
+import type { DefaultTheme } from "styled-components";
 
 const base = {
   Radius: {
@@ -123,11 +123,9 @@ const base = {
         Negative: "#ff4035",
         Translucent: {
           Positive: "#32cc581a",
-          Warning:
-            "#f5c90537",
-          Negative:
-            "#ff40351a",
-        }
+          Warning: "#f5c90537",
+          Negative: "#ff40351a",
+        },
       },
     },
     Calendar: {
@@ -139,15 +137,39 @@ const base = {
     },
   },
   Font: {
-    Display: {size: "3rem", lineHeight: "70px", weight: {weak: 400, regular: 500, strong: 600}},
-    Title: {size: "1.5rem", lineHeight: "34px", weight: {weak: 400, regular: 500, strong: 600}},
-    Headline: {size: "1.25rem", lineHeight: "28px", weight: {weak: 400, regular: 500, strong: 600}},
-    Body: {size: "1rem", lineHeight: "24px", weight: {weak: 400, regular: 500, strong: 600}},
-    Callout: {size: "1.1rem", lineHeight: "20px", weight: {weak: 400, regular: 500, strong: 600}},
-    Footnote: {size: "0.75rem", lineHeight: "18px", weight: {weak: 400, regular: 500, strong: 600}},
-    Caption: {size: "0.625rem", lineHeight: "14px", weight: {weak: 400, regular: 500, strong: 600}},
-    Paragraph_Large: {size: "1rem", lineHeight: "28.8px", weight: {weak: 400, regular: 500, strong: 600}},
-    Paragraph_Small: {size: "0.875rem", lineHeight: "24px", weight: {weak: 400, regular: 500, strong: 600}},
+    Display: { size: "3rem", lineHeight: "70px", weight: { weak: 400, regular: 500, strong: 600 } },
+    Title: { size: "1.5rem", lineHeight: "34px", weight: { weak: 400, regular: 500, strong: 600 } },
+    Headline: {
+      size: "1.25rem",
+      lineHeight: "28px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
+    Body: { size: "1rem", lineHeight: "24px", weight: { weak: 400, regular: 500, strong: 600 } },
+    Callout: {
+      size: "1.1rem",
+      lineHeight: "20px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
+    Footnote: {
+      size: "0.75rem",
+      lineHeight: "18px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
+    Caption: {
+      size: "0.625rem",
+      lineHeight: "14px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
+    Paragraph_Large: {
+      size: "1rem",
+      lineHeight: "28.8px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
+    Paragraph_Small: {
+      size: "0.875rem",
+      lineHeight: "24px",
+      weight: { weak: 400, regular: 500, strong: 600 },
+    },
   },
 };
 
@@ -155,15 +177,15 @@ export const lightTheme: DefaultTheme = {
   ...base,
   Colors: {
     Background: base.Colors.Background.Standard,
-    Content:    base.Colors.Content.Standard,
-    Line:       base.Colors.Line,
+    Content: base.Colors.Content.Standard,
+    Line: base.Colors.Line,
     Components: {
-      Fill:        base.Colors.Components.Fill.Standard,
+      Fill: base.Colors.Components.Fill.Standard,
       Translucent: base.Colors.Components.Translucent,
       Interaction: base.Colors.Components.Interaction,
     },
-    Solid:    base.Colors.Solid,
-    Core:     base.Colors.Core,
+    Solid: base.Colors.Solid,
+    Core: base.Colors.Core,
     Calendar: base.Colors.Calendar,
   },
 };
@@ -172,15 +194,15 @@ export const darkTheme: DefaultTheme = {
   ...base,
   Colors: {
     Background: base.Colors.Background.Inverted,
-    Content:    base.Colors.Content.Inverted,
-    Line:       base.Colors.Line,
+    Content: base.Colors.Content.Inverted,
+    Line: base.Colors.Line,
     Components: {
-      Fill:        base.Colors.Components.Fill.Inverted,
+      Fill: base.Colors.Components.Fill.Inverted,
       Translucent: base.Colors.Components.Translucent,
       Interaction: base.Colors.Components.Interaction,
     },
-    Solid:    base.Colors.Solid,
-    Core:     base.Colors.Core,
+    Solid: base.Colors.Solid,
+    Core: base.Colors.Core,
     Calendar: base.Colors.Calendar,
   },
 };

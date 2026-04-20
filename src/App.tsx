@@ -1,22 +1,22 @@
-import './App.style.ts'
+import "./App.style.ts";
+import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
 import AppStyle from "./App.style.ts";
-import {lightTheme} from "./styles/theme";
-import {BrowserRouter} from "react-router-dom";
 import PrimaryLayout from "./layouts/PrimaryLayout.tsx";
 import AppRouter from "./routes/AppRouter.tsx";
-import { ThemeProvider } from 'styled-components';
+import { lightTheme } from "./styles/theme";
 
 function App() {
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
-        <AppStyle/>
+        <AppStyle />
         <PrimaryLayout>
-          <AppRouter/>
+          <AppRouter />
         </PrimaryLayout>
       </BrowserRouter>
     </ThemeProvider>
-  )
+  );
 }
 
 export default App;

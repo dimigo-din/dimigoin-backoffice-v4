@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: ${({theme}) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Primary};
 `;
 
 const Title = styled.div`
@@ -20,10 +20,10 @@ const Title = styled.div`
 
   gap: 10px;
 
-  font-size: ${({theme}) => theme.Font.Title.size};
-  font-weight: ${({theme}) => theme.Font.Display.weight.strong};
+  font-size: ${({ theme }) => theme.Font.Title.size};
+  font-weight: ${({ theme }) => theme.Font.Display.weight.strong};
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   
   > svg {
     height: 28px;

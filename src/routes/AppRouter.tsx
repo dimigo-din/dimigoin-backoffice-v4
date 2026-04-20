@@ -1,5 +1,5 @@
-import {Routes, Route} from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
 import Loading from "../components/Loading.tsx";
 import StudentInfoPage from "../pages/studentinfo/StudentInfo.tsx";
 
@@ -19,26 +19,24 @@ const DienenManageTimePage = lazy(() => import("../pages/dienen/DienenManageTime
 const DienenDelayTimePage = lazy(() => import("../pages/dienen/DienenDelayTimePage.tsx"));
 
 const AppRouter = () => {
-
-
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/login/pw" element={<LoginPwPage/>}/>
-        <Route path="/applystay" element={<ApplyStayPage/>}/>
-        <Route path="/viewstayseat" element={<ViewStaySeatPage/>}/>
-        <Route path="/wakeup" element={<WakeupPage/>}/>
-        <Route path="/applyfrigo" element={<FrigoPage/>}/>
-        <Route path="/openwakeup" element={<OpenWakeup/>}/>
-        <Route path="/laundrytimeline" element={<LaundryTimelinePage/>}/>
-        <Route path="/applylaundry" element={<LaundryApplyPage/>}/>
-        <Route path="/dienen_time" element={<DienenTimePage/>}/>
-        <Route path="/dienen_edittime" element={<DienenManageTimePage/>}/>
-        <Route path="/dienen_delaytime" element={<DienenDelayTimePage/>}/>
-        <Route path="/studentinfo" element={<StudentInfoPage/>}/>
-        <Route path="/uikit" element={<UiKitPage/>}/>
-        <Route path="*" element={<EmptyPage/>}/>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/pw" element={<LoginPwPage />} />
+        <Route path="/applystay" element={<ApplyStayPage />} />
+        <Route path="/viewstayseat" element={<ViewStaySeatPage />} />
+        <Route path="/wakeup" element={<WakeupPage />} />
+        <Route path="/applyfrigo" element={<FrigoPage />} />
+        <Route path="/openwakeup" element={<OpenWakeup />} />
+        <Route path="/laundrytimeline" element={<LaundryTimelinePage />} />
+        <Route path="/applylaundry" element={<LaundryApplyPage />} />
+        <Route path="/dienen_time" element={<DienenTimePage />} />
+        <Route path="/dienen_edittime" element={<DienenManageTimePage />} />
+        <Route path="/dienen_delaytime" element={<DienenDelayTimePage />} />
+        <Route path="/studentinfo" element={<StudentInfoPage />} />
+        <Route path="/uikit" element={<UiKitPage />} />
+        <Route path="*" element={<EmptyPage />} />
       </Routes>
     </Suspense>
   );

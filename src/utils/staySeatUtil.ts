@@ -41,7 +41,7 @@ export const genTable = (): string[][] => {
   const to7 = chunkArray(generateRange(["M1", "N7"]), 7);
 
   return [...to18, ...to7];
-}
+};
 
 const chunkArray = (array: string[], chunkSize: number) => {
   const result = [];
@@ -50,4 +50,4 @@ const chunkArray = (array: string[], chunkSize: number) => {
   }
 
   return result;
-}
+};

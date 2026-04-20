@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { checkPermission, logout, ping } from "../api/auth.ts";
-import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/icons/dimigoin.svg?react";
 
 type MenuItemType = { key: string; label: string };
@@ -260,7 +260,9 @@ export default function SideBar({
 
   return (
     <Wrapper $mobileOpen={mobileOpen}>
-      <CloseButton aria-label="Close sidebar" onClick={() => onClose?.()}>✕</CloseButton>
+      <CloseButton aria-label="Close sidebar" onClick={() => onClose?.()}>
+        ✕
+      </CloseButton>
 
       <Header>
         <Brand>
@@ -316,16 +318,16 @@ export default function SideBar({
           </UtilityButton>
         ) : null}
         <UtilityButton
-            type="button"
-            $selected={pathname.startsWith("/logout")}
-            onClick={() => {
-              logout();
-              navigate("/login");
-              onNavigate?.();
-            }}
-          >
-            로그아웃
-          </UtilityButton>
+          type="button"
+          $selected={pathname.startsWith("/logout")}
+          onClick={() => {
+            logout();
+            navigate("/login");
+            onNavigate?.();
+          }}
+        >
+          로그아웃
+        </UtilityButton>
         <Footer>© 2026 DIMIGOIN Backoffice</Footer>
       </UtilityArea>
     </Wrapper>

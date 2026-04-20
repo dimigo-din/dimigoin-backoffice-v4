@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import type { ReactNode } from "react";
+import styled from "styled-components";
 
 type SegmentedItem = { label: string; value: string };
 
@@ -30,9 +30,15 @@ const SegmentItem = styled.button<{ $active: boolean }>`
 
 export function UISegmentedControl({ items, value, onChange }: UISegmentedControlProps) {
   return (
-    <SegmentRoot style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))` }}>
+    <SegmentRoot
+      style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))` }}
+    >
       {items.map((item) => (
-        <SegmentItem key={item.value} $active={item.value === value} onClick={() => onChange?.(item.value)}>
+        <SegmentItem
+          key={item.value}
+          $active={item.value === value}
+          onClick={() => onChange?.(item.value)}
+        >
           {item.label}
         </SegmentItem>
       ))}
@@ -71,7 +77,11 @@ export function UIOptionPicker({ items, value, onChange, columns = 3 }: UIOption
   return (
     <OptionRoot $columns={columns}>
       {items.map((item) => (
-        <OptionItem key={item.value} $active={item.value === value} onClick={() => onChange?.(item.value)}>
+        <OptionItem
+          key={item.value}
+          $active={item.value === value}
+          onClick={() => onChange?.(item.value)}
+        >
           {item.label}
         </OptionItem>
       ))}

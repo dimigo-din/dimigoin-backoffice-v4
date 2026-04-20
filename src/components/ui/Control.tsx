@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
 import type { ButtonHTMLAttributes } from "react";
+import styled, { css } from "styled-components";
 
 type ControlType = "heart" | "star" | "toggle" | "check" | "checkFill" | "radio";
 
@@ -88,7 +88,12 @@ const Dot = styled.span<{ $checked: boolean; $disabled: boolean }>`
   }
 `;
 
-export function UIControl({ controlType = "check", checked = false, disabled = false, ...props }: UIControlProps) {
+export function UIControl({
+  controlType = "check",
+  checked = false,
+  disabled = false,
+  ...props
+}: UIControlProps) {
   const isToggle = controlType === "toggle";
   return (
     <IconButton
@@ -99,13 +104,19 @@ export function UIControl({ controlType = "check", checked = false, disabled = f
       aria-pressed={checked}
       {...props}
     >
-      {isToggle ? (
-        <ToggleTrack $checked={checked} $disabled={disabled} />
-      ) : null}
+      {isToggle ? <ToggleTrack $checked={checked} $disabled={disabled} /> : null}
       {controlType === "heart" ? (checked ? "♥" : "♡") : null}
       {controlType === "star" ? (checked ? "★" : "☆") : null}
-      {controlType === "check" ? <Box $checked={checked} $disabled={disabled} $fill={false}>{checked ? "✓" : ""}</Box> : null}
-      {controlType === "checkFill" ? <Box $checked={checked} $disabled={disabled} $fill={true}>{checked ? "✓" : ""}</Box> : null}
+      {controlType === "check" ? (
+        <Box $checked={checked} $disabled={disabled} $fill={false}>
+          {checked ? "✓" : ""}
+        </Box>
+      ) : null}
+      {controlType === "checkFill" ? (
+        <Box $checked={checked} $disabled={disabled} $fill={true}>
+          {checked ? "✓" : ""}
+        </Box>
+      ) : null}
       {controlType === "radio" ? <Dot $checked={checked} $disabled={disabled} /> : null}
     </IconButton>
   );

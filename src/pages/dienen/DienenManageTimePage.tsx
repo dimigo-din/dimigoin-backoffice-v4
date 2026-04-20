@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const Panel = styled.section`
-  background: ${({theme}) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -26,24 +26,24 @@ const Panel = styled.section`
 
 const Title = styled.h2`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Title.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
 const Sub = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Secondary};
-  font-size: ${({theme}) => theme.Font.Body.size};
+  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
 const Badge = styled.div`
   width: fit-content;
-  border-radius: ${({theme}) => theme.Radius[400]};
-  background: ${({theme}) => theme.Colors.Components.Translucent.Secondary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  border-radius: ${({ theme }) => theme.Radius[400]};
+  background: ${({ theme }) => theme.Colors.Components.Translucent.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   padding: 8px 12px;
-  font-size: ${({theme}) => theme.Font.Footnote.size};
-  font-weight: ${({theme}) => theme.Font.Footnote.weight.strong};
+  font-size: ${({ theme }) => theme.Font.Footnote.size};
+  font-weight: ${({ theme }) => theme.Font.Footnote.weight.strong};
 `;
 
 export default function DienenManageTimePage() {
@@ -53,8 +53,8 @@ export default function DienenManageTimePage() {
         <Title>급식 시간 관리</Title>
         <Badge>개발중</Badge>
         <Sub>
-          급식 시간 관리 기능은 현재 개발중입니다. 우선은 조회/미루기 기능을 먼저 제공하고,
-          시간표 등록/수정은 안정화 후 순차 적용할 예정입니다.
+          급식 시간 관리 기능은 현재 개발중입니다. 우선은 조회/미루기 기능을 먼저 제공하고, 시간표
+          등록/수정은 안정화 후 순차 적용할 예정입니다.
         </Sub>
       </Panel>
     </Wrapper>

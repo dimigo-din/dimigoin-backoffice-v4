@@ -1,8 +1,8 @@
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import {useEffect, useMemo, useState} from "react";
-import {getMealTimeline, type MealTimelineData} from "../../api/dienen.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {UIButton} from "../../components/ui";
+import { getMealTimeline, type MealTimelineData } from "../../api/dienen.ts";
+import { UIButton } from "../../components/ui";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -19,7 +19,7 @@ const Wrapper = styled.div`
 `;
 
 const Panel = styled.section`
-  background: ${({theme}) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Secondary};
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -40,14 +40,14 @@ const HeaderRow = styled.div`
 
 const Title = styled.h2`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Title.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
 const Sub = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Secondary};
-  font-size: ${({theme}) => theme.Font.Footnote.size};
+  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  font-size: ${({ theme }) => theme.Font.Footnote.size};
 `;
 
 const GradeGrid = styled.div`
@@ -62,7 +62,7 @@ const GradeGrid = styled.div`
 
 const GradeCard = styled.div`
   border-radius: 10px;
-  background: ${({theme}) => theme.Colors.Background.Tertiary};
+  background: ${({ theme }) => theme.Colors.Background.Tertiary};
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -71,8 +71,8 @@ const GradeCard = styled.div`
 
 const GradeTitle = styled.h3`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Headline.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Headline.size};
 `;
 
 const TimelineRow = styled.div`
@@ -81,24 +81,24 @@ const TimelineRow = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  background: ${({theme}) => theme.Colors.Background.Primary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Body.size};
+  background: ${({ theme }) => theme.Colors.Background.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
 const EmptyText = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Tertiary};
 `;
 
 const NativeDateInput = styled.input`
   width: 220px;
   height: 44px;
-  border-radius: ${({theme}) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Radius[400]};
   border: 0;
   padding: 0 12px;
-  background: ${({theme}) => theme.Colors.Background.Tertiary};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   @media (max-width: 900px) {
     width: 100%;
@@ -113,7 +113,9 @@ function getErrorMessage(e: unknown): string {
 
 export default function DienenTimePage() {
   const { showToast } = useNotification();
-  const [date, setDate] = useState<string>(new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }));
+  const [date, setDate] = useState<string>(
+    new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [timeline, setTimeline] = useState<MealTimelineData | null>(null);
 
@@ -143,7 +145,9 @@ export default function DienenTimePage() {
         <Sub>조회 날짜를 선택하면 해당 주 급식 시간표를 불러옵니다.</Sub>
         <HeaderRow>
           <NativeDateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          <UIButton size="medium" onClick={fetchTimeline} disabled={isLoading}>조회</UIButton>
+          <UIButton size="medium" onClick={fetchTimeline} disabled={isLoading}>
+            조회
+          </UIButton>
         </HeaderRow>
       </Panel>
 
@@ -154,11 +158,17 @@ export default function DienenTimePage() {
             <GradeCard key={grade}>
               <GradeTitle>{grade}학년</GradeTitle>
               {items.length === 0 ? (
-                <EmptyText>{isLoading ? "불러오는 중..." : "등록된 급식 시간이 없습니다."}</EmptyText>
+                <EmptyText>
+                  {isLoading ? "불러오는 중..." : "등록된 급식 시간이 없습니다."}
+                </EmptyText>
               ) : (
                 items.map((item, index) => (
                   <TimelineRow key={`${item.time}-${index}`}>
-                    <strong>{item.delayed_time ? `${item.delayed_time} (${item.time}에서 지연)` : item.time}</strong>
+                    <strong>
+                      {item.delayed_time
+                        ? `${item.delayed_time} (${item.time}에서 지연)`
+                        : item.time}
+                    </strong>
                     <span>{item.class.join(", ")}반</span>
                   </TimelineRow>
                 ))

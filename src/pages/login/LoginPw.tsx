@@ -1,12 +1,12 @@
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import Scenery from "../../assets/imgs/schoolscenery.svg?react";
+import { getPermission, logout, passwordLogin } from "../../api/auth.ts";
 import Logo from "../../assets/icons/dimigoin.svg?react";
-import {getPermission, logout, passwordLogin} from "../../api/auth.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
-import {parseJwt} from "../../utils/jwt.ts";
-import {Input} from "../../styles/components/input.ts";
+import Scenery from "../../assets/imgs/schoolscenery.svg?react";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { Input } from "../../styles/components/input.ts";
+import { parseJwt } from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: ${({theme}) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Primary};
 `;
 
 const Brand = styled.div`
@@ -37,10 +37,10 @@ const Title = styled.div`
   gap: 10px;
   margin-bottom: 16px;
 
-  font-size: ${({theme}) => theme.Font.Title.size};
-  font-weight: ${({theme}) => theme.Font.Title.weight.strong};
+  font-size: ${({ theme }) => theme.Font.Title.size};
+  font-weight: ${({ theme }) => theme.Font.Title.weight.strong};
 
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
 
   > svg {
     width: 28px;
@@ -58,8 +58,8 @@ const Form = styled.form`
 const LoginButton = styled.button`
   width: 100%;
   min-height: 56px;
-  border-radius: ${({theme}) => theme.Radius[400]};
-  background-color: ${({theme}) => theme.Colors.Core.Brand.Primary};
+  border-radius: ${({ theme }) => theme.Radius[400]};
+  background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   border: 0;
 
   display: inline-flex;
@@ -68,33 +68,33 @@ const LoginButton = styled.button`
   justify-content: center;
   gap: 8px;
   padding: 0 20px;
-  color: ${({theme}) => theme.Colors.Solid.White};
+  color: ${({ theme }) => theme.Colors.Solid.White};
 
   p {
     margin: 0;
     color: inherit;
-    font-size: ${({theme}) => theme.Font.Body.size};
-    line-height: ${({theme}) => theme.Font.Body.lineHeight};
-    font-weight: ${({theme}) => theme.Font.Body.weight.regular};
+    font-size: ${({ theme }) => theme.Font.Body.size};
+    line-height: ${({ theme }) => theme.Font.Body.lineHeight};
+    font-weight: ${({ theme }) => theme.Font.Body.weight.regular};
   }
 
   &:active:not(:disabled) {
-    background-color: ${({theme}) => theme.Colors.Core.Brand.Secondary};
+    background-color: ${({ theme }) => theme.Colors.Core.Brand.Secondary};
   }
 
   &:disabled {
-    background-color: ${({theme}) => theme.Colors.Components.Fill.Tertiary};
-    color: ${({theme}) => theme.Colors.Content.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Components.Fill.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Tertiary};
     cursor: not-allowed;
   }
 `;
 
 const BackLink = styled(Link)`
-  color: ${({theme}) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Secondary};
   text-decoration: none;
   margin-top: 8px;
-  font-size: ${({theme}) => theme.Font.Footnote.size};
-  line-height: ${({theme}) => theme.Font.Footnote.lineHeight};
+  font-size: ${({ theme }) => theme.Font.Footnote.size};
+  line-height: ${({ theme }) => theme.Font.Footnote.lineHeight};
 
   &:hover {
     text-decoration: underline;
@@ -115,17 +115,22 @@ const SceneryLayer = styled.div`
 `;
 
 function getErrorMessage(e: unknown) {
-  const error = e as {response?: {data?: {error?: unknown}}};
+  const error = e as { response?: { data?: { error?: unknown } } };
   const apiError = error.response?.data?.error;
   if (typeof apiError === "string") return apiError;
-  if (apiError && typeof apiError === "object" && "message" in apiError && typeof apiError.message === "string") {
+  if (
+    apiError &&
+    typeof apiError === "object" &&
+    "message" in apiError &&
+    typeof apiError.message === "string"
+  ) {
     return apiError.message;
   }
   return "알 수 없는 오류가 발생했습니다.";
 }
 
 function LoginPw() {
-  const {showToast} = useNotification();
+  const { showToast } = useNotification();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +147,7 @@ function LoginPw() {
 
     try {
       showToast("로그인중입니다...", "info");
-      const {accessToken} = await passwordLogin(email.trim(), password);
+      const { accessToken } = await passwordLogin(email.trim(), password);
       const payload = parseJwt(accessToken);
 
       const permissions = await getPermission();
@@ -174,7 +179,7 @@ function LoginPw() {
     <Wrapper>
       <Brand>
         <Title>
-          <Logo/>
+          <Logo />
           <p>디미고인</p>
         </Title>
         <Form onSubmit={onSubmit}>

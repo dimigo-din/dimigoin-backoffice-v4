@@ -1,19 +1,19 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {Input} from "../../styles/components/input.ts";
-import {useEffect, useState} from "react";
+import { getPersonalInformation, type PersonalInformation } from "../../api/auth.ts";
 import {
   auditFrigo,
   createFrigoApply,
   type FrigoApply,
   type FrigoApplyPayload,
   type FrigoTiming,
-  getFrigoApplies
+  getFrigoApplies,
 } from "../../api/frigo.ts";
-import {searchUser, type User} from "../../api/user.ts";
-import { getPersonalInformation, type PersonalInformation } from "../../api/auth.ts";
-import {Button} from "../../styles/components/button.ts";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
+import { searchUser, type User } from "../../api/user.ts";
 import Loading from "../../components/Loading.tsx";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { Button } from "../../styles/components/button.ts";
+import { Input } from "../../styles/components/input.ts";
 import { ExportFrigoAppliesToExcel } from "../../utils/frigo2excel.ts";
 
 const Wrapper = styled.div`
@@ -51,7 +51,7 @@ const ApplyList = styled.div`
   gap: 8px;
 
   border-radius: 12px;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
 
   padding: 10px;
 
@@ -79,7 +79,6 @@ const ControllerBox = styled.div`
   }
 `;
 
-
 const FitController = styled.div`
   height: fit-content;
   width: 100%;
@@ -88,7 +87,7 @@ const FitController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
 
   padding: 16px;
   gap: 8px;
@@ -102,7 +101,7 @@ const StretchController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
 
   padding: 16px;
   gap: 8px;
@@ -117,24 +116,24 @@ const ExportButton = styled.div`
   justify-content: space-between;
 `;
 
-const SelectionRow = styled.div<{ height?: string, width?: string }>`
-  margin-left: ${({width}) => width ? "none" : "2%"};
+const SelectionRow = styled.div<{ height?: string; width?: string }>`
+  margin-left: ${({ width }) => (width ? "none" : "2%")};
   
-  height: ${({height}) => height || "4dvh"};
-  width: ${({width}) => width || "18%"};
+  height: ${({ height }) => height || "4dvh"};
+  width: ${({ width }) => width || "18%"};
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
-  font-size: ${({theme}) => theme.Font.Callout.size};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
   
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 12px;
   
   overflow: hidden;
 `;
 
-const SelectionItem = styled.div<{ border?: boolean, selected: boolean }>`
+const SelectionItem = styled.div<{ border?: boolean; selected: boolean }>`
   flex: 1;
   
   height: 100%;
@@ -142,11 +141,11 @@ const SelectionItem = styled.div<{ border?: boolean, selected: boolean }>`
   text-align: center;
   align-content: center;
   
-  color: ${({theme, selected}) => selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary};
+  color: ${({ theme, selected }) => (selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary)};
   
-  border-left: ${({theme, border}) => border ? `1px solid ${theme.Colors.Line.Outline}` : "none"};
+  border-left: ${({ theme, border }) => (border ? `1px solid ${theme.Colors.Line.Outline}` : "none")};
   
-  background-color: ${({theme, selected}) => selected ? theme.Colors.Core.Brand.Primary : "none"};
+  background-color: ${({ theme, selected }) => (selected ? theme.Colors.Core.Brand.Primary : "none")};
 `;
 
 const Apply = styled.div`
@@ -161,10 +160,10 @@ const Apply = styled.div`
   
   border-radius: 8px;
   
-  background-color: ${({theme}) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
   padding: 0 2dvh;
   
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   
   > .left {
     display: flex;
@@ -175,19 +174,19 @@ const Apply = styled.div`
     gap: 0.5vw;
     
     .name {
-      font-size: ${({theme}) => theme.Font.Title.size};
+      font-size: ${({ theme }) => theme.Font.Title.size};
     }
     .detail {
-      font-size: ${({theme}) => theme.Font.Headline.size};
-      color: ${({theme}) => theme.Colors.Content.Secondary};
+      font-size: ${({ theme }) => theme.Font.Headline.size};
+      color: ${({ theme }) => theme.Colors.Content.Secondary};
       
       > .when {
-        font-size: ${({theme}) => theme.Font.Headline.size};
-        background-color: ${({theme}) => theme.Colors.Background.Quaternary};
+        font-size: ${({ theme }) => theme.Font.Headline.size};
+        background-color: ${({ theme }) => theme.Colors.Background.Quaternary};
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
-        color: ${({theme}) => theme.Colors.Content.Secondary};
+        color: ${({ theme }) => theme.Colors.Content.Secondary};
         border: none;
         border-radius: 8px;
         
@@ -204,8 +203,8 @@ const Apply = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Callout.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Callout.size};
 `;
 
 const InputWrapper = styled.div`
@@ -220,8 +219,8 @@ const SuggestBox = styled.div`
   right: 0;
   max-height: 30dvh;
   overflow-y: auto;
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.18);
   z-index: 20;
@@ -230,22 +229,22 @@ const SuggestBox = styled.div`
 
 const SuggestItem = styled.div`
   padding: 10px 12px;
-  font-size: ${({theme}) => theme.Font.Paragraph_Large.size};
-  color: ${({theme}) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   transition: background-color 120ms ease;
   
-  &:hover { background-color: ${({theme}) => theme.Colors.Components.Interaction.Hover}; }
-  &:active { background-color: ${({theme}) => theme.Colors.Components.Interaction.Pressed}; }
+  &:hover { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Hover}; }
+  &:active { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Pressed}; }
 
-  .meta { color: ${({theme}) => theme.Colors.Content.Tertiary}; font-size: ${({theme}) => theme.Font.Footnote.size}; }
+  .meta { color: ${({ theme }) => theme.Colors.Content.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
 `;
 
 function FrigoPage() {
-  const { showToast } = useNotification()
+  const { showToast } = useNotification();
 
   // Type for student user suggestion results
   type StudentUser = User & PersonalInformation;
@@ -270,43 +269,51 @@ function FrigoPage() {
   const canApply = !(newUser === null || newTiming === null || newReason === null);
 
   const updateScreen = () => {
-    getFrigoApplies().then((data) => {
-      setApplies(data);
-    }).catch((e) => {
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    getFrigoApplies()
+      .then((data) => {
+        setApplies(data);
+      })
+      .catch((e) => {
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const apply = () => {
     if (newTiming === null || newUser === null || newReason === null) return;
-    createFrigoApply({ timing: newTiming, user: newUser.id, reason: newReason }).then(() => {
-      showToast("성공했습니다.", "info");
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    createFrigoApply({ timing: newTiming, user: newUser.id, reason: newReason })
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const updateFrigo = (data: FrigoApplyPayload) => {
-    createFrigoApply(data).then(() => {
-      showToast("성공했습니다.", "info");
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    createFrigoApply(data)
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   const updateState = (id: string, state: boolean | null) => {
-    auditFrigo(id, state).then(() => {
-      showToast("성공했습니다.", "info");
-      updateScreen();
-    }).catch((e) => {
-      console.error(e);
-      showToast(e.response.data.error.message || e.response.data.error, "danger");
-    });
-  }
+    auditFrigo(id, state)
+      .then(() => {
+        showToast("성공했습니다.", "info");
+        updateScreen();
+      })
+      .catch((e) => {
+        console.error(e);
+        showToast(e.response.data.error.message || e.response.data.error, "danger");
+      });
+  };
 
   useEffect(() => {
     updateScreen();
@@ -318,16 +325,21 @@ function FrigoPage() {
 
   useEffect(() => {
     let alive = true;
-    if (!nameSearch) { setNameResults([]); return; }
+    if (!nameSearch) {
+      setNameResults([]);
+      return;
+    }
     const t = setTimeout(async () => {
       setNameLoading(true);
       const res = await searchUser(nameSearch);
       if (!alive) return;
       if (res && res.length) {
-        const emails = res.map(r => r.email).filter(Boolean) as string[];
+        const emails = res.map((r) => r.email).filter(Boolean) as string[];
         try {
           const personals = emails.length ? await getPersonalInformation(emails) : [];
-          const merged = res.map((r, i) => personals[i] ? ({ ...r, ...personals[i] }) as StudentUser : (r as StudentUser));
+          const merged = res.map((r, i) =>
+            personals[i] ? ({ ...r, ...personals[i] } as StudentUser) : (r as StudentUser),
+          );
           setNameResults(merged);
         } catch {
           setNameResults(res as StudentUser[]);
@@ -337,60 +349,96 @@ function FrigoPage() {
       }
       setNameLoading(false);
     }, 180);
-    return () => { alive = false; clearTimeout(t); };
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
   }, [nameSearch]);
 
   return (
     <Wrapper>
       <ApplyList>
-        {applies !== null ?
-          applies.filter((a) =>
-            (filterGrade === null || filterGrade === a.user.grade) &&
-            (filterGender === null || filterGender === a.user.gender) &&
-            (filterState === undefined || filterState === a.approved) &&
-            (filterName === "" || a.user.name.includes(filterName))
-          ).sort((a, b) => {
-            if (a.user.grade !== b.user.grade) return a.user.grade - b.user.grade;
-            if (a.user.class !== b.user.class) return a.user.class - b.user.class;
-            return a.user.number - b.user.number;
-          }).map((a) => {
-          return (
-            <Apply key={a.id}>
-              <div className={"left"}>
-          <div className="name">{a.user.grade}{a.user.class}{("0"+a.user.number).slice(-2)} {a.user.name} ({a.user.gender === "male" ? "남" : "여"})</div>
-          <div className="detail">
-            {a.reason}
-            / &nbsp;
-            <select className={"when"} value={a.timing} onInput={(e) => { updateFrigo({ user: a.user.id, timing: (e.target as HTMLInputElement).value as FrigoTiming, reason: a.reason }) }}>
-              {/*"afterschool" | "dinner" | "after_1st_study" | "after_2nd_study";*/}
-              <option value="afterschool">방과후</option>
-              <option value="dinner">저녁시간</option>
-              <option value="after_1st_study">야간자율학습 1타임 이후</option>
-              <option value="after_2nd_study">야간자율학습 2타임 이후</option>
-            </select>
-          </div>
-              </div>
-              <div className={"right"}>
-          <SelectionRow width={"10dvw"}>
-            <SelectionItem selected={a.approved == true}
-               onClick={() => {updateState(a.id, true)}}>
-              허가
-            </SelectionItem>
-            <SelectionItem selected={a.approved == null}
-               border={true}
-               onClick={() => {updateState(a.id, null)}}>
-              검토
-            </SelectionItem>
-            <SelectionItem selected={a.approved == false}
-               border={true}
-               onClick={() => {updateState(a.id, false)}}>
-              반려
-            </SelectionItem>
-          </SelectionRow>
-              </div>
-            </Apply>
-          );
-        }) : <Loading />}
+        {applies !== null ? (
+          applies
+            .filter(
+              (a) =>
+                (filterGrade === null || filterGrade === a.user.grade) &&
+                (filterGender === null || filterGender === a.user.gender) &&
+                (filterState === undefined || filterState === a.approved) &&
+                (filterName === "" || a.user.name.includes(filterName)),
+            )
+            .sort((a, b) => {
+              if (a.user.grade !== b.user.grade) return a.user.grade - b.user.grade;
+              if (a.user.class !== b.user.class) return a.user.class - b.user.class;
+              return a.user.number - b.user.number;
+            })
+            .map((a) => {
+              return (
+                <Apply key={a.id}>
+                  <div className={"left"}>
+                    <div className="name">
+                      {a.user.grade}
+                      {a.user.class}
+                      {("0" + a.user.number).slice(-2)} {a.user.name} (
+                      {a.user.gender === "male" ? "남" : "여"})
+                    </div>
+                    <div className="detail">
+                      {a.reason}/ &nbsp;
+                      <select
+                        className={"when"}
+                        value={a.timing}
+                        onInput={(e) => {
+                          updateFrigo({
+                            user: a.user.id,
+                            timing: (e.target as HTMLInputElement).value as FrigoTiming,
+                            reason: a.reason,
+                          });
+                        }}
+                      >
+                        {/*"afterschool" | "dinner" | "after_1st_study" | "after_2nd_study";*/}
+                        <option value="afterschool">방과후</option>
+                        <option value="dinner">저녁시간</option>
+                        <option value="after_1st_study">야간자율학습 1타임 이후</option>
+                        <option value="after_2nd_study">야간자율학습 2타임 이후</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className={"right"}>
+                    <SelectionRow width={"10dvw"}>
+                      <SelectionItem
+                        selected={a.approved == true}
+                        onClick={() => {
+                          updateState(a.id, true);
+                        }}
+                      >
+                        허가
+                      </SelectionItem>
+                      <SelectionItem
+                        selected={a.approved == null}
+                        border={true}
+                        onClick={() => {
+                          updateState(a.id, null);
+                        }}
+                      >
+                        검토
+                      </SelectionItem>
+                      <SelectionItem
+                        selected={a.approved == false}
+                        border={true}
+                        onClick={() => {
+                          updateState(a.id, false);
+                        }}
+                      >
+                        반려
+                      </SelectionItem>
+                    </SelectionRow>
+                  </div>
+                </Apply>
+              );
+            })
+        ) : (
+          <Loading />
+        )}
       </ApplyList>
       <ControllerBox>
         <FitController>
@@ -403,7 +451,7 @@ function FrigoPage() {
               onBlur={() => setTimeout(() => setIsSuggestOpen(false), 120)}
               onInput={(e) => setNameSearch((e.target as HTMLInputElement).value)}
               value={nameSearch}
-              style={{height: "5dvh", width: "100%"}}
+              style={{ height: "5dvh", width: "100%" }}
             />
             {isSuggestOpen && (
               <SuggestBox>
@@ -413,19 +461,26 @@ function FrigoPage() {
                     <span className="meta">잠시만요</span>
                   </SuggestItem>
                 )}
-                {!nameLoading && nameResults.slice(0, 12).map((u) => (
-                  <SuggestItem
-                    key={u.id}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setNewUser(u);
-                      setNameSearch(`${u.grade}${u.class}${("0"+u.number).slice(-2)} ${u.name}`);
-                      setIsSuggestOpen(false);
-                    }}
-                  >
-                    <span>{u.grade}{u.class}{("0"+u.number).slice(-2)} {u.name}</span>
-                  </SuggestItem>
-                ))}
+                {!nameLoading &&
+                  nameResults.slice(0, 12).map((u) => (
+                    <SuggestItem
+                      key={u.id}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setNewUser(u);
+                        setNameSearch(
+                          `${u.grade}${u.class}${("0" + u.number).slice(-2)} ${u.name}`,
+                        );
+                        setIsSuggestOpen(false);
+                      }}
+                    >
+                      <span>
+                        {u.grade}
+                        {u.class}
+                        {("0" + u.number).slice(-2)} {u.name}
+                      </span>
+                    </SuggestItem>
+                  ))}
                 {!nameLoading && nameResults.length === 0 && nameSearch && (
                   <SuggestItem key="empty" onMouseDown={(e) => e.preventDefault()}>
                     <span>검색 결과가 없습니다</span>
@@ -439,34 +494,44 @@ function FrigoPage() {
             placeholder={"사유를 입력해주세요"}
             onInput={(e) => setNewReason((e.target as HTMLInputElement).value)}
             value={newReason!}
-            style={{height: "5dvh", width: "100%"}}
+            style={{ height: "5dvh", width: "100%" }}
           />
           <SelectionRow width={"100%"}>
-            <SelectionItem selected={newTiming === "afterschool"}
-                           onClick={() => setNewTiming("afterschool")}>
+            <SelectionItem
+              selected={newTiming === "afterschool"}
+              onClick={() => setNewTiming("afterschool")}
+            >
               종례 후
             </SelectionItem>
-            <SelectionItem selected={newTiming === "dinner"}
-                           border={true}
-                           onClick={() => setNewTiming("dinner")}>
+            <SelectionItem
+              selected={newTiming === "dinner"}
+              border={true}
+              onClick={() => setNewTiming("dinner")}
+            >
               저녁시간
             </SelectionItem>
-            <SelectionItem selected={newTiming === "after_1st_study"}
-                           border={true}
-                           onClick={() => setNewTiming("after_1st_study")}>
+            <SelectionItem
+              selected={newTiming === "after_1st_study"}
+              border={true}
+              onClick={() => setNewTiming("after_1st_study")}
+            >
               야자1T
             </SelectionItem>
-            <SelectionItem selected={newTiming === "after_2nd_study"}
-                           border={true}
-                           onClick={() => setNewTiming("after_2nd_study")}>
+            <SelectionItem
+              selected={newTiming === "after_2nd_study"}
+              border={true}
+              onClick={() => setNewTiming("after_2nd_study")}
+            >
               야자2T
             </SelectionItem>
           </SelectionRow>
           <Button
             disabled={!canApply}
             onClick={() => apply()}
-            style={{height: "5dvh", padding: 0}}>
-          신청하기</Button>
+            style={{ height: "5dvh", padding: 0 }}
+          >
+            신청하기
+          </Button>
         </FitController>
         <StretchController>
           <Text>분류</Text>
@@ -474,62 +539,79 @@ function FrigoPage() {
             value={filterName}
             onInput={(e) => setFilterName((e.target as HTMLInputElement).value)}
             placeholder={"이름을 입력해주세요."}
-            style={{height: "5dvh", paddingTop: 0, paddingBottom: 0}}/>
+            style={{ height: "5dvh", paddingTop: 0, paddingBottom: 0 }}
+          />
           <SelectionRow width={"100%"}>
-            <SelectionItem selected={filterGrade === 1}
-                           onClick={() => setFilterGrade(1)}>
+            <SelectionItem selected={filterGrade === 1} onClick={() => setFilterGrade(1)}>
               1학년 ({applies && applies.filter((a) => a.user.grade === 1).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterGrade === 2}
-                           border={true}
-                           onClick={() => setFilterGrade(2)}>
+            <SelectionItem
+              selected={filterGrade === 2}
+              border={true}
+              onClick={() => setFilterGrade(2)}
+            >
               2학년 ({applies && applies.filter((a) => a.user.grade === 2).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterGrade === 3}
-                           border={true}
-                           onClick={() => setFilterGrade(3)}>
+            <SelectionItem
+              selected={filterGrade === 3}
+              border={true}
+              onClick={() => setFilterGrade(3)}
+            >
               3학년 ({applies && applies.filter((a) => a.user.grade === 3).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterGrade === null}
-                           border={true}
-                           onClick={() => setFilterGrade(null)}>
+            <SelectionItem
+              selected={filterGrade === null}
+              border={true}
+              onClick={() => setFilterGrade(null)}
+            >
               모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
           <SelectionRow width={"100%"}>
-            <SelectionItem selected={filterGender === "male"}
-                           onClick={() => setFilterGender("male")}>
+            <SelectionItem
+              selected={filterGender === "male"}
+              onClick={() => setFilterGender("male")}
+            >
               남 ({applies && applies.filter((a) => a.user.gender === "male").length}건)
             </SelectionItem>
-            <SelectionItem selected={filterGender === "female"}
-                           border={true}
-                           onClick={() => setFilterGender("female")}>
+            <SelectionItem
+              selected={filterGender === "female"}
+              border={true}
+              onClick={() => setFilterGender("female")}
+            >
               여 ({applies && applies.filter((a) => a.user.gender === "female").length}건)
             </SelectionItem>
-            <SelectionItem selected={filterGender === null}
-                           border={true}
-                           onClick={() => setFilterGender(null)}>
+            <SelectionItem
+              selected={filterGender === null}
+              border={true}
+              onClick={() => setFilterGender(null)}
+            >
               모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
           <SelectionRow width={"100%"}>
-            <SelectionItem selected={filterState === true}
-                           onClick={() => setFilterState(true)}>
+            <SelectionItem selected={filterState === true} onClick={() => setFilterState(true)}>
               허가 ({applies && applies.filter((a) => a.approved === true).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterState === null}
-                           border={true}
-                           onClick={() => setFilterState(null)}>
+            <SelectionItem
+              selected={filterState === null}
+              border={true}
+              onClick={() => setFilterState(null)}
+            >
               검토 ({applies && applies.filter((a) => a.approved === null).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterState === false}
-                           border={true}
-                           onClick={() => setFilterState(false)}>
+            <SelectionItem
+              selected={filterState === false}
+              border={true}
+              onClick={() => setFilterState(false)}
+            >
               불허 ({applies && applies.filter((a) => a.approved === false).length}건)
             </SelectionItem>
-            <SelectionItem selected={filterState === undefined}
-                           border={true}
-                           onClick={() => setFilterState(undefined)}>
+            <SelectionItem
+              selected={filterState === undefined}
+              border={true}
+              onClick={() => setFilterState(undefined)}
+            >
               모두 ({applies && applies.length}건)
             </SelectionItem>
           </SelectionRow>
@@ -537,9 +619,16 @@ function FrigoPage() {
         <FitController>
           <Text>파일 내보내기</Text>
           <ExportButton>
-            <Button style={{height: "100%", fontSize: "14px", padding: "0 8px"}} onClick={() => {
-              ExportFrigoAppliesToExcel(applies?.filter(a => a.approved === true) || [], { filename: `금요귀가 신청 현황(${applies?.[0]?.week ? new Date(new Date(applies[0].week).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)})` });
-            }}>내보내기</Button>
+            <Button
+              style={{ height: "100%", fontSize: "14px", padding: "0 8px" }}
+              onClick={() => {
+                ExportFrigoAppliesToExcel(applies?.filter((a) => a.approved === true) || [], {
+                  filename: `금요귀가 신청 현황(${applies?.[0]?.week ? new Date(new Date(applies[0].week).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)})`,
+                });
+              }}
+            >
+              내보내기
+            </Button>
           </ExportButton>
         </FitController>
       </ControllerBox>

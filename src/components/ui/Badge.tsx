@@ -72,7 +72,12 @@ const Root = styled.span<Required<Pick<UIBadgeProps, "type" | "size" | "tone">>>
   ${({ tone }) => colorMap[tone]}
 `;
 
-export function UIBadge({ type = "normal", size = "large", tone = "grayscale", label = "배지" }: UIBadgeProps) {
+export function UIBadge({
+  type = "normal",
+  size = "large",
+  tone = "grayscale",
+  label = "배지",
+}: UIBadgeProps) {
   const content = type === "circular" ? null : label;
   return (
     <Root type={type} size={size} tone={tone}>

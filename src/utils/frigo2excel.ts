@@ -11,18 +11,26 @@ function genderKo(g: string) {
 
 // ---- Types for strongly-typed cells/styles (no `any`) ----
 type CellColor = { rgb?: string };
-interface CellBorderSide { style?: string; color?: CellColor }
+interface CellBorderSide {
+  style?: string;
+  color?: CellColor;
+}
 interface CellStyle {
   font?: { name?: string; sz?: number; bold?: boolean };
   alignment?: { horizontal?: string; vertical?: string };
   fill?: { fgColor?: CellColor };
-  border?: { top?: CellBorderSide; bottom?: CellBorderSide; left?: CellBorderSide; right?: CellBorderSide };
+  border?: {
+    top?: CellBorderSide;
+    bottom?: CellBorderSide;
+    left?: CellBorderSide;
+    right?: CellBorderSide;
+  };
 }
 
 type StylableCell = XLSX.CellObject & { s?: CellStyle };
 
 const ORANGE = "ED7D32"; // border color
-const PEACH = "FFE6D8";  // header bg
+const PEACH = "FFE6D8"; // header bg
 const FONT = { name: "맑은 고딕", sz: 10 } as const;
 
 const headerStyle: CellStyle = {
@@ -87,12 +95,29 @@ const timing = {
 type TimingKey = keyof typeof timing;
 
 function createSheetTitle(date: Date, grade?: number): string {
-  const md = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).format(date);
-  const dow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(date).replace("요일", "");
+  const md = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "numeric",
+    day: "numeric",
+  }).format(date);
+  const dow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" })
+    .format(date)
+    .replace("요일", "");
   const now = new Date();
-  const currentMd = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).format(now);
-  const currentDow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" }).format(now).replace("요일", "");
-  const currentHm = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
+  const currentMd = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "numeric",
+    day: "numeric",
+  }).format(now);
+  const currentDow = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", weekday: "short" })
+    .format(now)
+    .replace("요일", "");
+  const currentHm = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
 
   const gradeText = grade ? `${grade}학년 ` : "";
   return `${md}(${dow}) ${gradeText}금요귀가 신청 현황 (${currentMd} ${currentDow} ${currentHm} 기준)`;
@@ -177,7 +202,8 @@ export type ExportOptions = {
 
 export function ExportFrigoAppliesToExcel(applies: FrigoApply[], opts: ExportOptions = {}) {
   const filename =
-    (opts.filename && (opts.filename.endsWith(".xlsx") ? opts.filename : `${opts.filename}.xlsx`)) ||
+    (opts.filename &&
+      (opts.filename.endsWith(".xlsx") ? opts.filename : `${opts.filename}.xlsx`)) ||
     `금요귀가 신청 현황.xlsx`;
 
   // Columns
@@ -194,7 +220,7 @@ export function ExportFrigoAppliesToExcel(applies: FrigoApply[], opts: ExportOpt
         (a, b) =>
           (Number(a.user.grade) || 0) - (Number(b.user.grade) || 0) ||
           (Number(a.user.class) || 0) - (Number(b.user.class) || 0) ||
-          (Number(a.user.number) || 0) - (Number(b.user.number) || 0)
+          (Number(a.user.number) || 0) - (Number(b.user.number) || 0),
       )
       .map((a) => {
         const grade = a.user.grade ?? "";
@@ -245,7 +271,10 @@ export function ExportFrigoAppliesToExcel(applies: FrigoApply[], opts: ExportOpt
 
     // 총원 행 병합 - 학년-반-인원 (0-2열)
     const lastRowIndex = 2 + rows.length;
-    (ws["!merges"] as XLSX.Range[]).push({ s: { r: lastRowIndex, c: 0 }, e: { r: lastRowIndex, c: 2 } });
+    (ws["!merges"] as XLSX.Range[]).push({
+      s: { r: lastRowIndex, c: 0 },
+      e: { r: lastRowIndex, c: 2 },
+    });
 
     // 총원 행 병합 - 나머지 칸들 (3-8열)
     (ws["!merges"] as XLSX.Range[]).push({
@@ -329,12 +358,12 @@ export function ExportFrigoAppliesToExcel(applies: FrigoApply[], opts: ExportOpt
 
     // 열 너비(가독성 보강) - 필요시 조절
     (ws["!cols"] as XLSX.ColInfo[]) = [
-      { wch: 6 },  // 학년
-      { wch: 6 },  // 반
-      { wch: 6 },  // 인원
+      { wch: 6 }, // 학년
+      { wch: 6 }, // 반
+      { wch: 6 }, // 인원
       { wch: 10 }, // 학번
       { wch: 10 }, // 이름
-      { wch: 6 },  // 성별
+      { wch: 6 }, // 성별
       { wch: 16 }, // 사유
       { wch: 10 }, // 귀가시간
       { wch: 16 }, // 비고

@@ -1,8 +1,8 @@
-import {getTodayWakeup} from "../../api/wakeup.ts";
-import {useState} from "react";
-import {useNotification} from "../../providers/MobileNotifiCationProvider.tsx";
+import { AxiosError } from "axios";
+import { useState } from "react";
 import styled from "styled-components";
-import {AxiosError} from "axios";
+import { getTodayWakeup } from "../../api/wakeup.ts";
+import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -10,15 +10,15 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({theme}) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Primary};
   padding: 16px;
 `;
 
 const Card = styled.div`
   width: min(420px, 100%);
-  border: 1px solid ${({theme}) => theme.Colors.Line.Outline};
+  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 12px;
-  background: ${({theme}) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Secondary};
   padding: 20px;
 
   display: flex;
@@ -28,17 +28,17 @@ const Card = styled.div`
 
 const Title = styled.h1`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Primary};
-  font-size: ${({theme}) => theme.Font.Title.size};
-  line-height: ${({theme}) => theme.Font.Title.lineHeight};
-  font-weight: ${({theme}) => theme.Font.Title.weight.strong};
+  color: ${({ theme }) => theme.Colors.Content.Primary};
+  font-size: ${({ theme }) => theme.Font.Title.size};
+  line-height: ${({ theme }) => theme.Font.Title.lineHeight};
+  font-weight: ${({ theme }) => theme.Font.Title.weight.strong};
 `;
 
 const Desc = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.Colors.Content.Secondary};
-  font-size: ${({theme}) => theme.Font.Paragraph_Small.size};
-  line-height: ${({theme}) => theme.Font.Paragraph_Small.lineHeight};
+  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  font-size: ${({ theme }) => theme.Font.Paragraph_Small.size};
+  line-height: ${({ theme }) => theme.Font.Paragraph_Small.lineHeight};
 `;
 
 const ActionRow = styled.div`
@@ -53,14 +53,14 @@ const ActionRow = styled.div`
 
 const ActionButton = styled.button`
   min-height: 48px;
-  border-radius: ${({theme}) => theme.Radius[400]};
-  border: 1px solid ${({theme}) => theme.Colors.Core.Brand.Primary};
-  background: ${({theme}) => theme.Colors.Core.Brand.Primary};
-  color: ${({theme}) => theme.Colors.Solid.White};
+  border-radius: ${({ theme }) => theme.Radius[400]};
+  border: 1px solid ${({ theme }) => theme.Colors.Core.Brand.Primary};
+  background: ${({ theme }) => theme.Colors.Core.Brand.Primary};
+  color: ${({ theme }) => theme.Colors.Solid.White};
 
-  font-size: ${({theme}) => theme.Font.Body.size};
-  line-height: ${({theme}) => theme.Font.Body.lineHeight};
-  font-weight: ${({theme}) => theme.Font.Body.weight.regular};
+  font-size: ${({ theme }) => theme.Font.Body.size};
+  line-height: ${({ theme }) => theme.Font.Body.lineHeight};
+  font-weight: ${({ theme }) => theme.Font.Body.weight.regular};
 
   &:disabled {
     opacity: 0.45;
@@ -81,7 +81,7 @@ function OpenWakeup() {
       window.open(`https://www.youtube.com/watch?v=${res.video_id}`, "_blank");
     } catch (error) {
       console.error(error);
-      const e = error as AxiosError<{error?: {message?: string} | string}>;
+      const e = error as AxiosError<{ error?: { message?: string } | string }>;
       const message =
         typeof e.response?.data?.error === "string"
           ? e.response?.data?.error
@@ -91,7 +91,7 @@ function OpenWakeup() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Wrapper>
@@ -99,8 +99,12 @@ function OpenWakeup() {
         <Title>기상송 선택</Title>
         <Desc>원하는 생활관의 오늘 기상송을 선택해 열어보세요.</Desc>
         <ActionRow>
-          <ActionButton disabled={isLoading} onClick={() => run("male")}>학봉관 기상송</ActionButton>
-          <ActionButton disabled={isLoading} onClick={() => run("female")}>우정학사 기상송</ActionButton>
+          <ActionButton disabled={isLoading} onClick={() => run("male")}>
+            학봉관 기상송
+          </ActionButton>
+          <ActionButton disabled={isLoading} onClick={() => run("female")}>
+            우정학사 기상송
+          </ActionButton>
         </ActionRow>
       </Card>
     </Wrapper>

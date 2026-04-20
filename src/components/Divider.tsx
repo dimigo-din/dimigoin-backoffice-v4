@@ -8,10 +8,10 @@ const DividerElement = styled.div`
   
   border-radius: 2px;
   
-  background-color: ${({theme}) => theme.Colors.Line.Divider};
+  background-color: ${({ theme }) => theme.Colors.Line.Divider};
 `;
 function Divider() {
-  return ( <DividerElement>&nbsp;</DividerElement>);
+  return <DividerElement>&nbsp;</DividerElement>;
 }
 
 export default Divider;
