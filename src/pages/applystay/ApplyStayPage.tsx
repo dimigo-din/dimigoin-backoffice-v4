@@ -260,7 +260,7 @@ const SeatRow = styled.div<{seat: string | null}>`
 
   > span.taken-2 {
     background-color: rgba(139, 92, 246, 0.15);
-  }ken
+  }
 
   > span.taken-3 {
     background-color: rgba(236, 72, 153, 0.15);
