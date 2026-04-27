@@ -255,17 +255,14 @@ const SeatRow = styled.div<{ seat: string | null }>`
   }
 
   > span.taken-1 {
-    color: rgb(59, 130, 246);
     background-color: rgba(59, 130, 246, 0.15);
   }
 
   > span.taken-2 {
-    color: rgb(139, 92, 246);
     background-color: rgba(139, 92, 246, 0.15);
-  }
+  }ken
 
   > span.taken-3 {
-    color: rgb(236, 72, 153);
     background-color: rgba(236, 72, 153, 0.15);
   }
 
@@ -1151,7 +1148,7 @@ function ApplyStayPage() {
                                   id={seat}
                                   ref={selectedApply.stay_seat === seat ? seatRef : null}
                                   className={[
-                                    isActive ? "active" : "inactive",
+                                    (isActive || taken) ? "active" : "inactive",
                                     taken ? `taken-${taken.user.grade}` : "notTaken",
                                   ].join(" ")}
                                   onClick={() =>
