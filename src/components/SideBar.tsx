@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { checkPermission, logout, ping } from "../api/auth.ts";
 import Logo from "../assets/icons/dimigoin.svg?react";
+import { mobile } from "../styles/media.ts";
 
 type MenuItemType = { key: string; label: string };
 
@@ -23,7 +24,7 @@ const Wrapper = styled.aside<{ $mobileOpen: boolean }>`
   border-radius: 12px;
   overflow: hidden;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     position: fixed;
     top: 0;
     left: 0;
@@ -94,7 +95,7 @@ const CloseButton = styled.button`
   background: ${({ theme }) => theme.Colors.Background.Secondary};
   display: none;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     display: inline-flex;
     align-items: center;
     justify-content: center;

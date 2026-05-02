@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import styled, { css } from "styled-components";
+import { mobile } from "../../styles/media.ts";
 
 type ButtonVariant = "primary" | "neutral" | "danger" | "ghost";
 type ButtonSize = "large" | "medium" | "small";
@@ -82,7 +83,7 @@ const Root = styled.button<Required<Pick<UIButtonProps, "variant" | "size" | "fu
     cursor: not-allowed;
   }
 
-  @media (max-width: 768px) {
+  ${mobile} {
     width: ${({ fullWidth }) => (fullWidth ? "100%" : "auto")};
   }
 `;

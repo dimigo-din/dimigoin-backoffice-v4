@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import SideBar from "../components/SideBar.tsx";
 import { MobileNotificationProvider } from "../providers/MobileNotifiCationProvider.tsx";
+import { mobile } from "../styles/media.ts";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -16,7 +17,7 @@ const Wrapper = styled.div`
 
   background-color: ${({ theme }) => theme.Colors.Background.Secondary};
 
-  @media (max-width: 768px) {
+  ${mobile} {
     padding: 0;
     gap: 0;
     justify-content: flex-start;
@@ -36,7 +37,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     width: 100dvw;
     height: 100dvh;
     border-radius: 0;
@@ -51,7 +52,7 @@ const MainContent = styled.main`
 
 const TopBar = styled.div`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: flex;
     position: relative;
     align-items: center;
@@ -64,7 +65,7 @@ const TopBar = styled.div`
 
 const HamburgerButton = styled.button`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -79,7 +80,7 @@ const HamburgerButton = styled.button`
 
 const TopBarTitle = styled.span`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: block;
     position: absolute;
     left: 50%;
@@ -92,7 +93,7 @@ const TopBarTitle = styled.span`
 
 const RightSpacer = styled.span`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: inline-flex;
     width: 40px;
     height: 40px;
@@ -105,23 +106,23 @@ const SideBarHost = styled.div`
   width: 268px;
   flex: 0 0 268px;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     width: auto;
     flex: 0 0 auto;
   }
 `;
 
 const Backdrop = styled.div<{ $visible: boolean }>`
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
-  transition: opacity 200ms ease;
-  z-index: 8; /* below sidebar */
-
-  @media (min-width: 769px) {
-    display: none;
+  display: none;
+  ${mobile} {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+    pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
+    transition: opacity 200ms ease;
+    z-index: 8;
   }
 `;
 

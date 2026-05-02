@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import styled from "styled-components";
+import { mobile } from "../../styles/media.ts";
 
 type SegmentedItem = { label: string; value: string };
 
@@ -59,7 +60,7 @@ const OptionRoot = styled.div<{ $columns: number }>`
   grid-template-columns: repeat(${({ $columns }) => $columns}, minmax(0, 1fr));
   gap: ${({ theme }) => theme.Spacing[200]};
 
-  @media (max-width: 768px) {
+  ${mobile} {
     grid-template-columns: 1fr 1fr;
   }
 `;

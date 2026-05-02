@@ -14,6 +14,7 @@ import {
   UITextAreaField,
   UIToggleRow,
 } from "../../components/ui";
+import { mobile } from "../../styles/media.ts";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -22,7 +23,7 @@ const Wrapper = styled.div`
   padding: ${({ theme }) => theme.Spacing[600]};
   background: ${({ theme }) => theme.Colors.Background.Secondary};
 
-  @media (max-width: 768px) {
+  ${mobile} {
     padding: ${({ theme }) => theme.Spacing[300]};
   }
 `;
