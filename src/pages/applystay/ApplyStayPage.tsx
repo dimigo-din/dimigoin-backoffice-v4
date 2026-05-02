@@ -569,16 +569,12 @@ function ApplyStayPage() {
       // 깊은 복사로 완전히 독립적인 객체 생성
       const applyCopy = JSON.parse(JSON.stringify(apply));
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       const merged =
         applyCopy.stay_seat +
         applyCopy.outing
-          .map((a) =>
-            Object.keys(a)
-              .map((k) => String(a[k]))
-              .join(""),
-          )
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
           .join("");
 
       sha256(merged).then((data) => {
@@ -600,32 +596,24 @@ function ApplyStayPage() {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     const merged =
       selectedApply.stay_seat +
       selectedApply.outing
-        .map((a) =>
-          Object.keys(a)
-            .map((k) => String(a[k]))
-            .join(""),
-        )
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
         .join("");
     sha256(merged).then((data) => {
       if (data !== selectedApplyChecksum) {
         if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
           // 무한 반복 방지를 위해 새로운 함수로 에디터 열기
           const openNewEditor = (targetApply: StayApply) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
             const newMerged =
               targetApply.stay_seat +
               targetApply.outing
-                .map((a) =>
-                  Object.keys(a)
-                    .map((k) => String(a[k]))
-                    .join(""),
-                )
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
                 .join("");
             sha256(newMerged).then((newData) => {
               setSelectedApplyChecksum(newData);
@@ -705,11 +693,9 @@ function ApplyStayPage() {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     updateStayApply({
       ...selectedApply,
-      stay: currentStay.id!,
+      stay: currentStay!.id,
       user: selectedApply!.user.id,
       stay_seat: selectedApply.stay_seat,
     })
@@ -871,8 +857,6 @@ function ApplyStayPage() {
                 outing: [],
                 user: newUser,
               } as unknown as StayApply;
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-expect-error
               setSelectedApply(newApply);
             }}
           >

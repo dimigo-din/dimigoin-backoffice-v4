@@ -122,7 +122,7 @@ export type Outing = {
   dinner_cancel: boolean;
   from: string;
   to: string;
-  approved: boolean;
+  approved: boolean | null;
   audit_reason: string;
 };
 
