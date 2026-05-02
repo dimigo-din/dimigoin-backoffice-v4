@@ -7,7 +7,7 @@ import {
   type PersonalInformation,
   setPersonalInformations,
 } from "../../api/auth.ts";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   height: 100%;

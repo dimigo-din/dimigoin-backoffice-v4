@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { getPermission, logout, passwordLogin } from "../../api/auth.ts";
 import Logo from "../../assets/icons/dimigoin.svg?react";
 import Scenery from "../../assets/imgs/schoolscenery.svg?react";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 import { Input } from "../../styles/components/input.ts";
 import { parseJwt } from "../../utils/jwt.ts";
 

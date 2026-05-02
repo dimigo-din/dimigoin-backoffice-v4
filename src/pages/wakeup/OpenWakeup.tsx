@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import styled from "styled-components";
 import { getTodayWakeup } from "../../api/wakeup.ts";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;

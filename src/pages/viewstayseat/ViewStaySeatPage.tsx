@@ -11,7 +11,7 @@ import {
   type StayListItem,
 } from "../../api/stay.ts";
 import Loading from "../../components/Loading.tsx";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 import { Select } from "../../styles/components/select.ts";
 import { genTable } from "../../utils/staySeatUtil.ts";

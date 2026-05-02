@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import SideBar from "../components/SideBar.tsx";
-import { MobileNotificationProvider } from "../providers/MobileNotifiCationProvider.tsx";
+import { MobileNotificationProvider } from "../providers/ToastProvider.tsx";
 import { mobile } from "../styles/media.ts";
 
 const Wrapper = styled.div`

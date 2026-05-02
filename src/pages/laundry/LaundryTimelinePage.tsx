@@ -13,7 +13,7 @@ import {
 import CheckBox from "../../components/CheckBox.tsx";
 import Loading from "../../components/Loading.tsx";
 import { UISegmentedControl } from "../../components/ui";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 import { Input } from "../../styles/components/input.ts";
 

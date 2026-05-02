@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { getMealTimeline, type MealTimelineData } from "../../api/dienen.ts";
 import { UIButton } from "../../components/ui";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;

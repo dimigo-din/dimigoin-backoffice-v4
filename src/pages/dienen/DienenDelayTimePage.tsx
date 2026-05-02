@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { delayMealTimeline, getMealTimeline, type MealTimelineData } from "../../api/dienen.ts";
 import Divider from "../../components/Divider.tsx";
 import { UIButton, UIInputField } from "../../components/ui";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;

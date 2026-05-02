@@ -11,7 +11,7 @@ import {
 } from "../../api/frigo.ts";
 import { searchUser, type User } from "../../api/user.ts";
 import Loading from "../../components/Loading.tsx";
-import { useNotification } from "../../providers/MobileNotifiCationProvider.tsx";
+import { useNotification } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 import { Input } from "../../styles/components/input.ts";
 import { ExportFrigoAppliesToExcel } from "../../utils/frigo2excel.ts";
