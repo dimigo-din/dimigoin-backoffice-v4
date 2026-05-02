@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import styled from "styled-components";
 import { getTodayWakeup } from "../../api/wakeup.ts";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -69,7 +69,7 @@ const ActionButton = styled.button`
 `;
 
 function OpenWakeup() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const run = async (gender: "male" | "female") => {

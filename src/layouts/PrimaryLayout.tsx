@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import SideBar from "../components/SideBar.tsx";
-import { MobileNotificationProvider } from "../providers/ToastProvider.tsx";
+import { ToastProvider } from "../providers/ToastProvider.tsx";
 import { mobile } from "../styles/media.ts";
 
 const Wrapper = styled.div`
@@ -131,7 +131,7 @@ function PrimaryLayout({ children }: { children: ReactNode }) {
 
   return (
     <Wrapper>
-      <MobileNotificationProvider>
+      <ToastProvider>
         <SideBarHost>
           <SideBar
             mobileOpen={mobileOpen}
@@ -152,7 +152,7 @@ function PrimaryLayout({ children }: { children: ReactNode }) {
           </TopBar>
           <MainContent>{children}</MainContent>
         </ContentWrapper>
-      </MobileNotificationProvider>
+      </ToastProvider>
     </Wrapper>
   );
 }

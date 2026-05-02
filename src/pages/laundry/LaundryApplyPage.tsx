@@ -17,7 +17,7 @@ import { type User } from "../../api/user.ts";
 import Loading from "../../components/Loading.tsx";
 import SearchStudent from "../../components/SearchStudent.tsx";
 import { UISegmentedControl, UISelectField } from "../../components/ui";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 
 const Wrapper = styled.div`
@@ -152,7 +152,7 @@ const LaundryApply = styled.div<{ selected?: boolean }>`
 `;
 
 function LaundryApplyPage() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const [machines, setMachines] = useState<LaundryMachine[]>([]);

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { getPermission, logout, passwordLogin } from "../../api/auth.ts";
 import Logo from "../../assets/icons/dimigoin.svg?react";
 import Scenery from "../../assets/imgs/schoolscenery.svg?react";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 import { Input } from "../../styles/components/input.ts";
 import { parseJwt } from "../../utils/jwt.ts";
 
@@ -130,7 +130,7 @@ function getErrorMessage(e: unknown) {
 }
 
 function LoginPw() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

@@ -5,7 +5,7 @@ import { getPermission, getRedirectUri, googleLogin, logout } from "../../api/au
 import Logo from "../../assets/icons/dimigoin.svg?react";
 import GoogleLogo from "../../assets/icons/google.svg?react";
 import Scenery from "../../assets/imgs/schoolscenery.svg?react";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 import { parseJwt } from "../../utils/jwt.ts";
 
 const Wrapper = styled.div`
@@ -119,7 +119,7 @@ const SceneryLayer = styled.div`
 `;
 
 function LoginPage() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
 
   const handleLoginClick = () => {

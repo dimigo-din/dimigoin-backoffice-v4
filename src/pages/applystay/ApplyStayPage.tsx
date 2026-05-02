@@ -23,7 +23,7 @@ import Loading from "../../components/Loading.tsx";
 import SearchStudent from "../../components/SearchStudent.tsx";
 import SelectionDialog from "../../components/SelectionDialog.tsx";
 import { UIButton, UIInputField, UISegmentedControl, UISelectField } from "../../components/ui";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button, LightButton } from "../../styles/components/button.ts";
 import { Input } from "../../styles/components/input.ts";
 import { makeid } from "../../utils/makeid.ts";
@@ -421,7 +421,7 @@ function ApplyStayPage() {
     return new Date(new TZDate(local, KST_TZ)).toISOString(); // ISO 8601 UTC
   };
 
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
 
   const seatRef = useRef<HTMLSpanElement | null>(null);
   const seatBoxRef = useRef<HTMLDivElement | null>(null);

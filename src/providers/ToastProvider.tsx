@@ -4,28 +4,28 @@ import ErrorIcon from "../assets/icons/error.svg?react";
 import InfoIcon from "../assets/icons/info.svg?react";
 import WarningIcon from "../assets/icons/warning.svg?react";
 
-interface NotificationContextType {
+interface ToastContextType {
   showToast: (msg: string, type: "info" | "warning" | "danger") => void;
 }
 
-const NotificationContext = createContext<NotificationContextType | null>(null);
+const ToastContext = createContext<ToastContextType | null>(null);
 
-export function useNotification() {
-  const context = useContext(NotificationContext);
+export function useToast() {
+  const context = useContext(ToastContext);
   if (!context) {
-    throw new Error("useNotification must be used within a MobileNotificationProvider");
+    throw new Error("useToast must be used within a ToastProvider");
   }
   return context;
 }
 
-interface NotificationItem {
+interface ToastItem {
   id: number;
   text: string;
   type: "info" | "warning" | "danger";
   isLeaving: boolean;
 }
 
-const NotificationArea = styled.div`
+const ToastArea = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -60,7 +60,7 @@ const slideUpFadeOut = keyframes`
   }
 `;
 
-const Notification = styled.div<{ leaving?: boolean }>`
+const Toast = styled.div<{ leaving?: boolean }>`
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -94,8 +94,8 @@ const Notification = styled.div<{ leaving?: boolean }>`
     `}
 `;
 
-export function MobileNotificationProvider({ children }: { children: React.ReactNode }) {
-  const [messages, setMessages] = useState<NotificationItem[]>([]);
+export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const [messages, setMessages] = useState<ToastItem[]>([]);
 
   const showToast = (msg: string, type: "info" | "warning" | "danger" = "info") => {
     const id = Date.now() + Math.random();
@@ -110,18 +110,18 @@ export function MobileNotificationProvider({ children }: { children: React.React
   };
 
   return (
-    <NotificationContext.Provider value={{ showToast }}>
-      <NotificationArea id="NOTIFICATION">
+    <ToastContext.Provider value={{ showToast }}>
+      <ToastArea>
         {messages.map((m) => (
-          <Notification key={m.id} leaving={m.isLeaving}>
+          <Toast key={m.id} leaving={m.isLeaving}>
             {m.type === "info" ? <InfoIcon /> : null}
             {m.type === "warning" ? <WarningIcon /> : null}
             {m.type === "danger" ? <ErrorIcon /> : null}
             {m.text}
-          </Notification>
+          </Toast>
         ))}
-      </NotificationArea>
+      </ToastArea>
       {children}
-    </NotificationContext.Provider>
+    </ToastContext.Provider>
   );
 }

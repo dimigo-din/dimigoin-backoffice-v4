@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { getMealTimeline, type MealTimelineData } from "../../api/dienen.ts";
 import { UIButton } from "../../components/ui";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -112,7 +112,7 @@ function getErrorMessage(e: unknown): string {
 }
 
 export default function DienenTimePage() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [date, setDate] = useState<string>(
     new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
   );

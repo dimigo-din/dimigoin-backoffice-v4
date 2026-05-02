@@ -7,7 +7,7 @@ import {
   type PersonalInformation,
   setPersonalInformations,
 } from "../../api/auth.ts";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -228,7 +228,7 @@ const rowValue = (row: Record<string, string>, keys: string[], fallbackIndex: nu
 };
 
 function StudentInfoPage() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
   const [currentInformations, setCurrentInformations] = useState<PersonalInformation[]>([]);
   const [draftInformations, setDraftInformations] = useState<PersonalInformation[]>([]);
   const [templateHeaders, setTemplateHeaders] = useState<string[]>(templateFallbackHeaders);

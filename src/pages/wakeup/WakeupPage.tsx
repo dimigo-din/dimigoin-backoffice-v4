@@ -7,7 +7,7 @@ import {
   type WakeupApply,
 } from "../../api/wakeup.ts";
 import { UIButton } from "../../components/ui";
-import { useNotification } from "../../providers/ToastProvider.tsx";
+import { useToast } from "../../providers/ToastProvider.tsx";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -181,7 +181,7 @@ const ActionButton = styled(UIButton)`
 `;
 
 function WakeupPage() {
-  const { showToast } = useNotification();
+  const { showToast } = useToast();
 
   const [applies, setApplies] = useState<WakeupApply[] | null>();
 
