@@ -35,7 +35,7 @@ const AppRouter = () => {
         <Route path="/dienen_edittime" element={<DienenManageTimePage />} />
         <Route path="/dienen_delaytime" element={<DienenDelayTimePage />} />
         <Route path="/studentinfo" element={<StudentInfoPage />} />
-        <Route path="/uikit" element={<UiKitPage />} />
+        {import.meta.env.DEV && <Route path="/uikit" element={<UiKitPage />} />}
         <Route path="*" element={<EmptyPage />} />
       </Routes>
     </Suspense>
