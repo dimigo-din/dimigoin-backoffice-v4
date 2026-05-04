@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   padding: 16px;
 `;
 
@@ -18,7 +18,7 @@ const Card = styled.div`
   width: min(420px, 100%);
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 12px;
-  background: ${({ theme }) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   padding: 20px;
 
   display: flex;
@@ -28,7 +28,7 @@ const Card = styled.div`
 
 const Title = styled.h1`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Title.size};
   line-height: ${({ theme }) => theme.Font.Title.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Title.weight.strong};
@@ -36,7 +36,7 @@ const Title = styled.h1`
 
 const Desc = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Paragraph_Small.size};
   line-height: ${({ theme }) => theme.Font.Paragraph_Small.lineHeight};
 `;
@@ -53,7 +53,7 @@ const ActionRow = styled.div`
 
 const ActionButton = styled.button`
   min-height: 48px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   border: 1px solid ${({ theme }) => theme.Colors.Core.Brand.Primary};
   background: ${({ theme }) => theme.Colors.Core.Brand.Primary};
   color: ${({ theme }) => theme.Colors.Solid.White};

@@ -20,7 +20,7 @@ const Wrapper = styled.aside<{ $mobileOpen: boolean }>`
   display: flex;
   flex-direction: column;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 12px;
   overflow: hidden;
 
@@ -47,7 +47,7 @@ const Brand = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   > svg {
     width: 24px;
@@ -65,7 +65,7 @@ const UserRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   .meta {
     display: flex;
@@ -74,7 +74,7 @@ const UserRow = styled.div`
 
     .role {
       font-size: ${({ theme }) => theme.Font.Footnote.size};
-      color: ${({ theme }) => theme.Colors.Content.Secondary};
+      color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
     }
 
     .name {
@@ -91,8 +91,8 @@ const CloseButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
-  background: ${({ theme }) => theme.Colors.Background.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   display: none;
 
   ${mobile} {
@@ -115,7 +115,7 @@ const SectionTitle = styled.p`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Body.size};
   line-height: ${({ theme }) => theme.Font.Body.lineHeight};
 `;
@@ -133,14 +133,14 @@ const ItemButton = styled.button<{ $selected: boolean }>`
   border-radius: 8px;
   padding: 0 12px;
   text-align: left;
-  color: ${({ theme, $selected }) => ($selected ? theme.Colors.Content.Primary : theme.Colors.Content.Tertiary)};
-  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Background.Tertiary : "transparent")};
+  color: ${({ theme, $selected }) => ($selected ? theme.Colors.Content.Standard.Primary : theme.Colors.Content.Standard.Tertiary)};
+  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Background.Standard.Tertiary : "transparent")};
   font-size: ${({ theme }) => theme.Font.Body.size};
   line-height: ${({ theme }) => theme.Font.Body.lineHeight};
 
   &:hover {
-    background: ${({ theme }) => theme.Colors.Background.Tertiary};
-    color: ${({ theme }) => theme.Colors.Content.Primary};
+    background: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   }
 `;
 
@@ -156,13 +156,13 @@ const UtilityButton = styled.button<{ $selected?: boolean }>`
   border-radius: 10px;
   text-align: left;
   padding: 0 12px;
-  color: ${({ theme, $selected }) => ($selected ? theme.Colors.Content.Primary : theme.Colors.Content.Secondary)};
-  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Background.Tertiary : "transparent")};
+  color: ${({ theme, $selected }) => ($selected ? theme.Colors.Content.Standard.Primary : theme.Colors.Content.Standard.Secondary)};
+  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Background.Standard.Tertiary : "transparent")};
 `;
 
 const Footer = styled.p`
   margin: 10px 0 0;
-  color: ${({ theme }) => theme.Colors.Content.Quaternary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Quaternary};
   text-align: center;
   font-size: ${({ theme }) => theme.Font.Caption.size};
 `;

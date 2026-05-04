@@ -20,31 +20,31 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding: ${({ theme }) => theme.Spacing[600]};
+  padding: ${({ theme }) => theme.Component.Spacing[600]};
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: ${({ theme }) => theme.Spacing[550]};
+  gap: ${({ theme }) => theme.Component.Spacing[550]};
 
   ${mobile} {
-    padding: ${({ theme }) => theme.Spacing[300]};
+    padding: ${({ theme }) => theme.Component.Spacing[300]};
     grid-template-columns: 1fr;
   }
 `;
 
 const Section = styled.section`
-  background: ${({ theme }) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  border-radius: ${({ theme }) => theme.Radius[600]};
-  padding: ${({ theme }) => theme.Spacing[500]};
+  border-radius: ${({ theme }) => theme.Component.Radius[600]};
+  padding: ${({ theme }) => theme.Component.Spacing[500]};
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.Spacing[300]};
+  gap: ${({ theme }) => theme.Component.Spacing[300]};
 `;
 
 const Row = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({ theme }) => theme.Spacing[200]};
+  gap: ${({ theme }) => theme.Component.Spacing[200]};
   align-items: center;
 `;
 
@@ -54,7 +54,7 @@ const PhoneFrame = styled.div`
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 28px;
   overflow: hidden;
-  background: ${({ theme }) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
 `;
 
 export default function UiKitPage() {

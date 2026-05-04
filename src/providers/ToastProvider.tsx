@@ -68,7 +68,7 @@ const Toast = styled.div<{ leaving?: boolean }>`
 
   width: fit-content;
   margin: 0 auto;
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
 
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 32px;
@@ -82,7 +82,7 @@ const Toast = styled.div<{ leaving?: boolean }>`
 
   animation: ${slideDown} 0.3s ease;
   
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   ${({ leaving }) =>
     leaving &&

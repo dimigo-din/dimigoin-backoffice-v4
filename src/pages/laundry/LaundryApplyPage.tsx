@@ -63,7 +63,7 @@ const BodyBox = styled.div`
   flex-direction: row;
   align-items: center;
   
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
@@ -75,7 +75,7 @@ const BodyBox = styled.div`
   > hr {
     width: 0.7px;
     height: 85%; 
-    border: 1px solid ${({ theme }) => theme.Colors.Background.Quaternary};
+    border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   }
 `;
 
@@ -99,7 +99,7 @@ const FitController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -114,7 +114,7 @@ const StretchController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -122,7 +122,7 @@ const StretchController = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   font-weight: 600;
 `;
@@ -138,11 +138,11 @@ const LaundryApply = styled.div<{ selected?: boolean }>`
   justify-content: space-between;
   align-items: center;
   
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   font-size: ${({ theme }) => theme.Font.Headline.size};
   
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 

@@ -44,7 +44,7 @@ const colorMap: Record<TextColor, "Primary" | "Secondary" | "Tertiary" | "Quater
 
 const StyledText = styled.span<Required<Pick<TextProps, "variant" | "weight" | "color">>>`
   margin: 0;
-  color: ${({ theme, color }) => theme.Colors.Content[colorMap[color]]};
+  color: ${({ theme, color }) => theme.Colors.Content.Standard[colorMap[color]]};
 
   ${({ theme, variant, weight }) => {
     const token = theme.Font[variantMap[variant]];

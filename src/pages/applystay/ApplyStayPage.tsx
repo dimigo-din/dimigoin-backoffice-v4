@@ -69,7 +69,7 @@ const StayApplyContainer = styled.div`
   gap: 8px;
   padding: 10px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
 
   overflow-y: auto;
@@ -92,7 +92,7 @@ const ControllerContainer = styled.div`
 
   gap: 16px;
 
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   @media (max-width: 900px) {
     height: auto;
@@ -110,7 +110,7 @@ const ControllerContainer = styled.div`
 
 //   border-radius: 8px;
 
-//   background-color: ${({theme}) => theme.Colors.Background.Secondary};
+//   background-color: ${({theme}) => theme.Colors.Background.Standard.Secondary};
 //   padding: 2dvh 2dvh;
 // `;
 
@@ -120,7 +120,7 @@ const FitContainer = styled.div`
 
   border-radius: 12px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   padding: 16px;
 
   display: flex;
@@ -135,7 +135,7 @@ const NoApply = styled.div`
   text-align: center;
   align-content: center;
 
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
@@ -146,8 +146,8 @@ const StayApplyCard = styled.div<{ outingCount: number }>`
   height: 6dvh;
   flex: 0 0 auto;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   border-radius: 6px;
 
@@ -180,7 +180,7 @@ const StayApplyCardSummary = styled.div`
 
     text-align: right;
     align-content: center;
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   }
 `;
 
@@ -202,7 +202,7 @@ const StayApplyDetail = styled.div`
     margin-top: 2dvh;
   }
 
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 `;
 
 const StayApplyHeader = styled.div`
@@ -224,7 +224,7 @@ const SeatBox = styled.div`
   height: 35dvh;
   width: 100%;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 8px;
 
   overflow: scroll;
@@ -243,7 +243,7 @@ const SeatRow = styled.div<{ seat: string | null }>`
     padding: 12px 0;
     margin: 4px;
 
-    background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
     border-radius: 8px;
 
     text-align: center;
@@ -251,7 +251,7 @@ const SeatRow = styled.div<{ seat: string | null }>`
 
   > span.inactive {
     filter: brightness(0.9);
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   }
 
   > span.taken-1 {
@@ -280,7 +280,7 @@ const SeatRow = styled.div<{ seat: string | null }>`
 const OutingBox = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 8px;
   margin-top: 2dvh;
 
@@ -404,7 +404,7 @@ const NoOuting = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   margin-bottom: 2px;
 `;
 
@@ -574,7 +574,11 @@ function ApplyStayPage() {
         applyCopy.outing
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
-          .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
+          .map((a) =>
+            Object.keys(a)
+              .map((k) => String(a[k]))
+              .join(""),
+          )
           .join("");
 
       sha256(merged).then((data) => {
@@ -598,11 +602,7 @@ function ApplyStayPage() {
 
     const merged =
       selectedApply.stay_seat +
-      selectedApply.outing
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
-        .join("");
+      selectedApply.outing.map((a) => Object.values(a).map(String).join("")).join("");
     sha256(merged).then((data) => {
       if (data !== selectedApplyChecksum) {
         if (confirm("다른 열림 탭에 수정사항이 존재합니다. 정말로 닫으시겠습니까?")) {
@@ -610,11 +610,7 @@ function ApplyStayPage() {
           const openNewEditor = (targetApply: StayApply) => {
             const newMerged =
               targetApply.stay_seat +
-              targetApply.outing
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                .map((a) => Object.keys(a).map((k) => String(a[k])).join(""))
-                .join("");
+              targetApply.outing.map((a) => Object.values(a).map(String).join("")).join("");
             sha256(newMerged).then((newData) => {
               setSelectedApplyChecksum(newData);
               setSelectedApply(targetApply);
@@ -848,8 +844,7 @@ function ApplyStayPage() {
           />
           <UIButton
             disabled={newUser === null}
-            size="medium"
-            fullWidth
+            variant={{ size: "Medium", stretchWidth: true }}
             onClick={() => {
               const newApply = {
                 id: "new",
@@ -1132,7 +1127,7 @@ function ApplyStayPage() {
                                   id={seat}
                                   ref={selectedApply.stay_seat === seat ? seatRef : null}
                                   className={[
-                                    (isActive || taken) ? "active" : "inactive",
+                                    isActive || taken ? "active" : "inactive",
                                     taken ? `taken-${taken.user.grade}` : "notTaken",
                                   ].join(" ")}
                                   onClick={() =>

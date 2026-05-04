@@ -13,18 +13,18 @@ interface UISegmentedControlProps {
 const SegmentRoot = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.Colors.Components.Translucent.Secondary};
-  border-radius: ${({ theme }) => theme.Radius[500]};
-  padding: ${({ theme }) => theme.Spacing[100]};
+  border-radius: ${({ theme }) => theme.Component.Radius[500]};
+  padding: ${({ theme }) => theme.Component.Spacing[100]};
   display: grid;
-  gap: ${({ theme }) => theme.Spacing[100]};
+  gap: ${({ theme }) => theme.Component.Spacing[100]};
 `;
 
 const SegmentItem = styled.button<{ $active: boolean }>`
   height: 52px;
   border: 0;
-  border-radius: ${({ theme }) => theme.Radius[400]};
-  color: ${({ theme, $active }) => ($active ? theme.Colors.Content.Primary : theme.Colors.Content.Secondary)};
-  background: ${({ theme, $active }) => ($active ? theme.Colors.Background.Primary : "transparent")};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
+  color: ${({ theme, $active }) => ($active ? theme.Colors.Content.Standard.Primary : theme.Colors.Content.Standard.Secondary)};
+  background: ${({ theme, $active }) => ($active ? theme.Colors.Background.Standard.Primary : "transparent")};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   font-weight: ${({ theme }) => theme.Font.Callout.weight.strong};
 `;
@@ -58,7 +58,7 @@ const OptionRoot = styled.div<{ $columns: number }>`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(${({ $columns }) => $columns}, minmax(0, 1fr));
-  gap: ${({ theme }) => theme.Spacing[200]};
+  gap: ${({ theme }) => theme.Component.Spacing[200]};
 
   ${mobile} {
     grid-template-columns: 1fr 1fr;
@@ -67,10 +67,10 @@ const OptionRoot = styled.div<{ $columns: number }>`
 
 const OptionItem = styled.button<{ $active: boolean }>`
   min-height: 44px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   border: 1px solid ${({ theme, $active }) => ($active ? theme.Colors.Core.Brand.Primary : theme.Colors.Line.Outline)};
-  background: ${({ theme, $active }) => ($active ? theme.Colors.Core.Brand.Tertiary : theme.Colors.Background.Primary)};
-  color: ${({ theme, $active }) => ($active ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Secondary)};
+  background: ${({ theme, $active }) => ($active ? theme.Colors.Core.Brand.Tertiary : theme.Colors.Background.Standard.Primary)};
+  color: ${({ theme, $active }) => ($active ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Standard.Secondary)};
   font-size: ${({ theme }) => theme.Font.Footnote.size};
 `;
 
@@ -102,9 +102,9 @@ const NavRoot = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 ${({ theme }) => theme.Spacing[300]};
+  padding: 0 ${({ theme }) => theme.Component.Spacing[300]};
   border-bottom: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  background: ${({ theme }) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
 `;
 
 const Slot = styled.div`
@@ -112,12 +112,12 @@ const Slot = styled.div`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 `;
 
 const NavTitle = styled.h1`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Callout.weight.strong};

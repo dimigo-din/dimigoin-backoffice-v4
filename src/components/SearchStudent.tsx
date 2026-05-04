@@ -17,7 +17,7 @@ const SuggestBox = styled.div`
   right: 0;
   max-height: 30dvh;
   overflow-y: auto;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.18);
@@ -29,7 +29,7 @@ const SuggestItem = styled.div`
   width: 100%;
   padding: 10px 12px;
   font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -39,7 +39,7 @@ const SuggestItem = styled.div`
   &:hover { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Hover}; }
   &:active { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Pressed}; }
 
-  .meta { color: ${({ theme }) => theme.Colors.Content.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
+  .meta { color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
 `;
 
 interface SearchStudentProps {

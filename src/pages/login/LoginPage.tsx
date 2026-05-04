@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: ${({ theme }) => theme.Colors.Background.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
 `;
 
 const Brand = styled.div`
@@ -40,7 +40,7 @@ const Title = styled.div`
   font-size: ${({ theme }) => theme.Font.Title.size};
   font-weight: ${({ theme }) => theme.Font.Title.weight.strong};
 
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   > svg {
     width: 28px;
@@ -51,7 +51,7 @@ const Title = styled.div`
 const LoginButton = styled.button`
   width: 100%;
   min-height: 56px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
 
   display: inline-flex;
@@ -80,8 +80,8 @@ const LoginButton = styled.button`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.Colors.Components.Fill.Tertiary};
-    color: ${({ theme }) => theme.Colors.Content.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Components.Fill.Standard.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
     cursor: not-allowed;
   }
 `;
@@ -90,10 +90,10 @@ const PwLoginButton = styled(Link)`
   width: 100%;
   min-height: 44px;
   margin-top: 10px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   text-decoration: none;
 
   display: inline-flex;

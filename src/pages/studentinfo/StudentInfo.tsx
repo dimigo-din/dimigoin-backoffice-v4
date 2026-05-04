@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 const Card = styled.div`
   flex: 1;
   min-height: 0;
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -43,12 +43,12 @@ const CardHead = styled.div`
   h3 {
     margin: 0;
     font-size: ${({ theme }) => theme.Font.Headline.size};
-    color: ${({ theme }) => theme.Colors.Content.Primary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   }
 
   p {
     margin: 2px 0 0;
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
     font-size: ${({ theme }) => theme.Font.Body.size};
   }
 `;
@@ -76,11 +76,11 @@ const ActionButton = styled.button`
 `;
 
 const GhostButton = styled(ActionButton)`
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   &:hover {
-    background-color: ${({ theme }) => theme.Colors.Background.Tertiary}cc;
+    background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary}cc;
   }
 `;
 
@@ -104,10 +104,10 @@ const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
 
   thead {
-    background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
     position: sticky;
     top: 0;
     z-index: 1;
@@ -118,21 +118,21 @@ const StyledTable = styled.table`
     padding: 10px;
     text-align: left;
     font-size: ${({ theme }) => theme.Font.Body.size};
-    color: ${({ theme }) => theme.Colors.Content.Primary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   tbody tr:hover {
-    background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+    background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   }
 `;
 
 const SortButton = styled.button`
   border: none;
   background: transparent;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Body.size};
   font-weight: ${({ theme }) => theme.Font.Body.weight.regular};
   cursor: pointer;
@@ -142,8 +142,8 @@ const SortButton = styled.button`
 const EditableInput = styled.input<{ $changed?: boolean }>`
   width: 100%;
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary)};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Standard.Primary)};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   border-radius: 6px;
   padding: 8px;
   font-size: ${({ theme }) => theme.Font.Body.size};
@@ -157,8 +157,8 @@ const EditableInput = styled.input<{ $changed?: boolean }>`
 const EditableSelect = styled.select<{ $changed?: boolean }>`
   width: 100%;
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Primary)};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ $changed, theme }) => ($changed ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Standard.Primary)};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   border-radius: 6px;
   padding: 8px;
   font-size: ${({ theme }) => theme.Font.Body.size};
@@ -178,7 +178,7 @@ const ActionRow = styled.div`
 
 const EmptyText = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 

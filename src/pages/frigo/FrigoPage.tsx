@@ -51,7 +51,7 @@ const ApplyList = styled.div`
   gap: 8px;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 
   padding: 10px;
 
@@ -87,7 +87,7 @@ const FitController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 
   padding: 16px;
   gap: 8px;
@@ -101,7 +101,7 @@ const StretchController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 
   padding: 16px;
   gap: 8px;
@@ -141,7 +141,7 @@ const SelectionItem = styled.div<{ border?: boolean; selected: boolean }>`
   text-align: center;
   align-content: center;
   
-  color: ${({ theme, selected }) => (selected ? theme.Colors.Solid.White : theme.Colors.Content.Primary)};
+  color: ${({ theme, selected }) => (selected ? theme.Colors.Solid.White : theme.Colors.Content.Standard.Primary)};
   
   border-left: ${({ theme, border }) => (border ? `1px solid ${theme.Colors.Line.Outline}` : "none")};
   
@@ -160,10 +160,10 @@ const Apply = styled.div`
   
   border-radius: 8px;
   
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   padding: 0 2dvh;
   
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   
   > .left {
     display: flex;
@@ -178,15 +178,15 @@ const Apply = styled.div`
     }
     .detail {
       font-size: ${({ theme }) => theme.Font.Headline.size};
-      color: ${({ theme }) => theme.Colors.Content.Secondary};
+      color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
       
       > .when {
         font-size: ${({ theme }) => theme.Font.Headline.size};
-        background-color: ${({ theme }) => theme.Colors.Background.Quaternary};
+        background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
-        color: ${({ theme }) => theme.Colors.Content.Secondary};
+        color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
         border: none;
         border-radius: 8px;
         
@@ -203,7 +203,7 @@ const Apply = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
 `;
 
@@ -219,7 +219,7 @@ const SuggestBox = styled.div`
   right: 0;
   max-height: 30dvh;
   overflow-y: auto;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.18);
@@ -230,7 +230,7 @@ const SuggestBox = styled.div`
 const SuggestItem = styled.div`
   padding: 10px 12px;
   font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -240,7 +240,7 @@ const SuggestItem = styled.div`
   &:hover { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Hover}; }
   &:active { background-color: ${({ theme }) => theme.Colors.Components.Interaction.Pressed}; }
 
-  .meta { color: ${({ theme }) => theme.Colors.Content.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
+  .meta { color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary}; font-size: ${({ theme }) => theme.Font.Footnote.size}; }
 `;
 
 function FrigoPage() {

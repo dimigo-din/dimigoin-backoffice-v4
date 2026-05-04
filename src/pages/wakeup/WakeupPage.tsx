@@ -51,7 +51,7 @@ const SectionTitle = styled.div`
   min-height: 32px;
 
   font-size: ${({ theme }) => theme.Font.Title.size};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   text-align: center;
   align-content: center;
 
@@ -71,7 +71,7 @@ const WakeupList = styled.div`
   flex-direction: column;
   gap: 8px;
   
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   overflow-y: auto;
   
@@ -84,14 +84,14 @@ const WakeupItem = styled.div`
   min-height: 110px;
   width: 100%;
   
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 8px;
   
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   
   overflow: hidden;
 
@@ -128,7 +128,7 @@ const WakeupItem = styled.div`
         word-break: break-word;
       }
       .votes {
-        color: ${({ theme }) => theme.Colors.Content.Secondary};
+        color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
       }
     }
 
@@ -272,14 +272,20 @@ function WakeupPage() {
                       </div>
                       <div className="right">
                         <ActionButton
-                          variant="danger"
-                          size="small"
-                          fullWidth
+                          variant={{
+                            size: "Small",
+                            theme: "Negative",
+                            style: "Primary",
+                            stretchWidth: true,
+                          }}
                           onClick={() => deleteSong(apply.id)}
                         >
                           삭제
                         </ActionButton>
-                        <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>
+                        <ActionButton
+                          variant={{ size: "Small", stretchWidth: true }}
+                          onClick={() => selectSong(apply.id)}
+                        >
                           확정
                         </ActionButton>
                       </div>
@@ -321,14 +327,20 @@ function WakeupPage() {
                       </div>
                       <div className="right">
                         <ActionButton
-                          variant="danger"
-                          size="small"
-                          fullWidth
+                          variant={{
+                            size: "Small",
+                            theme: "Negative",
+                            style: "Primary",
+                            stretchWidth: true,
+                          }}
                           onClick={() => deleteSong(apply.id)}
                         >
                           삭제
                         </ActionButton>
-                        <ActionButton size="small" fullWidth onClick={() => selectSong(apply.id)}>
+                        <ActionButton
+                          variant={{ size: "Small", stretchWidth: true }}
+                          onClick={() => selectSong(apply.id)}
+                        >
                           확정
                         </ActionButton>
                       </div>

@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const Panel = styled.section`
-  background: ${({ theme }) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -26,21 +26,21 @@ const Panel = styled.section`
 
 const Title = styled.h2`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
 const Sub = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
 const Badge = styled.div`
   width: fit-content;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   background: ${({ theme }) => theme.Colors.Components.Translucent.Secondary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   padding: 8px 12px;
   font-size: ${({ theme }) => theme.Font.Footnote.size};
   font-weight: ${({ theme }) => theme.Font.Footnote.weight.strong};

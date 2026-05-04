@@ -64,7 +64,7 @@ const FitController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -79,7 +79,7 @@ const StretchController = styled.div`
   flex-direction: column;
 
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   
   padding: 16px;
@@ -99,8 +99,8 @@ const TimelineListItemBlock = styled.div<{ selected: boolean }>`
   border-radius: 12px;
   
   font-size: ${({ theme }) => theme.Font.Headline.size};
-  background-color: ${({ theme, selected }) => (selected ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Tertiary)};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background-color: ${({ theme, selected }) => (selected ? theme.Colors.Components.Translucent.Primary : theme.Colors.Background.Standard.Tertiary)};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   padding: 0 12px;
   box-shadow: ${({ selected }) => (selected ? "0 2px 8px rgba(0, 0, 0, 0.12)" : "0 1px 4px rgba(0, 0, 0, 0.08)")};
   cursor: pointer;
@@ -108,7 +108,7 @@ const TimelineListItemBlock = styled.div<{ selected: boolean }>`
 
 const TimelineListItemEnableIndicator = styled.div<{ enabled?: boolean }>`
   font-size: ${({ theme }) => theme.Font.Body.size};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   background-color: ${({ theme, enabled }) => (enabled ? theme.Colors.Core.Status.Positive : theme.Colors.Core.Status.Translucent.Positive)};
   
   padding: 0.5dvh 0.5dvw;
@@ -126,7 +126,7 @@ const TimelineDetail = styled.div`
   padding: 16px;
   gap: 10px;
   
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
@@ -162,9 +162,9 @@ const Time = styled.div`
   align-items: center;
   gap: 10px;
   
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
@@ -204,11 +204,11 @@ const GradeCheckGroup = styled.div`
 
 const Select = styled.select`
   font-size: ${({ theme }) => theme.Font.Headline.size};
-  background-color: ${({ theme }) => theme.Colors.Background.Quaternary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
   border-radius: 8px;
 
@@ -218,7 +218,7 @@ const Select = styled.select`
 `;
 
 const Text = styled.p`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   font-weight: 600;
 `;
@@ -230,7 +230,7 @@ const DeleteTime = styled.div`
   border-radius: 8px;
   
   background-color: ${({ theme }) => theme.Colors.Core.Status.Negative};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   
   padding: 8px 12px;
   cursor: pointer;
@@ -247,7 +247,7 @@ const LaundryTimeChildMachine = styled.div`
   
   margin-left: 0;
   padding: 8px 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 8px;
 `;
 
@@ -257,7 +257,7 @@ const UnassignMachineButton = styled.div`
   border-radius: 6px;
 
   background-color: ${({ theme }) => theme.Colors.Core.Status.Negative};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   
   padding: 6px 10px;
   cursor: pointer;

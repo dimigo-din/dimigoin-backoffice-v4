@@ -7,7 +7,7 @@ const Element = styled.div<{ canceled: boolean }>`
   min-width: fit-content;
 
   border-radius: 12px;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
   line-height: 1;
   font-weight: ${({ theme, canceled }) => (canceled ? theme.Font.Paragraph_Large.weight.regular : theme.Font.Paragraph_Large.weight.weak)};
@@ -35,7 +35,7 @@ const Element = styled.div<{ canceled: boolean }>`
   }
 
   path {
-    fill: ${({ theme, canceled }) => (canceled ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Quaternary)};
+    fill: ${({ theme, canceled }) => (canceled ? theme.Colors.Core.Brand.Primary : theme.Colors.Content.Standard.Quaternary)};
     transition: fill 0.3s ease;
   }
 `;

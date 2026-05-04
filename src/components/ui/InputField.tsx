@@ -16,11 +16,11 @@ const FieldWrap = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.Spacing[100]};
+  gap: ${({ theme }) => theme.Component.Spacing[100]};
 `;
 
 const Label = styled.label`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Footnote.size};
   line-height: ${({ theme }) => theme.Font.Footnote.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Footnote.weight.regular};
@@ -28,7 +28,7 @@ const Label = styled.label`
 
 const Hint = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Caption.size};
   line-height: ${({ theme }) => theme.Font.Caption.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Caption.weight.regular};
@@ -37,13 +37,13 @@ const Hint = styled.p`
 const InputWrap = styled.div`
   width: 100%;
   min-height: 44px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.Spacing[100]};
-  padding: 0 ${({ theme }) => theme.Spacing[300]};
+  gap: ${({ theme }) => theme.Component.Spacing[100]};
+  padding: 0 ${({ theme }) => theme.Component.Spacing[300]};
 
   &:focus-within {
     border-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
@@ -54,12 +54,12 @@ const NativeInput = styled.input`
   width: 100%;
   border: 0;
   background: transparent;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
 
   &::placeholder {
-    color: ${({ theme }) => theme.Colors.Content.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
   }
 
   &:focus {
@@ -72,7 +72,7 @@ const ClearButton = styled.button`
   height: 20px;
   border: 0;
   background: transparent;
-  color: ${({ theme }) => theme.Colors.Content.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
   font-size: 16px;
   display: inline-flex;
   align-items: center;
@@ -82,19 +82,19 @@ const ClearButton = styled.button`
 const TagRow = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({ theme }) => theme.Spacing[100]};
+  gap: ${({ theme }) => theme.Component.Spacing[100]};
 `;
 
 const Tag = styled.button`
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  border-radius: ${({ theme }) => theme.Radius[400]};
-  background: ${({ theme }) => theme.Colors.Background.Primary};
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   min-height: 32px;
-  padding: 0 ${({ theme }) => theme.Spacing[300]};
+  padding: 0 ${({ theme }) => theme.Component.Spacing[300]};
   display: inline-flex;
   align-items: center;
-  gap: ${({ theme }) => theme.Spacing[100]};
+  gap: ${({ theme }) => theme.Component.Spacing[100]};
 `;
 
 export function UIInputField({
@@ -140,7 +140,7 @@ interface UITextAreaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 const TextareaWrap = styled(InputWrap)`
   align-items: flex-start;
   min-height: 112px;
-  padding: ${({ theme }) => theme.Spacing[300]};
+  padding: ${({ theme }) => theme.Component.Spacing[300]};
 `;
 
 const NativeTextarea = styled.textarea`
@@ -149,12 +149,12 @@ const NativeTextarea = styled.textarea`
   resize: vertical;
   border: 0;
   background: transparent;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
 
   &::placeholder {
-    color: ${({ theme }) => theme.Colors.Content.Tertiary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
   }
 
   &:focus {
@@ -184,7 +184,7 @@ const NativeSelect = styled.select`
   width: 100%;
   border: 0;
   background: transparent;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
 
@@ -221,12 +221,12 @@ interface UIToggleRowProps {
 const ToggleRowRoot = styled.button`
   width: 100%;
   border: 0;
-  padding: ${({ theme }) => theme.Spacing[200]} 0;
+  padding: ${({ theme }) => theme.Component.Spacing[200]} 0;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Body.size};
   line-height: ${({ theme }) => theme.Font.Body.lineHeight};
   text-align: left;

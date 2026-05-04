@@ -14,7 +14,7 @@ interface UIBadgeProps {
 const colorMap = {
   grayscale: css`
     background-color: ${({ theme }) => theme.Colors.Components.Translucent.Primary};
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   `,
   accent: css`
     background-color: ${({ theme }) => theme.Colors.Core.Brand.Tertiary};
@@ -25,7 +25,7 @@ const colorMap = {
     color: ${({ theme }) => theme.Colors.Core.Status.Negative};
   `,
   solid: css`
-    background-color: ${({ theme }) => theme.Colors.Content.Primary};
+    background-color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     color: ${({ theme }) => theme.Colors.Solid.White};
   `,
   positive: css`
@@ -61,8 +61,8 @@ const Root = styled.span<Required<Pick<UIBadgeProps, "type" | "size" | "tone">>>
 
     return css`
       min-height: ${size === "large" ? "22px" : "18px"};
-      padding: 0 ${size === "large" ? theme.Spacing[300] : theme.Spacing[200]};
-      border-radius: ${theme.Radius[400]};
+      padding: 0 ${size === "large" ? theme.Component.Spacing[300] : theme.Component.Spacing[200]};
+      border-radius: ${theme.Component.Radius[400]};
       font-size: ${theme.Font.Footnote.size};
       line-height: ${theme.Font.Footnote.lineHeight};
       font-weight: ${theme.Font.Footnote.weight.regular};

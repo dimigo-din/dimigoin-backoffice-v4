@@ -19,7 +19,7 @@ const Wrapper = styled.div`
 `;
 
 const Panel = styled.section`
-  background: ${({ theme }) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -40,13 +40,13 @@ const HeaderRow = styled.div`
 
 const Title = styled.h2`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
 const Sub = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Footnote.size};
 `;
 
@@ -62,7 +62,7 @@ const GradeGrid = styled.div`
 
 const GradeCard = styled.div`
   border-radius: 10px;
-  background: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@ const GradeCard = styled.div`
 
 const GradeTitle = styled.h3`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Headline.size};
 `;
 
@@ -81,24 +81,24 @@ const TimelineRow = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  background: ${({ theme }) => theme.Colors.Background.Primary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
 const EmptyText = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
 `;
 
 const NativeDateInput = styled.input`
   width: 220px;
   height: 44px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
   border: 0;
   padding: 0 12px;
-  background: ${({ theme }) => theme.Colors.Background.Tertiary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 
   @media (max-width: 900px) {
     width: 100%;
@@ -145,7 +145,7 @@ export default function DienenTimePage() {
         <Sub>조회 날짜를 선택하면 해당 주 급식 시간표를 불러옵니다.</Sub>
         <HeaderRow>
           <NativeDateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          <UIButton size="medium" onClick={fetchTimeline} disabled={isLoading}>
+          <UIButton variant={{ size: "Medium" }} onClick={fetchTimeline} disabled={isLoading}>
             조회
           </UIButton>
         </HeaderRow>

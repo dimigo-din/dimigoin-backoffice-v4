@@ -3,9 +3,9 @@ import styled from "styled-components";
 export const Select = styled.select`
   padding: 0 16px;
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
   line-height: ${({ theme }) => theme.Font.Paragraph_Large.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Paragraph_Large.weight.regular};
@@ -14,7 +14,7 @@ export const Select = styled.select`
   height: "5dvh";
 
   &::placeholder {
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
     font-size: ${({ theme }) => theme.Font.Paragraph_Large.size};
     line-height: ${({ theme }) => theme.Font.Paragraph_Large.lineHeight};
     font-weight: ${({ theme }) => theme.Font.Paragraph_Large.weight.regular};

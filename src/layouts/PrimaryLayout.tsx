@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   gap: 32px;
   padding: 58px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 
   ${mobile} {
     padding: 0;
@@ -30,7 +30,7 @@ const ContentWrapper = styled.div`
   flex: 1;
   min-width: 0;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 12px;
 
   overflow: hidden;
@@ -59,7 +59,7 @@ const TopBar = styled.div`
     height: 56px;
     padding: 0 16px;
     border-bottom: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-    background: ${({ theme }) => theme.Colors.Background.Primary};
+    background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   }
 `;
 
@@ -72,8 +72,8 @@ const HamburgerButton = styled.button`
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    background: ${({ theme }) => theme.Colors.Background.Secondary};
-    color: ${({ theme }) => theme.Colors.Content.Primary};
+    background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     z-index: 1;
   }
 `;
@@ -86,7 +86,7 @@ const TopBarTitle = styled.span`
     left: 50%;
     transform: translateX(-50%);
     font-weight: 600;
-    color: ${({ theme }) => theme.Colors.Content.Primary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     pointer-events: none;
   }
 `;

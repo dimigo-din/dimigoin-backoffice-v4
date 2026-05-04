@@ -46,7 +46,7 @@ const DialogPanel = styled.div<{ $isClosing: boolean }>`
   max-width: 960px;
   min-width: 520px;
   height: 100%;
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   border-radius: 16px 0 0 16px;
 
   display: flex;

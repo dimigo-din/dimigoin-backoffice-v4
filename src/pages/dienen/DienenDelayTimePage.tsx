@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 `;
 
 const Panel = styled.section`
-  background: ${({ theme }) => theme.Colors.Background.Secondary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -35,13 +35,13 @@ const Panel = styled.section`
 
 const Title = styled.h2`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Title.size};
 `;
 
 const Sub = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Footnote.size};
 `;
 
@@ -60,8 +60,8 @@ const CounterBox = styled.div`
   width: 100%;
   max-width: 320px;
   height: 44px;
-  border-radius: ${({ theme }) => theme.Radius[400]};
-  background: ${({ theme }) => theme.Colors.Background.Tertiary};
+  border-radius: ${({ theme }) => theme.Component.Radius[400]};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   display: grid;
   grid-template-columns: 44px 1fr 44px;
   align-items: stretch;
@@ -74,8 +74,8 @@ const CounterBox = styled.div`
 
 const CounterButton = styled.button`
   border: 0;
-  background: ${({ theme }) => theme.Colors.Background.Tertiary};
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  background: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Headline.size};
   font-weight: ${({ theme }) => theme.Font.Headline.weight.strong};
 `;
@@ -84,7 +84,7 @@ const CounterValue = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
   font-weight: ${({ theme }) => theme.Font.Callout.weight.strong};
 `;
@@ -101,7 +101,7 @@ const TimeList = styled.div`
 
 const TimeCard = styled.button<{ $selected: boolean }>`
   border: 0;
-  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Core.Brand.Tertiary : theme.Colors.Background.Tertiary)};
+  background: ${({ theme, $selected }) => ($selected ? theme.Colors.Core.Brand.Tertiary : theme.Colors.Background.Standard.Tertiary)};
   border-radius: 10px;
   padding: 10px 12px;
   text-align: left;
@@ -111,18 +111,18 @@ const TimeCard = styled.button<{ $selected: boolean }>`
 `;
 
 const TimeTitle = styled.strong`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   font-size: ${({ theme }) => theme.Font.Callout.size};
 `;
 
 const TimeMeta = styled.span`
-  color: ${({ theme }) => theme.Colors.Content.Secondary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   font-size: ${({ theme }) => theme.Font.Footnote.size};
 `;
 
 const EmptyText = styled.p`
   margin: 0;
-  color: ${({ theme }) => theme.Colors.Content.Tertiary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Tertiary};
   font-size: ${({ theme }) => theme.Font.Body.size};
 `;
 
@@ -270,8 +270,7 @@ export default function DienenDelayTimePage() {
 
         <FieldRow>
           <UIButton
-            size="medium"
-            variant="neutral"
+            variant={{ size: "Medium", theme: "Grayscale", style: "Secondary" }}
             onClick={loadTodayTimeline}
             disabled={isLoading}
           >
@@ -329,7 +328,7 @@ export default function DienenDelayTimePage() {
           </Sub>
 
           <UIButton
-            size="medium"
+            variant={{ size: "Medium" }}
             onClick={submit}
             disabled={isLoading || selectedSources.length === 0}
           >

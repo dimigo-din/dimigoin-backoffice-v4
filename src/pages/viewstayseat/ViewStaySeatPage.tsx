@@ -49,7 +49,7 @@ const StayApplyContainer = styled.div`
   gap: 8px;
   padding: 10px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
 
   @media (max-width: 900px) {
@@ -69,7 +69,7 @@ const ControllerContainer = styled.div`
 
   gap: 16px;
 
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
 `;
 
 const FitContainer = styled.div`
@@ -78,7 +78,7 @@ const FitContainer = styled.div`
 
   border-radius: 12px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   padding: 16px;
 
   display: flex;
@@ -92,7 +92,7 @@ const SeatBox = styled.div`
   height: 100%;
   width: 100%;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
   border-radius: 12px;
 
   overflow: scroll;
@@ -115,12 +115,12 @@ const SeatRow = styled.div`
 
     margin: 4px;
 
-    background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+    background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
     border-radius: 8px;
 
     text-align: center;
 
-    color: ${({ theme }) => theme.Colors.Content.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Secondary};
   }
 
   > div.taken-1 {
@@ -140,7 +140,7 @@ const SeatRow = styled.div`
 `;
 
 const Text = styled.p`
-  color: ${({ theme }) => theme.Colors.Content.Primary};
+  color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
   margin-bottom: 2px;
 `;
 

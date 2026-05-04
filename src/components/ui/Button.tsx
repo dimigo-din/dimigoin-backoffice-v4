@@ -30,68 +30,74 @@ const minMax = {
     min-width: 32px;
     min-height: 32px;
     max-height: 32px;
-  `
+  `,
 };
 const gap = {
   Large: css`
-    gap: ${({ theme }) => theme.Spacing[200]};
+    gap: ${({ theme }) => theme.Component.Spacing[200]};
   `,
   Medium: css`
-    gap: ${({ theme }) => theme.Spacing[150]};
+    gap: ${({ theme }) => theme.Component.Spacing[150]};
   `,
   Small: css`
-    gap: ${({ theme }) => theme.Spacing[100]};
+    gap: ${({ theme }) => theme.Component.Spacing[100]};
   `,
 };
 const padding = {
   // top&bottom left&right (invert Figma)
   Large: css`
-    padding: ${({ theme }) => `${theme.Spacing[400]} ${theme.Spacing[500]}`};
+    padding: ${({ theme }) => `${theme.Component.Spacing[400]} ${theme.Component.Spacing[500]}`};
   `,
   Medium: css`
-    padding: ${({ theme }) => `${theme.Spacing[300]} ${theme.Spacing[400]}`};
+    padding: ${({ theme }) => `${theme.Component.Spacing[300]} ${theme.Component.Spacing[400]}`};
   `,
   Small: css`
-    padding: ${({ theme }) => `${theme.Spacing[150]} ${theme.Spacing[300]}`};
+    padding: ${({ theme }) => `${theme.Component.Spacing[150]} ${theme.Component.Spacing[300]}`};
   `,
 };
 const borderRadius = {
   Large: css`
-    border-radius: ${({ theme }) => theme.Radius[400]};
+    border-radius: ${({ theme }) => theme.Component.Radius[400]};
   `,
   Medium: css`
-    border-radius: ${({ theme }) => theme.Radius[400]};
+    border-radius: ${({ theme }) => theme.Component.Radius[400]};
   `,
   Small: css`
-    border-radius: ${({ theme }) => theme.Radius[300]};
+    border-radius: ${({ theme }) => theme.Component.Radius[300]};
   `,
 };
 
-const backgroundColor = {
+const colors = {
   Grayscale: {
     Primary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Inverted.Primary};
+      color: ${({ theme }) => theme.Colors.Content.Inverted.Primary};
     `,
     Secondary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
-    `
+      background-color: ${({ theme }) => theme.Colors.Components.Translucent.Secondary};
+      color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
+    `,
   },
   Accent: {
     Primary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+      background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
+      color: ${({ theme }) => theme.Colors.Solid.White};
     `,
     Secondary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
-    `
+      background-color: ${({ theme }) => theme.Colors.Core.Brand.Tertiary};
+      color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
+    `,
   },
   Negative: {
     Primary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+      background-color: ${({ theme }) => theme.Colors.Core.Status.Negative};
+      color: ${({ theme }) => theme.Colors.Solid.White};
     `,
     Secondary: css`
-      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
-    `
-  }
+      background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
+      color: ${({ theme }) => theme.Colors.Solid.Pink};
+    `,
+  },
 };
 
 const Root = styled.button<{
@@ -112,7 +118,7 @@ const Root = styled.button<{
   }
   ${({ $variant }) => borderRadius[$variant.size]}
 
-  ${({ $variant }) => backgroundColor[$variant.theme][$variant.style]}
+  ${({ $variant }) => colors[$variant.theme][$variant.style]}
 
 
   font-size: ${({ theme }) => theme.Font.Callout.size};
@@ -137,14 +143,20 @@ const Root = styled.button<{
 
 export function UIButton({
   variant,
-  leadingArea,
-  children,
-  trailingArea,
+  leadingArea, 
+  children, 
+  trailingArea, 
   ...props
 }: ButtonProps) {
   return (
-    <Root 
-      $variant={{ size: "Large", theme: "Grayscale", style: "Primary", stretchWidth: false, ...variant }}
+    <Root
+      $variant={{
+        size: "Large",
+        theme: "Grayscale",
+        style: "Primary",
+        stretchWidth: false,
+        ...variant,
+      }}
       {...props}
     >
       {leadingArea}
