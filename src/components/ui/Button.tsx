@@ -2,73 +2,124 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import styled, { css } from "styled-components";
 import { mobile } from "../../styles/media.ts";
 
-type ButtonVariant = "primary" | "neutral" | "danger" | "ghost";
-type ButtonSize = "large" | "medium" | "small";
-
-interface UIButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  fullWidth?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
+export interface ButtonVariant {
+  size?: "Large" | "Medium" | "Small";
+  theme?: "Grayscale" | "Accent" | "Negative";
+  style?: "Primary" | "Secondary";
+  stretchWidth?: boolean;
 }
 
-const sizeStyles = {
-  large: css`
-    height: 56px;
-    padding: 0 20px;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  leadingArea?: ReactNode;
+  trailingArea?: ReactNode;
+}
+
+const minMax = {
+  Large: css`
+    min-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
   `,
-  medium: css`
-    height: 48px;
-    padding: 0 16px;
+  Medium: css`
+    min-width: 46px;
+    min-height: 46px;
+    max-height: 46px;
   `,
-  small: css`
-    height: 40px;
-    padding: 0 14px;
+  Small: css`
+    min-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
+  `
+};
+const gap = {
+  Large: css`
+    gap: ${({ theme }) => theme.Spacing[200]};
+  `,
+  Medium: css`
+    gap: ${({ theme }) => theme.Spacing[150]};
+  `,
+  Small: css`
+    gap: ${({ theme }) => theme.Spacing[100]};
+  `,
+};
+const padding = {
+  // top&bottom left&right (invert Figma)
+  Large: css`
+    padding: ${({ theme }) => `${theme.Spacing[400]} ${theme.Spacing[500]}`};
+  `,
+  Medium: css`
+    padding: ${({ theme }) => `${theme.Spacing[300]} ${theme.Spacing[400]}`};
+  `,
+  Small: css`
+    padding: ${({ theme }) => `${theme.Spacing[150]} ${theme.Spacing[300]}`};
+  `,
+};
+const borderRadius = {
+  Large: css`
+    border-radius: ${({ theme }) => theme.Radius[400]};
+  `,
+  Medium: css`
+    border-radius: ${({ theme }) => theme.Radius[400]};
+  `,
+  Small: css`
+    border-radius: ${({ theme }) => theme.Radius[300]};
   `,
 };
 
-const variantStyles = {
-  primary: css`
-    background-color: ${({ theme }) => theme.Colors.Core.Brand.Primary};
-    color: ${({ theme }) => theme.Colors.Solid.White};
-    border: 1px solid ${({ theme }) => theme.Colors.Core.Brand.Primary};
-  `,
-  neutral: css`
-    background-color: ${({ theme }) => theme.Colors.Components.Fill.Secondary};
-    color: ${({ theme }) => theme.Colors.Content.Primary};
-    border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  `,
-  danger: css`
-    background-color: ${({ theme }) => theme.Colors.Core.Status.Negative};
-    color: ${({ theme }) => theme.Colors.Solid.White};
-    border: 1px solid ${({ theme }) => theme.Colors.Core.Status.Negative};
-  `,
-  ghost: css`
-    background-color: transparent;
-    color: ${({ theme }) => theme.Colors.Content.Primary};
-    border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  `,
+const backgroundColor = {
+  Grayscale: {
+    Primary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `,
+    Secondary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `
+  },
+  Accent: {
+    Primary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `,
+    Secondary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `
+  },
+  Negative: {
+    Primary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `,
+    Secondary: css`
+      background-color: ${({ theme }) => theme.Colors.Components.Fill.Primary};
+    `
+  }
 };
 
-const Root = styled.button<Required<Pick<UIButtonProps, "variant" | "size" | "fullWidth">>>`
-  width: ${({ fullWidth }) => (fullWidth ? "100%" : "auto")};
-  min-width: 112px;
-  border-radius: ${({ theme }) => theme.Radius[500]};
-
+const Root = styled.button<{
+  $variant: Required<ButtonVariant>;
+}>`
   display: inline-flex;
+  width: ${({ $variant }) => ($variant.stretchWidth ? "100%" : "auto")};
+  ${({ $variant }) => minMax[$variant.size]}
   align-items: center;
   justify-content: center;
-  gap: ${({ theme }) => theme.Spacing[100]};
+  ${({ $variant }) => gap[$variant.size]}
+  ${({ $variant }) => padding[$variant.size]}
+  overflow: hidden;
+  
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  ${({ $variant }) => borderRadius[$variant.size]}
+
+  ${({ $variant }) => backgroundColor[$variant.theme][$variant.style]}
+
 
   font-size: ${({ theme }) => theme.Font.Callout.size};
   line-height: ${({ theme }) => theme.Font.Callout.lineHeight};
   font-weight: ${({ theme }) => theme.Font.Callout.weight.strong};
 
   transition: background-color 140ms ease, border-color 140ms ease, opacity 140ms ease;
-
-  ${({ size }) => sizeStyles[size]}
-  ${({ variant }) => variantStyles[variant]}
 
   &:hover:not(:disabled) {
     filter: brightness(0.97);
@@ -78,30 +129,27 @@ const Root = styled.button<Required<Pick<UIButtonProps, "variant" | "size" | "fu
     filter: brightness(0.92);
   }
 
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
 
   ${mobile} {
-    width: ${({ fullWidth }) => (fullWidth ? "100%" : "auto")};
+    width: ${({ $variant }) => ($variant.stretchWidth ? "100%" : "auto")};
   }
 `;
 
 export function UIButton({
-  variant = "primary",
-  size = "large",
-  fullWidth = false,
-  leftIcon,
-  rightIcon,
+  variant,
+  leadingArea,
   children,
+  trailingArea,
   ...props
-}: UIButtonProps) {
+}: ButtonProps) {
   return (
-    <Root variant={variant} size={size} fullWidth={fullWidth} {...props}>
-      {leftIcon}
-      {children}
-      {rightIcon}
+    <Root 
+      $variant={{ size: "Large", theme: "Grayscale", style: "Primary", stretchWidth: false, ...variant }}
+      {...props}
+    >
+      {leadingArea}
+      <span>{children}</span>
+      {trailingArea}
     </Root>
   );
 }

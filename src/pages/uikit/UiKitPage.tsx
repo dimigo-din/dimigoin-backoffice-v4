@@ -78,9 +78,6 @@ export default function UiKitPage() {
         </Text>
         <Row>
           <UIButton>Primary</UIButton>
-          <UIButton variant="neutral">Neutral</UIButton>
-          <UIButton variant="danger">Danger</UIButton>
-          <UIButton variant="ghost">Ghost</UIButton>
         </Row>
 
         <Text variant="callout" weight="strong">
@@ -155,7 +152,7 @@ export default function UiKitPage() {
               onChange={setPicker}
               columns={2}
             />
-            <UIButton fullWidth>신청하기</UIButton>
+            <UIButton variant={{ stretchWidth: true }}>신청하기</UIButton>
           </div>
         </PhoneFrame>
       </Section>
