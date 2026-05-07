@@ -1,5 +1,5 @@
-import {getInstance} from "./client.ts";
-import { openDB, type DBSchema } from "idb";
+import { type DBSchema, openDB } from "idb";
+import { getInstance } from "./client.ts";
 
 const client = getInstance();
 
@@ -27,18 +27,32 @@ export async function ping(): Promise<"퐁"> {
 }
 
 export async function getRedirectUri(): Promise<string> {
-  return (await client.get("/auth/login/google?redirect_uri=" + location.protocol + "//" + location.host + "/login")).data;
+  return (
+    await client.get(
+      "/auth/login/google?redirect_uri=" + location.protocol + "//" + location.host + "/login",
+    )
+  ).data;
 }
 
-export async function passwordLogin(email: string, password: string): Promise<{
-  accessToken: string,
-  refreshToken: string
+export async function passwordLogin(
+  email: string,
+  password: string,
+): Promise<{
+  accessToken: string;
+  refreshToken: string;
 }> {
-  return (await client.post("/auth/login/password", {email, password})).data;
+  return (await client.post("/auth/login/password", { email, password })).data;
 }
 
-export async function googleLogin(code: string): Promise<{ accessToken: string, refreshToken: string }> {
-  return (await client.post("/auth/login/google/callback", {code, redirect_uri: location.protocol + "//" + location.host + "/login"})).data;
+export async function googleLogin(
+  code: string,
+): Promise<{ accessToken: string; refreshToken: string }> {
+  return (
+    await client.post("/auth/login/google/callback", {
+      code,
+      redirect_uri: location.protocol + "//" + location.host + "/login",
+    })
+  ).data;
 }
 
 export async function getPermission(): Promise<string[]> {
@@ -53,7 +67,9 @@ export async function logout(): Promise<void> {
   await client.get("/auth/logout");
 }
 
-export async function getPersonalInformation(email: string[]): Promise<(PersonalInformation | null)[]> {
+export async function getPersonalInformation(
+  email: string[],
+): Promise<(PersonalInformation | null)[]> {
   try {
     if (email.length === 0) return [];
     const db = await openDB<PersonalInfoDB>(PERSONAL_INFO_DB, 1, {

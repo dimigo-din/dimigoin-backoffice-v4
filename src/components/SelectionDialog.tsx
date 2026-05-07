@@ -32,8 +32,7 @@ const DialogBox = styled.div<{ $isClosing: boolean }>`
 
   background: transparent;   /* backdrop-filter 보이게 */
 
-  backdrop-filter: ${({ $isClosing }) =>
-    $isClosing ? "brightness(90%)" : "brightness(100%)"};
+  backdrop-filter: ${({ $isClosing }) => ($isClosing ? "brightness(90%)" : "brightness(100%)")};
 
   ${({ $isClosing }) => css`
     animation: ${$isClosing ? brighten : darken} 0.3s ease forwards;
@@ -47,7 +46,7 @@ const DialogPanel = styled.div<{ $isClosing: boolean }>`
   max-width: 960px;
   min-width: 520px;
   height: 100%;
-  background-color: ${({ theme }) => theme.Colors.Background.Tertiary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
   border-radius: 16px 0 0 16px;
 
   display: flex;
@@ -180,11 +179,7 @@ function SelectionDialog({
   if (!shouldRender) return null;
 
   const node = (
-    <DialogBox
-      $isClosing={isClosing}
-      onClick={handleBackdropClick}
-      aria-hidden={false}
-    >
+    <DialogBox $isClosing={isClosing} onClick={handleBackdropClick} aria-hidden={false}>
       <DialogPanel
         $isClosing={isClosing}
         role="dialog"
