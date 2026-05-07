@@ -7,9 +7,6 @@ import {
   UIControl,
   UIDivider,
   UIInputField,
-  UINavBar,
-  UIOptionPicker,
-  UISegmentedControl,
   UISelectField,
   UITextAreaField,
   UIToggleRow,
@@ -48,18 +45,7 @@ const Row = styled.div`
   align-items: center;
 `;
 
-const PhoneFrame = styled.div`
-  width: min(100%, 393px);
-  margin: 0 auto;
-  border: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
-  border-radius: 28px;
-  overflow: hidden;
-  background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
-`;
-
 export default function UiKitPage() {
-  const [segment, setSegment] = useState("stay");
-  const [picker, setPicker] = useState("hospital");
   const [agree, setAgree] = useState(false);
 
   return (
