@@ -25,7 +25,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
 
-    font-size: clamp(0.5rem, 1.5vh, 1rem);
+    font-size: 16px;
     font-family: Pretendard, sans-serif;
   }
   

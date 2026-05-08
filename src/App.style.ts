@@ -33,7 +33,7 @@ const AppStyle = createGlobalStyle`
     "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 
-    font-size: clamp(0.5rem, 1.5vh, 1rem);
+    font-size: 16px;
   }
 
   a {
