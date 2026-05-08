@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   gap: 32px;
   padding: 58px;
 
-  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
 
   ${mobile} {
     padding: 0;
