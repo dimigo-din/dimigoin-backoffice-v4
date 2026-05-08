@@ -103,8 +103,8 @@ const RightSpacer = styled.span`
 
 const SideBarHost = styled.div`
   height: 100%;
-  width: 268px;
-  flex: 0 0 268px;
+  width: 341px;
+  flex: 0 0 341px;
 
   ${mobile} {
     width: auto;
