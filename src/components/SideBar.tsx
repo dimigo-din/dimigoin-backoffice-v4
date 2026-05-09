@@ -135,6 +135,7 @@ const MenuSection = styled.section`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.Component.Spacing[300]};
+  padding: 0 16px;
 `;
 
 const SectionTitle = styled.div<{ $selected: boolean }>`
