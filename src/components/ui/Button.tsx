@@ -151,8 +151,8 @@ export function UIButton({
   return (
     <Root
       $variant={{
-        size: "Large",
-        theme: "Grayscale",
+        size: "Medium",
+        theme: "Accent",
         style: "Primary",
         stretchWidth: false,
         ...variant,
