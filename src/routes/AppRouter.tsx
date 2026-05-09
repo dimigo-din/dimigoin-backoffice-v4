@@ -7,6 +7,7 @@ const LoginPage = lazy(() => import("../pages/login/LoginPage.tsx"));
 const LoginPwPage = lazy(() => import("../pages/login/LoginPw.tsx"));
 const EmptyPage = lazy(() => import("../pages/EmptyPage.tsx"));
 const ApplyStayPage = lazy(() => import("../pages/applystay/ApplyStayPage.tsx"));
+const StayPage = lazy(() => import("../pages/stay/StayPage.tsx"));
 const ViewStaySeatPage = lazy(() => import("../pages/viewstayseat/ViewStaySeatPage.tsx"));
 const WakeupPage = lazy(() => import("../pages/wakeup/WakeupPage.tsx"));
 const FrigoPage = lazy(() => import("../pages/frigo/FrigoPage.tsx"));
@@ -24,6 +25,7 @@ const AppRouter = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/login/pw" element={<LoginPwPage />} />
+        <Route path="/stay" element={<StayPage />} />
         <Route path="/applystay" element={<ApplyStayPage />} />
         <Route path="/viewstayseat" element={<ViewStaySeatPage />} />
         <Route path="/wakeup" element={<WakeupPage />} />

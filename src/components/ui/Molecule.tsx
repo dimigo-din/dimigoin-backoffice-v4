@@ -8,6 +8,7 @@ interface UISegmentedControlProps {
   items: SegmentedItem[];
   value: string;
   onChange?: (value: string) => void;
+  style?: object;
 }
 
 const SegmentRoot = styled.div`
@@ -29,10 +30,10 @@ const SegmentItem = styled.button<{ $active: boolean }>`
   font-weight: ${({ theme }) => theme.Font.Callout.weight.strong};
 `;
 
-export function UISegmentedControl({ items, value, onChange }: UISegmentedControlProps) {
+export function UISegmentedControl({ items, value, onChange, style }: UISegmentedControlProps) {
   return (
     <SegmentRoot
-      style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))` }}
+      style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))`, ...style }}
     >
       {items.map((item) => (
         <SegmentItem
