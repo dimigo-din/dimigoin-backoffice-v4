@@ -1,36 +1,11 @@
-import { TZDate } from "@date-fns/tz";
-import { format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
-import { type PersonalInformation } from "../../api/auth.ts";
 import {
-  changeStaySeat,
-  createStayApply,
-  deleteStayApply,
-  getStay,
-  getStayApply,
   getStayList,
-  type Outing,
-  type Stay,
-  type StayApply,
   type StayListItem,
-  updateStayApply,
 } from "../../api/stay.ts";
-import { type User } from "../../api/user.ts";
-import CheckBox from "../../components/CheckBox.tsx";
-import Loading from "../../components/Loading.tsx";
-import SearchStudent from "../../components/SearchStudent.tsx";
-import { Text, UIButton, UIControl, UIInputField, UISegmentedControl, UISelectField } from "../../components/ui";
-import { useToast } from "../../providers/ToastProvider.tsx";
-import { Button, LightButton } from "../../styles/components/button.ts";
-import { Input } from "../../styles/components/input.ts";
-import { makeid } from "../../utils/makeid.ts";
-import { sha256 } from "../../utils/sha256.ts";
-import { ExportStayAppliesToExcel } from "../../utils/stay2excel.ts";
-import { stay2excel } from "../../utils/stay2format.ts";
-import { stay2pdf } from "../../utils/stay2pdf.ts";
-import { genTable, isInRange } from "../../utils/staySeatUtil.ts";
+import { Text, UIButton, UISegmentedControl } from "../../components/ui";
+import { Button } from "../../styles/components/button.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -175,6 +150,7 @@ function ApplyStayPage() {
   const [seatSegmentValue, setSeatSegmentValue] = useState<"1" | "2">("1");
 
   const updateScreen = async () => {
+    console.log(stayList);
     setStayList(await getStayList());
   }
   
