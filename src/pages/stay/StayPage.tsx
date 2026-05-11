@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled, { css } from "styled-components";
-import {
-  getStayList,
-  type StayListItem,
-} from "../../api/stay.ts";
+import { getStayList, type StayListItem } from "../../api/stay.ts";
 import { Text, UIButton, UISegmentedControl } from "../../components/ui";
+import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 
 const Wrapper = styled.div`
@@ -18,7 +16,7 @@ const Wrapper = styled.div`
   overflow-y: auto;
 `;
 
-const Section = styled.div<{ $width: string; }>`
+const Section = styled.div<{ $width: string }>`
   height: 100%;
   width: ${({ $width }) => $width};
   min-width: 0;
@@ -46,21 +44,21 @@ const fitContainerBackgroundColors = {
   `,
 };
 
-const FitContainer = styled.div<{ color: "Primary" | "Secondary"; padding?: string; }>`
+const FitContainer = styled.div<{ color: "Primary" | "Secondary"; padding?: string }>`
   height: fit-content;
   width: 100%;
 
   border-radius: 12px;
 
   ${({ color }) => fitContainerBackgroundColors[color]}
-  padding: ${({ theme, padding }) => padding ? padding : `${theme.Component.Spacing[300]} ${theme.Component.Spacing[550]}`};
+  padding: ${({ theme, padding }) => (padding ? padding : `${theme.Component.Spacing[300]} ${theme.Component.Spacing[550]}`)};
 
   display: flex;
   flex-direction: column;
   gap: 20px;
 `;
 
-const FillContainer = styled.div<{ padding?: string; }>`
+const FillContainer = styled.div<{ padding?: string }>`
   height: 100%;
   width: 100%;
 
@@ -69,12 +67,12 @@ const FillContainer = styled.div<{ padding?: string; }>`
   gap: 24px;
   overflow: scroll;
 
-  padding: ${({ theme, padding }) => padding ? padding : `${theme.Component.Spacing[550]} ${theme.Component.Spacing[550]}`};
+  padding: ${({ theme, padding }) => (padding ? padding : `${theme.Component.Spacing[550]} ${theme.Component.Spacing[550]}`)};
   border-radius: 12px;
 
   background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 `;
-  
+
 const HStack = styled.div`
   width: 100%;
   display: flex;
@@ -92,7 +90,7 @@ const segmentColors = {
   Red: css`
     background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
   `,
-}
+};
 
 const Segment = styled.div<{ color: "Green" | "Yellow" | "Red" }>`
   width: 80px;
@@ -107,7 +105,6 @@ const Segment = styled.div<{ color: "Green" | "Yellow" | "Red" }>`
 
   ${({ color }) => segmentColors[color]}
 `;
-
 
 // customs
 const StayApplyPeriodWrapper = styled.div`
@@ -137,26 +134,29 @@ const ScheduleButton = styled.div<{ $selected?: boolean }>`
   padding: 0 20px;
   border-radius: 12px;
 
-  background-color: ${({ theme, $selected }) => $selected ? theme.Colors.Components.Interaction.Focussed : theme.Colors.Components.Translucent.Interactive};
+  background-color: ${({ theme, $selected }) => ($selected ? theme.Colors.Components.Interaction.Focussed : theme.Colors.Components.Translucent.Interactive)};
 
   &:hover {
-    cursor: ${({ $selected }) => $selected ? "auto" : "pointer"};
+    cursor: ${({ $selected }) => ($selected ? "auto" : "pointer")};
   }
 `;
 
-
 function ApplyStayPage() {
+  const { showToast } = useToast();
   const [stayList, setStayList] = useState<StayListItem[] | null>(null);
   const [seatSegmentValue, setSeatSegmentValue] = useState<"1" | "2">("1");
 
-  const updateScreen = async () => {
-    console.log(stayList);
-    setStayList(await getStayList());
-  }
-  
+  const updateScreen = useCallback(async () => {
+    try {
+      var _stayList = setStayList(await getStayList());
+    } catch (e) {
+      showToast(e as string, "danger");
+    }
+  }, [showToast]);
+
   useEffect(() => {
     updateScreen();
-  }, []);
+  }, [updateScreen]);
 
   return (
     <Wrapper>
@@ -169,38 +169,52 @@ function ApplyStayPage() {
         </FitContainer>
         <FillContainer>
           <FitContainer color="Primary" padding="20px 28px">
-            <Text variant="body" weight="strong" as="span">신청기간</Text>
+            <Text variant="body" weight="strong" as="span">
+              신청기간
+            </Text>
             <StayApplyPeriodWrapper>
               <StayApplyPeriod>
                 <Text>1학년</Text>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>부터</Text>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>까지</Text>
                 </div>
               </StayApplyPeriod>
               <StayApplyPeriod>
                 <Text>2학년</Text>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>부터</Text>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>까지</Text>
                 </div>
               </StayApplyPeriod>
               <StayApplyPeriod>
                 <Text>3학년</Text>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>부터</Text>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>까지</Text>
                 </div>
               </StayApplyPeriod>
@@ -208,14 +222,20 @@ function ApplyStayPage() {
           </FitContainer>
           <FitContainer color="Primary" padding="20px 28px">
             <HStack>
-              <Text variant="body" weight="strong" as="span">잔류기간</Text>
+              <Text variant="body" weight="strong" as="span">
+                잔류기간
+              </Text>
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>부터</Text>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>2026.01.11. (목) 20:00</UIButton>
+                  <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
+                    2026.01.11. (목) 20:00
+                  </UIButton>
                   <Text>까지</Text>
                 </div>
               </div>
@@ -223,7 +243,9 @@ function ApplyStayPage() {
           </FitContainer>
           <FitContainer color="Primary" padding="20px 28px">
             <HStack>
-              <Text variant="body" weight="strong" as="span">열람실 좌석</Text>
+              <Text variant="body" weight="strong" as="span">
+                열람실 좌석
+              </Text>
               <UISegmentedControl
                 items={[
                   {
@@ -248,27 +270,38 @@ function ApplyStayPage() {
       <Section $width="40%">
         <FillContainer padding="0">
           <FillContainer>
-          <Text weight="strong">잔류 일정 목록</Text>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: "16px" }}>
-            <ScheduleButton $selected>
-              <Text weight="strong">주말잔류 (2026-01-10 ~ 2026-01-11)</Text>
-              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <Segment color="Yellow">신청중</Segment>
-                <Button style={{ width: "80px", height: "40px", padding: 0 }}>
-                  <Text weight="strong" style={{color: "#f4f4f5"}}>삭제</Text>
-                </Button>
-              </div>
-            </ScheduleButton>
-            <ScheduleButton>
-              <Text>주말잔류 (2026-01-10 ~ 2026-01-11)</Text>
-              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <Segment color="Red">신청전</Segment>
-                <Button style={{ width: "80px", height: "40px", padding: 0 }}>
-                  <Text weight="strong" style={{color: "#f4f4f5"}}>삭제</Text>
-                </Button>
-              </div>
-            </ScheduleButton>
-          </div>
+            <Text weight="strong">잔류 일정 목록</Text>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "stretch",
+                gap: "16px",
+              }}
+            >
+              <ScheduleButton $selected>
+                <Text weight="strong">주말잔류 (2026-01-10 ~ 2026-01-11)</Text>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <Segment color="Yellow">신청중</Segment>
+                  <Button style={{ width: "80px", height: "40px", padding: 0 }}>
+                    <Text weight="strong" style={{ color: "#f4f4f5" }}>
+                      삭제
+                    </Text>
+                  </Button>
+                </div>
+              </ScheduleButton>
+              <ScheduleButton>
+                <Text>주말잔류 (2026-01-10 ~ 2026-01-11)</Text>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <Segment color="Red">신청전</Segment>
+                  <Button style={{ width: "80px", height: "40px", padding: 0 }}>
+                    <Text weight="strong" style={{ color: "#f4f4f5" }}>
+                      삭제
+                    </Text>
+                  </Button>
+                </div>
+              </ScheduleButton>
+            </div>
           </FillContainer>
           <UIButton variant={{ size: "Large" }} style={{ margin: "24px" }}>
             잔류 일정 추가하기
