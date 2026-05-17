@@ -52,7 +52,7 @@ export type Stay = {
   stay_from: string;
   stay_to: string;
   outing_day: string[];
-  stay_apply_period: {
+  stay_apply_period_stay: {
     id: string;
     grade: 1 | 2 | 3;
     apply_start: string;
