@@ -4,45 +4,7 @@ import { deleteStay, getStay, getStayList, type Stay, type StayListItem } from "
 import { Text, UIButton } from "../../components/ui";
 import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
-import { Wrapper, Section } from "../../layouts/MainLayout.tsx";
-
-const fitContainerBackgroundColors = {
-  Primary: css`
-    background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
-  `,
-  Secondary: css`
-    background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
-  `,
-};
-
-const FitContainer = styled.div<{ color: "Primary" | "Secondary"; padding?: string }>`
-  height: fit-content;
-  width: 100%;
-
-  border-radius: 12px;
-
-  ${({ color }) => fitContainerBackgroundColors[color]}
-  padding: ${({ theme, padding }) => (padding ? padding : `${theme.Component.Spacing[300]} ${theme.Component.Spacing[550]}`)};
-
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const FillContainer = styled.div<{ padding?: string }>`
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  overflow: scroll;
-
-  padding: ${({ theme, padding }) => (padding ? padding : `${theme.Component.Spacing[550]} ${theme.Component.Spacing[550]}`)};
-  border-radius: 12px;
-
-  background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
-`;
+import { Wrapper, Section, FitContainer, FillContainer } from "../../layouts/MainLayout.tsx";
 
 const HStack = styled.div`
   width: 100%;
