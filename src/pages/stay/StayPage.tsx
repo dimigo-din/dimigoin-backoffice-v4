@@ -4,36 +4,7 @@ import { deleteStay, getStay, getStayList, type Stay, type StayListItem } from "
 import { Text, UIButton } from "../../components/ui";
 import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
-
-const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-
-  gap: 24px;
-  padding: 24px;
-  overflow-y: auto;
-`;
-
-const Section = styled.div<{ $width: string }>`
-  height: 100%;
-  width: ${({ $width }) => $width};
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 24px;
-
-  overflow-y: auto;
-
-  @media (max-width: 900px) {
-    width: 100%;
-    height: auto;
-    min-height: 340px;
-  }
-`;
+import { Wrapper, Section } from "../../layouts/MainLayout.tsx";
 
 const fitContainerBackgroundColors = {
   Primary: css`
