@@ -5,6 +5,8 @@ import { Text, UIButton } from "../../components/ui";
 import { useToast } from "../../providers/ToastProvider.tsx";
 import { Wrapper, Section, FitContainer, FillContainer, Segment } from "../../layouts/MainLayout.tsx";
 import { StayList } from "./StayList.tsx";
+import { getErrorMessage } from "../../utils/error.ts";
+import { getStayStatus, formatDateRange, formatDateTime } from "../../utils/stayStatus.ts";
 
 const HStack = styled.div`
   width: 100%;
@@ -43,66 +45,6 @@ const StayApplyPeriod = styled.div`
     flex-direction: column;
   }
 `;
-
-type StayStatus = {
-  label: string;
-  color: "Green" | "Yellow" | "Red";
-};
-
-const getErrorMessage = (e: unknown, fallback: string) => {
-  const error = e as { response?: { data?: { error?: { message?: string } | string } } };
-  const dataError = error.response?.data?.error;
-
-  if (typeof dataError === "string") return dataError;
-  return dataError?.message ?? fallback;
-};
-
-const formatDateTime = (value?: string) => {
-  if (!value) return "-";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-
-  return new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(date);
-};
-
-const formatDateRange = (from?: string, to?: string) => {
-  if (!from || !to) return "-";
-
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) return "-";
-
-  const dateFormat = new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-
-  return `${dateFormat.format(fromDate)} ~ ${dateFormat.format(toDate)}`;
-};
-
-const getStayStatus = (stay?: Stay | null): StayStatus => {
-  const applyPeriod = stay?.stay_apply_period_stay;
-
-  if (!applyPeriod || applyPeriod.length === 0) return { label: "불러오는 중", color: "Yellow" };
-
-  const now = new Date();
-  const earliest = new Date(Math.min(...applyPeriod.map((p) => new Date(p.apply_start).getTime())));
-  const latest = new Date(Math.max(...applyPeriod.map((p) => new Date(p.apply_end).getTime())));
-
-  if (now < earliest) return { label: "신청전", color: "Red" };
-  if (now <= latest) return { label: "신청중", color: "Yellow" };
-  return { label: "마감", color: "Green" };
-};
 
 function StayPage() {
   const { showToast } = useToast();
