@@ -1,42 +1,16 @@
 import { useEffect, useState } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { deleteStay, getStay, getStayList, type Stay, type StayListItem } from "../../api/stay.ts";
 import { Text, UIButton } from "../../components/ui";
 import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
-import { Wrapper, Section, FitContainer, FillContainer } from "../../layouts/MainLayout.tsx";
+import { Wrapper, Section, FitContainer, FillContainer, Segment } from "../../layouts/MainLayout.tsx";
 
 const HStack = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-`;
-
-const segmentColors = {
-  Green: css`
-    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Green};
-  `,
-  Yellow: css`
-    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Yellow};
-  `,
-  Red: css`
-    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
-  `,
-};
-
-const Segment = styled.div<{ color: "Green" | "Yellow" | "Red" }>`
-  width: 80px;
-  height: 40px;
-
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: ${({ theme }) => theme.Component.Radius[300]};
-  font-weight: 500;
-
-  ${({ color }) => segmentColors[color]}
 `;
 
 // customs

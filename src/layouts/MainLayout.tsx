@@ -67,3 +67,29 @@ export const FillContainer = styled.div<{ padding?: string }>`
 
   background-color: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
 `;
+
+const segmentColors = {
+  Green: css`
+    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Green};
+  `,
+  Yellow: css`
+    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Yellow};
+  `,
+  Red: css`
+    background-color: ${({ theme }) => theme.Colors.Solid.Translucent.Red};
+  `,
+};
+
+export const Segment = styled.div<{ color: "Green" | "Yellow" | "Red" }>`
+  width: 80px;
+  height: 40px;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: ${({ theme }) => theme.Component.Radius[300]};
+  font-weight: 500;
+
+  ${({ color }) => segmentColors[color]}
+`;
