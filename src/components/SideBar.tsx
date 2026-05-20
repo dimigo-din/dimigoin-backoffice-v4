@@ -247,6 +247,12 @@ function getSections(): MenuSection[] {
       icon: ArtistIcon,
       items: [{ key: "wakeup", label: "기상송 열람 및 관리" }],
     },
+    {
+      title: "시설 관리",
+      key: "facility-section",
+      icon: SchoolIcon,
+      items: [{ key: "facility", label: "시설 제보 관리" }],
+    },
   ];
 
   const sections_dienen: MenuSection[] = [

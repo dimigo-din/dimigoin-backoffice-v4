@@ -18,6 +18,7 @@ const UiKitPage = lazy(() => import("../pages/uikit/UiKitPage.tsx"));
 const DienenTimePage = lazy(() => import("../pages/dienen/DienenTimePage.tsx"));
 const DienenManageTimePage = lazy(() => import("../pages/dienen/DienenManageTimePage.tsx"));
 const DienenDelayTimePage = lazy(() => import("../pages/dienen/DienenDelayTimePage.tsx"));
+const FacilityPage = lazy(() => import("../pages/facility/FacilityPage.tsx"));
 
 const AppRouter = () => {
   return (
@@ -36,6 +37,7 @@ const AppRouter = () => {
         <Route path="/dienen_time" element={<DienenTimePage />} />
         <Route path="/dienen_edittime" element={<DienenManageTimePage />} />
         <Route path="/dienen_delaytime" element={<DienenDelayTimePage />} />
+        <Route path="/facility" element={<FacilityPage />} />
         <Route path="/studentinfo" element={<StudentInfoPage />} />
         {import.meta.env.DEV && <Route path="/uikit" element={<UiKitPage />} />}
         <Route path="*" element={<EmptyPage />} />
