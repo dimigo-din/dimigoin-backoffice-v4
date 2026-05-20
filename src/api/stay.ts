@@ -246,3 +246,12 @@ export async function setMealCancel(
 export async function changeStaySeat(targets: string[], to: string): Promise<StayApply> {
   return (await client.post("/manage/stay/change_seat", { targets, to })).data;
 }
+
+export type SeatLayout = {
+  left_columns: { name: string; max_row: number }[];
+  right_columns: { name: string; max_row: number }[];
+};
+
+export async function getSeatLayout(): Promise<SeatLayout> {
+  return (await client.get("/student/stay/seat-layout")).data;
+}

@@ -6,6 +6,8 @@ import {
   getStay,
   getStayApply,
   getStayList,
+  getSeatLayout,
+  type SeatLayout,
   type Stay,
   type StayApply,
   type StayListItem,
@@ -14,7 +16,6 @@ import Loading from "../../components/Loading.tsx";
 import { useToast } from "../../providers/ToastProvider.tsx";
 import { Button } from "../../styles/components/button.ts";
 import { Select } from "../../styles/components/select.ts";
-import { genTable } from "../../utils/staySeatUtil.ts";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -153,6 +154,7 @@ function ViewStaySeatPage() {
   const [currentStayIndex, setCurrentStayIndex] = useState<number>(0);
   const [currentStay, setCurrentStay] = useState<Stay | null>(null);
   const [stayApplies, setStayApplies] = useState<StayApply[] | null>(null);
+  const [seatLayout, setSeatLayout] = useState<SeatLayout | null>(null);
 
   const updateScreen = async () => {
     getStayList()
@@ -268,10 +270,15 @@ function ViewStaySeatPage() {
   };
 
   useEffect(() => {
-    updateScreen();
+    getSeatLayout()
+      .then(setSeatLayout)
+      .catch((e) => {
+        showToast(e.response?.data?.error?.message || e.response?.data?.error || "좌석 레이아웃을 불러오지 못했습니다.", "danger");
+      });
+  }, []);
 
-    console.log(currentStay);
-    console.log(stayApplies);
+  useEffect(() => {
+    updateScreen();
   }, [currentStayIndex]);
 
   return (
@@ -279,46 +286,60 @@ function ViewStaySeatPage() {
       <StayApplyContainer>
         {currentStay && (
           <SeatBox ref={seatBoxRef}>
-            {(() => {
-              const table = genTable();
-              const groupedRows: string[][][] = [];
-              for (let i = 0; i < table.length; i += 2) {
-                groupedRows.push(table.slice(i, i + 2));
-              }
-              return groupedRows.map((group, idx) => (
-                <div key={idx} style={{ marginBottom: "16px" }}>
-                  {group.map((row, rowIdx) => (
-                    <SeatRow key={rowIdx}>
-                      {row.map((seat, seatIdx) => {
-                        const taken = stayApplies?.find((sapply) => sapply.stay_seat === seat);
-                        return (
-                          <div
-                            id={seat}
-                            className={taken ? `taken-${taken.user.grade}` : "notTaken"}
-                            key={seat}
-                            style={{
-                              marginRight:
-                                (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1
-                                  ? "20px"
-                                  : undefined,
-                            }}
-                          >
-                            {seat}
-                            <br />
-                            {taken
-                              ? `${taken.user.grade}${taken.user.class}${("0" + taken.user.number).slice(-2)}`
-                              : ""}
-                            <br />
-                            {taken ? `${taken.user.name.replace(/[0-9]/g, "")}` : ""}
-                            <br />
-                          </div>
-                        );
-                      })}
-                    </SeatRow>
-                  ))}
-                </div>
-              ));
-            })()}
+            {seatLayout ? (() => {
+              const renderSection = (columns: { name: string; max_row: number }[]) => {
+                const grouped: { name: string; max_row: number }[][] = [];
+                for (let i = 0; i < columns.length; i += 2) {
+                  grouped.push(columns.slice(i, i + 2));
+                }
+                return grouped.map((group, idx) => (
+                  <div key={idx} style={{ marginBottom: "16px" }}>
+                    {group.map((col) => {
+                      const row = Array.from(
+                        { length: col.max_row },
+                        (_, i) => `${col.name}${i + 1}`,
+                      );
+                      return (
+                        <SeatRow key={col.name}>
+                          {row.map((seat, seatIdx) => {
+                            const taken = stayApplies?.find((sapply) => sapply.stay_seat === seat);
+                            return (
+                              <div
+                                id={seat}
+                                className={taken ? `taken-${taken.user.grade}` : "notTaken"}
+                                key={seat}
+                                style={{
+                                  marginRight:
+                                    (seatIdx + 1) % 9 === 0 && seatIdx !== row.length - 1
+                                      ? "20px"
+                                      : undefined,
+                                }}
+                              >
+                                {seat}
+                                <br />
+                                {taken
+                                  ? `${taken.user.grade}${taken.user.class}${("0" + taken.user.number).slice(-2)}`
+                                  : ""}
+                                <br />
+                                {taken ? `${taken.user.name.replace(/[0-9]/g, "")}` : ""}
+                                <br />
+                              </div>
+                            );
+                          })}
+                        </SeatRow>
+                      );
+                    })}
+                  </div>
+                ));
+              };
+              return (
+                <>
+                  {renderSection(seatLayout.left_columns)}
+                  <div style={{ height: "1px", background: "currentColor", opacity: 0.1, margin: "8px 0 16px" }} />
+                  {renderSection(seatLayout.right_columns)}
+                </>
+              );
+            })() : <div style={{ padding: "16px", textAlign: "center" }}>좌석 정보를 불러오는 중...</div>}
           </SeatBox>
         )}
       </StayApplyContainer>
