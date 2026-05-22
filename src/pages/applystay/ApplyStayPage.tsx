@@ -1177,7 +1177,9 @@ function ApplyStayPage() {
                       <>
                         {renderSection(seatLayout.left_columns)}
                         <div style={{ height: "1px", background: "currentColor", opacity: 0.1, margin: "8px 0 16px" }} />
-                        {renderSection(seatLayout.right_columns)}
+                        <div style={{ paddingLeft: "calc(9 * (4.5dvw + 8px) + 20px)" }}>
+                          {renderSection(seatLayout.right_columns)}
+                        </div>
                       </>
                     );
                   })() : <div style={{ padding: "16px", textAlign: "center" }}>좌석 정보를 불러오는 중...</div>}
