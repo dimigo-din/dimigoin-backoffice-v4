@@ -106,7 +106,14 @@ function generateHtml(apply: StayApply[], stay: Stay, opt: { masking?: boolean }
       ? format(new Date(d), "MM-dd(eee)", { locale: ko })
       : format(new Date(), "yyyy년 MM월 dd일 eee", { locale: ko });
 
-  data["DATE"] = `${formatDate(stay.stay_from)} ~ ${formatDate(stay.stay_to)} ${stay.name} 현황`;
+  const from = formatDate(stay.stay_from);
+  const to = formatDate(stay.stay_to);
+  if (from === to) {
+    data["DATE"] = `${from} ${stay.name} 현황`;
+  } else {
+    data["DATE"] = `${from} ~ ${to} ${stay.name} 현황`;
+  }
+
   data["TODAY"] = format(new Date(), "yyyy. MM. dd. 기준");
   for (let grade = 1; grade <= 6; grade++) {
     for (let uclass = 1; uclass <= 6; uclass++) {
