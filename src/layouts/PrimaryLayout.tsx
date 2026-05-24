@@ -1,8 +1,9 @@
-import styled from "styled-components";
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useState } from "react";
+import styled from "styled-components";
 import SideBar from "../components/SideBar.tsx";
-import {MobileNotificationProvider} from "../providers/MobileNotifiCationProvider.tsx";
+import { ToastProvider } from "../providers/ToastProvider.tsx";
+import { mobile } from "../styles/media.ts";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -14,9 +15,9 @@ const Wrapper = styled.div`
   gap: 32px;
   padding: 58px;
 
-  background-color: ${({theme}) => theme.Colors.Background.Secondary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Tertiary};
 
-  @media (max-width: 768px) {
+  ${mobile} {
     padding: 0;
     gap: 0;
     justify-content: flex-start;
@@ -29,14 +30,14 @@ const ContentWrapper = styled.div`
   flex: 1;
   min-width: 0;
 
-  background-color: ${({theme}) => theme.Colors.Background.Primary};
+  background-color: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   border-radius: 12px;
 
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     width: 100dvw;
     height: 100dvh;
     border-radius: 0;
@@ -51,48 +52,48 @@ const MainContent = styled.main`
 
 const TopBar = styled.div`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: flex;
     position: relative;
     align-items: center;
     height: 56px;
     padding: 0 16px;
-    border-bottom: 1px solid ${({theme}) => theme.Colors.Line.Outline};
-    background: ${({theme}) => theme.Colors.Background.Primary};
+    border-bottom: 1px solid ${({ theme }) => theme.Colors.Line.Outline};
+    background: ${({ theme }) => theme.Colors.Background.Standard.Primary};
   }
 `;
 
 const HamburgerButton = styled.button`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    background: ${({theme}) => theme.Colors.Background.Secondary};
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    background: ${({ theme }) => theme.Colors.Background.Standard.Secondary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     z-index: 1;
   }
 `;
 
 const TopBarTitle = styled.span`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: block;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     font-weight: 600;
-    color: ${({theme}) => theme.Colors.Content.Primary};
+    color: ${({ theme }) => theme.Colors.Content.Standard.Primary};
     pointer-events: none;
   }
 `;
 
 const RightSpacer = styled.span`
   display: none;
-  @media (max-width: 768px) {
+  ${mobile} {
     display: inline-flex;
     width: 40px;
     height: 40px;
@@ -102,37 +103,41 @@ const RightSpacer = styled.span`
 
 const SideBarHost = styled.div`
   height: 100%;
-  width: 268px;
-  flex: 0 0 268px;
+  width: 341px;
+  flex: 0 0 341px;
 
-  @media (max-width: 768px) {
+  ${mobile} {
     width: auto;
     flex: 0 0 auto;
   }
 `;
 
 const Backdrop = styled.div<{ $visible: boolean }>`
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  opacity: ${({$visible}) => ($visible ? 1 : 0)};
-  pointer-events: ${({$visible}) => ($visible ? "auto" : "none")};
-  transition: opacity 200ms ease;
-  z-index: 8; /* below sidebar */
-
-  @media (min-width: 769px) {
-    display: none;
+  display: none;
+  ${mobile} {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+    pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
+    transition: opacity 200ms ease;
+    z-index: 8;
   }
 `;
 
-function PrimaryLayout({ children } : { children: ReactNode }) {
+function PrimaryLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <Wrapper>
-      <MobileNotificationProvider>
+      <ToastProvider>
         <SideBarHost>
-          <SideBar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} onNavigate={() => setMobileOpen(false)} />
+          <SideBar
+            mobileOpen={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            onNavigate={() => setMobileOpen(false)}
+          />
         </SideBarHost>
 
         <Backdrop $visible={mobileOpen} onClick={() => setMobileOpen(false)} />
@@ -145,11 +150,9 @@ function PrimaryLayout({ children } : { children: ReactNode }) {
             <TopBarTitle>디미고인</TopBarTitle>
             <RightSpacer aria-hidden="true" />
           </TopBar>
-          <MainContent>
-            {children}
-          </MainContent>
+          <MainContent>{children}</MainContent>
         </ContentWrapper>
-      </MobileNotificationProvider>
+      </ToastProvider>
     </Wrapper>
   );
 }

@@ -1,10 +1,10 @@
-import {createGlobalStyle} from "styled-components";
+import { createGlobalStyle } from "styled-components";
 
-const AppStyle = createGlobalStyle`
+const AppStyle = createGlobalStyle<{ $colorScheme: "light" | "dark" }>`
   @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
   :root {
-    color-scheme: light !important;
+    color-scheme: ${({ $colorScheme }) => $colorScheme};
   }
   *, *::before, *::after {
     box-sizing: border-box;
@@ -27,13 +27,13 @@ const AppStyle = createGlobalStyle`
   html, body {
     margin: 0;
     padding: 0;
-    color-scheme: light !important;
+    color-scheme: ${({ $colorScheme }) => $colorScheme};
     font-family: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
     "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 
-    font-size: clamp(0.5rem, 1.5vh, 1rem);
+    font-size: 16px;
   }
 
   a {

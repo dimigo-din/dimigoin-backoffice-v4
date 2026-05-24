@@ -1,4 +1,4 @@
-import {getInstance} from "./client.ts";
+import { getInstance } from "./client.ts";
 
 const client = getInstance();
 

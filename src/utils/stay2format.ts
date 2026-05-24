@@ -1,9 +1,9 @@
 // utils/stay2excel.ts
 "use client";
 
-import XLSX from "xlsx-js-style";
 import JSZip from "jszip";
-import type { StayApply, Stay } from "../api/stay.ts";
+import XLSX from "xlsx-js-style";
+import type { Stay, StayApply } from "../api/stay.ts";
 
 // ===== 유틸: 날짜 처리 (Intl, ko-KR) =====
 function parseDate(input?: string): Date {
@@ -56,7 +56,7 @@ const header: XLSX.CellStyle = {
 function rangeEach(
   ws: XLSX.WorkSheet,
   ref: string,
-  fn: (addr: string, cell: XLSX.CellObject) => void
+  fn: (addr: string, cell: XLSX.CellObject) => void,
 ) {
   const r = XLSX.utils.decode_range(ref);
   for (let R = r.s.r; R <= r.e.r; R++) {
@@ -87,7 +87,7 @@ async function forceFitToOnePage(xlsxArray: ArrayBuffer): Promise<ArrayBuffer> {
   const relsXml = await zip.file("xl/_rels/workbook.xml.rels")!.async("string");
   const relsDoc = new DOMParser().parseFromString(relsXml, "application/xml");
   const rels = Array.from(relsDoc.getElementsByTagNameNS(PKG_NS, "Relationship"));
-  const target = rels.find(r => r.getAttribute("Id") === sheetRelId)?.getAttribute("Target");
+  const target = rels.find((r) => r.getAttribute("Id") === sheetRelId)?.getAttribute("Target");
   if (!target) throw new Error("Cannot resolve sheet target from rels");
   // target 예: "worksheets/sheet1.xml"
   const sheetPath = `xl/${target.replace(/^\/?xl\//, "")}`;
@@ -138,22 +138,19 @@ async function forceFitToOnePage(xlsxArray: ArrayBuffer): Promise<ArrayBuffer> {
   return await zip.generateAsync({ type: "arraybuffer" });
 }
 
-export async function stay2excel(
-  apply: StayApply[],
-  stay: Stay,
-  opt: { masking?: boolean; } = {}
-) {
+export async function stay2excel(apply: StayApply[], stay: Stay, opt: { masking?: boolean } = {}) {
   const wb = XLSX.utils.book_new();
 
   // 44행 x 9열 (A..I)
-  const rows = 44, cols = 9;
+  const rows = 44,
+    cols = 9;
   const aoa: (string | number)[][] = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => "")
+    Array.from({ length: cols }, () => ""),
   );
 
   // 상단
   aoa[0][0] = "잔류 학생 명단 (DIMIGOIN.IO)"; // A1
-  
+
   // masking에 따른 헤더 구성
   if (!opt.masking) {
     // 내부용: 결재란 표시
@@ -182,12 +179,12 @@ export async function stay2excel(
     { grade: 2, startRow: 18, subtotalRow: 30 },
     { grade: 3, startRow: 31, subtotalRow: 43 },
   ];
-  const mask = opt.masking 
+  const mask = opt.masking
     ? (name: string) => {
         if (name.length >= 3) {
-          return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+          return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
         } else if (name.length === 2) {
-          return name[0] + '*';
+          return name[0] + "*";
         } else {
           return name;
         }
@@ -236,7 +233,7 @@ export async function stay2excel(
     allMaleSum += maleSum;
     allFemaleSum += femaleSum;
   }
-  aoa[43][0] = '총원';
+  aoa[43][0] = "총원";
   aoa[43][3] = `${allMaleSum + allFemaleSum}명`;
   aoa[43][4] = `(남${allMaleSum}명 + 여${allFemaleSum}명)`;
 
@@ -246,8 +243,15 @@ export async function stay2excel(
 
   // 열/행 크기
   ws["!cols"] = [
-    { wch: 6 }, { wch: 6 }, { wch: 6 }, { wch: 6 },
-    { wch: 36 }, { wch: 4 }, { wch: 10 }, { wch: 10 }, { wch: 10 },
+    { wch: 6 },
+    { wch: 6 },
+    { wch: 6 },
+    { wch: 6 },
+    { wch: 36 },
+    { wch: 4 },
+    { wch: 10 },
+    { wch: 10 },
+    { wch: 10 },
   ];
   ws["!rows"] = [];
   ws["!rows"][0] = { hpt: 18 };
@@ -259,15 +263,17 @@ export async function stay2excel(
   const baseMerges = [
     { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }, // A2:E2 (날짜)
     // 본문 E:H 병합(각 줄 & 소계 & 총원)
-    ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42, 43]
-      .map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
+    ...[
+      4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+      29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+    ].map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
     // C, B 짝줄 병합(반)
-    ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-    ...[17,19,21,23,25,27].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-    ...[30,32,34,36,38,40].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-    ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
-    ...[17,19,21,23,25,27].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
-    ...[30,32,34,36,38,40].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+    ...[4, 6, 8, 10, 12, 14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+    ...[17, 19, 21, 23, 25, 27].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+    ...[30, 32, 34, 36, 38, 40].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+    ...[4, 6, 8, 10, 12, 14].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+    ...[17, 19, 21, 23, 25, 27].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+    ...[30, 32, 34, 36, 38, 40].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
     // 학년(A열) 병합
     { s: { r: 4, c: 0 }, e: { r: 16, c: 0 } },
     { s: { r: 17, c: 0 }, e: { r: 29, c: 0 } },
@@ -287,15 +293,17 @@ export async function stay2excel(
       { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } }, // A2:I2 (날짜)
       { s: { r: 3, c: 4 }, e: { r: 3, c: 8 } }, // E4:I4 (잔류자 목록 헤더)
       // 기존 baseMerges에서 A2:E2 제외하고 추가
-      ...[4,5,6,7,8,9,10,11,12,13,14,15,16, 17,18,19,20,21,22,23,24,25,26,27,28,29, 30,31,32,33,34,35,36,37,38,39,40,41,42, 43]
-        .map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
+      ...[
+        4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+        28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+      ].map((r) => ({ s: { r, c: 4 }, e: { r, c: 7 } })),
       // C, B 짝줄 병합(반)
-      ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-      ...[17,19,21,23,25,27].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-      ...[30,32,34,36,38,40].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
-      ...[4,6,8,10,12,14].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
-      ...[17,19,21,23,25,27].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
-      ...[30,32,34,36,38,40].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+      ...[4, 6, 8, 10, 12, 14].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+      ...[17, 19, 21, 23, 25, 27].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+      ...[30, 32, 34, 36, 38, 40].map((top) => ({ s: { r: top, c: 2 }, e: { r: top + 1, c: 2 } })),
+      ...[4, 6, 8, 10, 12, 14].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+      ...[17, 19, 21, 23, 25, 27].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
+      ...[30, 32, 34, 36, 38, 40].map((top) => ({ s: { r: top, c: 1 }, e: { r: top + 1, c: 1 } })),
       // 학년(A열) 병합
       { s: { r: 4, c: 0 }, e: { r: 16, c: 0 } },
       { s: { r: 17, c: 0 }, e: { r: 29, c: 0 } },
@@ -340,12 +348,12 @@ export async function stay2excel(
   if (ws["A2"]) ws["A2"].s = { ...title };
 
   // 4) 3행(빈 줄) 테두리 제거(선택)
-  ["A3","B3","C3","D3","E3","F3","G3","H3","I3"].forEach((a) => {
+  ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3", "I3"].forEach((a) => {
     if (ws[a]) ws[a].s = { ...borderNone } as any;
   });
 
   // 5) 헤더(4행) - masking 여부에 관계없이 데이터가 있는 셀만 헤더 스타일 적용
-  ["A4","B4","C4","D4","E4","I4"].forEach((a) => {
+  ["A4", "B4", "C4", "D4", "E4", "I4"].forEach((a) => {
     if (ws[a]) ws[a].s = { ...header };
   });
 
@@ -364,11 +372,13 @@ export async function stay2excel(
   });
 
   // 8) 학생명 칸(E열) — 데이터 줄만 왼쪽 정렬
-  ([
-    [5, 16], // 1학년
-    [18, 29], // 2학년
-    [31, 42], // 3학년
-  ] as Array<[number, number]>).forEach(([start, end]) => {
+  (
+    [
+      [5, 16], // 1학년
+      [18, 29], // 2학년
+      [31, 42], // 3학년
+    ] as Array<[number, number]>
+  ).forEach(([start, end]) => {
     for (let r = start; r <= end; r++) {
       const addr = `E${r}`;
       if (!ws[addr]) ws[addr] = { t: "s", v: "" } as any;
@@ -389,7 +399,12 @@ export async function stay2excel(
 
   // 인쇄 여백
   ws["!margins"] = {
-    left: 0.5, right: 0.5, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3,
+    left: 0.5,
+    right: 0.5,
+    top: 0.75,
+    bottom: 0.75,
+    header: 0.3,
+    footer: 0.3,
   };
 
   XLSX.utils.book_append_sheet(wb, ws, "잔류 명단");

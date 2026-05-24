@@ -1,19 +1,19 @@
 import styled, { css } from "styled-components";
 
-type DividerSize = "large" | "medium" | "small";
+type DividerSize = "Large" | "Medium" | "Small";
 
 interface UIDividerProps {
   size?: DividerSize;
 }
 
 const sizeMap = {
-  large: css`
+  Large: css`
     height: 8px;
   `,
-  medium: css`
+  Medium: css`
     height: 4px;
   `,
-  small: css`
+  Small: css`
     height: 1px;
   `,
 };
@@ -26,6 +26,6 @@ const Root = styled.hr<{ $size: DividerSize }>`
   ${({ $size }) => sizeMap[$size]}
 `;
 
-export function UIDivider({ size = "small" }: UIDividerProps) {
+export function UIDivider({ size = "Small" }: UIDividerProps) {
   return <Root $size={size} />;
 }
