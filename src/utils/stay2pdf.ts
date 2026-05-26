@@ -132,13 +132,13 @@ function generateHtml(apply: StayApply[], stay: Stay, opt: { masking?: boolean }
         .map((a) => (opt.masking ? maskName(a.user.name) : a.user.name));
 
       data[`${grade}_${uclass}_MALE`] = maleStudents.reduce((acc, name, index) => {
-        if (index > 0 && index % 12 === 0) acc += "<br>";
-        return acc + (index % 12 === 0 ? "" : "&nbsp;&nbsp;") + name;
+        if (index > 0 && index % 10 === 0) acc += "<br>";
+        return acc + (index % 10 === 0 ? "" : "&nbsp;&nbsp;") + name;
       }, "");
 
       data[`${grade}_${uclass}_FEMALE`] = femaleStudents.reduce((acc, name, index) => {
-        if (index > 0 && index % 12 === 0) acc += "<br>";
-        return acc + (index % 12 === 0 ? "" : "&nbsp;&nbsp;") + name;
+        if (index > 0 && index % 10 === 0) acc += "<br>";
+        return acc + (index % 10 === 0 ? "" : "&nbsp;&nbsp;") + name;
       }, "");
     }
   }
