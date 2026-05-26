@@ -51,3 +51,17 @@ export const formatDateTime = (value?: string) => {
     hour12: false,
   }).format(date);
 };
+
+export const formatDate = (value?: string) => {
+  if (!value) return "-";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(date);
+};

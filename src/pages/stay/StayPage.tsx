@@ -6,7 +6,7 @@ import { useToast } from "../../providers/ToastProvider.tsx";
 import { Wrapper, Section, FitContainer, FillContainer, Segment } from "../../layouts/MainLayout.tsx";
 import { StayList } from "./StayList.tsx";
 import { getErrorMessage } from "../../utils/error.ts";
-import { getStayStatus, formatDateRange, formatDateTime } from "../../utils/stayStatus.ts";
+import { getStayStatus, formatDateRange, formatDateTime, formatDate } from "../../utils/stayStatus.ts";
 
 const HStack = styled.div`
   width: 100%;
@@ -129,13 +129,13 @@ function StayPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
-                      {formatDateTime(currentStay.stay_from)}
+                      {formatDate(currentStay.stay_from)}
                     </UIButton>
                     <Text>부터</Text>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <UIButton variant={{ theme: "Grayscale", style: "Secondary" }}>
-                      {formatDateTime(currentStay.stay_to)}
+                      {formatDate(currentStay.stay_to)}
                     </UIButton>
                     <Text>까지</Text>
                   </div>
